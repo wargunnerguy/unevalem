@@ -1,0 +1,14 @@
+[
+  {
+    "key": "calculatorCompletions",
+    "value": "Üle 1 200",
+    "displayText": "inimest on leidnud oma unevalemi",
+    "active": true
+  },
+  {
+    "key": "articlesRead",
+    "value": "4 800+",
+    "displayText": "artiklilugemisel",
+    "active": false
+  }
+]

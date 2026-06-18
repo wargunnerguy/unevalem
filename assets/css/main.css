@@ -1,0 +1,92 @@
+:root {
+  --color-midnight:  #0D1B2A;
+  --color-dusk:      #1B2D45;
+  --color-lavender:  #B8A9C9;
+  --color-moonlight: #F0EDF5;
+  --color-foam:      #FFFFFF;
+  --color-gold:      #C9A96E;
+  --color-muted:     #7B8794;
+  --color-success:   #4CAF7D;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-moonlight);
+  color: var(--color-midnight);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'DM Serif Display', serif;
+}
+
+/* Calculator slide transitions */
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(32px);
+}
+
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-32px);
+}
+
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-32px);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(32px);
+}
+
+/* Toast slide-up transition */
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.35s ease;
+}
+
+.toast-enter-from {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* Prose (article content) — map to design tokens */
+.prose {
+  --tw-prose-body: var(--color-midnight);
+  --tw-prose-headings: var(--color-midnight);
+  --tw-prose-lead: var(--color-muted);
+  --tw-prose-links: var(--color-midnight);
+  --tw-prose-bold: var(--color-midnight);
+  --tw-prose-counters: var(--color-muted);
+  --tw-prose-bullets: var(--color-lavender);
+  --tw-prose-hr: rgba(184, 169, 201, 0.4);
+  --tw-prose-quotes: var(--color-midnight);
+  --tw-prose-quote-borders: var(--color-lavender);
+  --tw-prose-captions: var(--color-muted);
+  --tw-prose-code: var(--color-midnight);
+  --tw-prose-pre-code: var(--color-moonlight);
+  --tw-prose-pre-bg: var(--color-dusk);
+  --tw-prose-th-borders: rgba(184, 169, 201, 0.3);
+  --tw-prose-td-borders: rgba(184, 169, 201, 0.2);
+}

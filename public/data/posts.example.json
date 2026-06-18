@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "slug": "miks-uni-on-oluline",
+    "title": "Miks on kvaliteetne uni tervise alustala?",
+    "excerpt": "Teadlased on avastanud, et uni on sama oluline kui toit ja liikumine. Vaata, mis juhtub sinu ajus ja kehas iga öö.",
+    "content": "# Miks on kvaliteetne uni tervise alustala?\n\nUni ei ole lihtsalt puhkeaeg — see on aktiivne protsess, mille käigus su aju ja keha teevad olulisi hooldustöid.\n\n## Mida aju öösel teeb?\n\nUne ajal eemaldab aju glümphaatilise süsteemi abil metaboliitseid jääkaineid, sealhulgas Alzheimeri tõvega seostatud valkude kuhjumisi. See on omamoodi öine koristustöö — seda ei saa päeva jooksul teha, sest see nõuab ajutegevuse aeglustumist.\n\n## Mälu kinnistamine toimub magades\n\nREM-une faasis töötleb aju päeva jooksul kogetud infot ja kinnistab selle mälusse. Õpilased, kes magavad pärast õppimist piisavalt, suudavad materjali paremini meelde jätta kui need, kes ületa­vad end ärkvelolekuga.\n\n## Hormoonide taastumine\n\nKasvuhormoon eritub peaaegu eranditult une ajal. See on oluline mitte ainult lastele — täiskasvanutel aitab see lihaseid taastada, rasva lagundada ja immuunsüsteemi tugevdada.\n\n## Südame-veresoonkonna tervis\n\nRegulaarsel unepuudusel on otsene seos kõrge vererõhu, südamehaiguste ja diabeediga. Uuringud näitavad, et inimesed, kes magavad alla 6 tunni ööpäevas, on kuni 48% suurema südameataki riskiga.\n\n## Mida saad ise teha?\n\nParima une saavutamiseks: mine magama ja ärka iga päev samal kellaajal, hoia magamistuba jahedana (16–19°C) ja pimedana, ning väldi kofeiini pärast kella 14.",
+    "category": "teadus",
+    "publishDate": "2025-04-15",
+    "tags": ["tervis", "uni", "teadus", "aju"],
+    "coverImage": "",
+    "status": "published",
+    "isFeatured": true,
+    "readingTimeMin": 5
+  },
+  {
+    "id": 2,
+    "slug": "magamisasend-ja-tervis",
+    "title": "Kumb magamisasend on selgroole parem — külili või selili?",
+    "excerpt": "Sinu magamisasend mõjutab kaela, selja ja isegi seedimist. Selgitame, mis asend sobib kellele ja miks.",
+    "content": "# Kumb magamisasend on selgroole parem?\n\nMagamisasend on üks olulisemaid, kuid enim alahinnatud tegureid une kvaliteedis.\n\n## Külilimagaja\n\nKüljel magamine on enamiku inimeste jaoks parim valik. See hoiab selgroo loomulikus kõveras ja vähendab norskamise tõenäosust. Peamine nõue: padi peab olema piisavalt kõrge, et kaelale neutraalne asend säilitada. Alla 8 cm padi ei toeta kaela piisavalt, üle 14 cm väänab seda liiga üles.\n\n## Seliasend\n\nSelili magamine on ortopeedi lemmik — see jaotab kehakaalu ühtlaselt. Nõrkus: norskajatele ja uneapnoe põdejatele sobib halvemini, kuna keel võib hingamisteed osaliselt blokeerida.\n\n## Kõhuli magamine\n\nKõhuli magamine koormab kaela ja nimme. Kui magad kõhuli, vali kindlasti madal (alla 5 cm) padi või mine üldse ilma.\n\n## Padi on võtmetegur\n\nIgale asendile on oma optimaalne padi: külili → kõrge (10–14 cm), selili → keskmine (8–12 cm), kõhuli → madal (alla 8 cm). Õige padi on üks lihtsamaid viise hommikuste kaelavalude vältimiseks.",
+    "category": "nõuanded",
+    "publishDate": "2025-04-22",
+    "tags": ["magamisasend", "selg", "padi", "nõuanded"],
+    "coverImage": "",
+    "status": "published",
+    "isFeatured": true,
+    "readingTimeMin": 4
+  },
+  {
+    "id": 3,
+    "slug": "bambus-voodipesu-eelised",
+    "title": "Miks bambusest voodipesu on termiliselt ülimuslik?",
+    "excerpt": "Bambus on öösiseks kehatemperatuuri reguleerimiseks parem valik kui puuvill — teadus selgitab, miks.",
+    "content": "# Bambus vs. puuvill: termoregulatsioon une ajal\n\nÖösiti higistamine on üks levinumaid uneprobleeme. Lahendus võib peituda voodipesus.\n\n## Bambuse eelised\n\nBambuskiud on loomuliku struktuuriga, mis juhib niiskust kehalt eemale 3× kiiremini kui puuvill. See on oluline: koos niiskusega kannab bambus ära ka soojust, hoides kehapinna jahedamana.\n\n## Temperatuuri reguleerimine\n\nBambus on termostaatiline — see tähendab, et ta kohandub kehatemperatuuriga. Talvel hoiab soojem, suvel jahedamana. Puuvillal seda omadust nii tugevalt ei ole.\n\n## Allergeenivabadus\n\nBambuskiud on looduslikult antimikroobsed, mis tähendab, et bakterid ja hallitusseened kasvavad neis palju aeglasemalt. See on oluline põhjus, miks allergikud eelistavad bambust.\n\n## Kestlikkus\n\nBambus kasvab kuni 90 cm päevas ja vajab kasvu ning töötlemiseks oluliselt vähem vett ja pestitsiide kui puuvill. Ökoloogiliselt teadlik valik.",
+    "category": "tooted",
+    "publishDate": "2025-05-01",
+    "tags": ["bambus", "voodipesu", "tooted", "termoregulatsioon"],
+    "coverImage": "",
+    "status": "published",
+    "isFeatured": false,
+    "readingTimeMin": 3
+  },
+  {
+    "id": 4,
+    "slug": "lapse-unerituaalid",
+    "title": "Kuidas luua lapsele toimiv unerituaal?",
+    "excerpt": "Lapsed vajavad uinumiseks selget päeva lõpetamise rituaali. Siin on teaduspõhised sammud, mis päriselt töötavad.",
+    "content": "# Lapse unerituaal: teaduspõhine lähenemine\n\nLapsed ei lülitu ümber nagu arvutid — neil on vaja aega ja signaale, et aju unerejiiimi minna.\n\n## Miks rituaal töötab?\n\nKorduv käitumine enne magamaminekut loob konditsioneeritud vastuse: aju hakkab rituaali iga sammu seostama uinumisega. See on sama põhimõte, mis toimib ka täiskasvanutel.\n\n## Efektiivne rituaal (30–45 minutit)\n\n1. **Vanni aeg (10 min)** — soe vann langetab keha tuumatemperatuuri, mis kutsub esile unisuse\n2. **Vaikus ja hämardumine** — lülita eredam valgus välja, vali soojemad toonid\n3. **Raamatu lugemine (15–20 min)** — mitte ekraanid. Lugu jutustamine aktiveerib kujutlusvõimet, mitte ergastab\n4. **Sama laul või fraas** — lõpeta alati sama sõnadega: „Head ööd, aeg magada\"\n\n## Ekraanide roll\n\nEkraanid ergastavad melatoniini tootmist pärssiva sinise valguse kaudu. Lülita kõik ekraanid välja vähemalt 45 minutit enne magamaminekut.\n\n## Vanuse eripärad\n\n- 1–3 a: vajab täielikku rituaali koos lapsevanemaga\n- 4–7 a: võib olla iseseisvam, aga vajab siiski kohalolu\n- 8–12 a: saab rituaali järgida iseseisvalt, vanemad kinnitavad",
+    "category": "uneaeg",
+    "publishDate": "2025-05-08",
+    "tags": ["lapsed", "rituaal", "uneaeg", "perekond"],
+    "coverImage": "",
+    "status": "published",
+    "isFeatured": true,
+    "readingTimeMin": 6
+  },
+  {
+    "id": 5,
+    "slug": "unetsyklid-selgitatud",
+    "title": "Unetsüklid selgitatud: miks ärkad mõnikord värskena ja mõnikord lörtsina?",
+    "excerpt": "90-minutilised unetsüklid selgitavad, miks sama arv tunde und annab nii erinevaid tulemusi. Siin on matemaatika.",
+    "content": "# Unetsüklid: miks ärkamisaeg on tähtsam kui uneaeg?\n\nOled sa märganud, et 7,5 tundi und tunnete end mõnikord paremini kui 8 tundi? Põhjus on unetsüklites.\n\n## Üks tsükkel = 90 minutit\n\nUni koosneb 90-minutilistest tsüklitest, mis sisaldavad nii kerget und, sügavat und kui ka REM-und. Öö jooksul läbid tavaliselt 4–6 tsüklit.\n\n## Miks ärkamisaeg on oluline\n\nKui ärkad tsükli keskel — eriti sügava une faasis — tunned end uimasena, desorientireerununa ja väsinuna. Kui ärkad tsükli lõpus, kerge une faasis, on ärkamine loomulik ja energiat täis.\n\n## Matemaatika\n\n- 5 tsüklit = 7,5 tundi → hea tunne\n- 5,33 tsüklit = 8 tundi → ärkad tsükli keskel\n- 6 tsüklit = 9 tundi → ideaalne, aga enamikule ei sobi\n\n## Kuidas arvutada?\n\nOtsusta, millal pead ärkama. Loe tagasi 90-minutiliste sammudega. Lisa 15 minutit uinumise ajaks. Näide: ärkad 7:00 → mine magama 23:15 (5 tsüklit) või 21:45 (6 tsüklit).\n\n## Praktilised soovitused\n\nKasuta kalkulaatorit (nt sleepyti.me) esimestel kordadel. Pärast paari nädalat tunneb su keha ise oma ideaalse tsükliarvuga une pikkuse.",
+    "category": "teadus",
+    "publishDate": "2025-05-14",
+    "tags": ["unetsüklid", "REM", "teadus", "ärkamine"],
+    "coverImage": "",
+    "status": "published",
+    "isFeatured": false,
+    "readingTimeMin": 4
+  }
+]

@@ -600,3 +600,49 @@ Work through these in order. Do not skip ahead.
 ---
 
 *Update this file whenever a significant architectural decision is made.*
+
+---
+
+## UPDATES — Read these after everything above, they override earlier sections
+
+### Backend: Apps Script (not Sheets API directly)
+
+The Google Sheets content backend uses an **Apps Script Web App** as a proxy,
+not the Sheets API v4 with an API key. The sheet is private; the script filters
+and serves only publishable content.
+
+Env var is a single URL:
+```bash
+SHEETS_API_URL=https://script.google.com/macros/s/AKfycbx6m86JxaQo3n9WGFJwk6bvkCDOw3bLxGK7b92xw7H2ijYDsGwIgYf5YPlKlL8k2sW72Q/exec
+```
+
+The fetch-content script calls three endpoints:
+${SHEETS_API_URL}?sheet=posts
+
+${SHEETS_API_URL}?sheet=notifications
+
+${SHEETS_API_URL}?sheet=stats
+
+Each returns a JSON array already filtered server-side (published posts only,
+active notifications/stats only). The script should still type-check and
+validate the response before writing to public/data/*.json.
+
+No Google Cloud project, no API key, no OAuth. Just the URL.
+
+### GitHub Actions Secret
+
+Only one secret is needed:
+- Name: `SHEETS_API_URL`
+- Value: the Apps Script Web App URL
+
+Remove any references to `GOOGLE_SHEETS_API_KEY` or `SHEETS_ID` from the
+workflow file and fetch-content script.
+
+### .env file
+```bash
+SHEETS_API_URL=https://script.google.com/macros/s/LONG_ID/exec
+```
+
+### dev without credentials
+If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
+`public/data/*.json` and exit cleanly so `npm run dev` still works.

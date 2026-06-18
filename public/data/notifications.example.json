@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "text": "Kristina ostis bambuspadja",
+    "type": "purchase",
+    "hoursAgo": 2,
+    "active": true
+  },
+  {
+    "id": 2,
+    "text": "Marten leidis oma unevalemi",
+    "type": "quiz",
+    "hoursAgo": 1,
+    "active": true
+  },
+  {
+    "id": 3,
+    "text": "Liis vaatas bambusteki tootelehte",
+    "type": "view",
+    "hoursAgo": 3,
+    "active": true
+  },
+  {
+    "id": 4,
+    "text": "Andres ostis nelja aastaaegade teki",
+    "type": "purchase",
+    "hoursAgo": 5,
+    "active": true
+  },
+  {
+    "id": 5,
+    "text": "Mari tegi kronotüübi viktoriini",
+    "type": "quiz",
+    "hoursAgo": 1,
+    "active": true
+  },
+  {
+    "id": 6,
+    "text": "Taavi ostis universaalse bambuspadja",
+    "type": "purchase",
+    "hoursAgo": 4,
+    "active": true
+  },
+  {
+    "id": 7,
+    "text": "Kati leidis oma unevalemi",
+    "type": "quiz",
+    "hoursAgo": 2,
+    "active": true
+  },
+  {
+    "id": 8,
+    "text": "Jaak vaatas külilimagaja padja",
+    "type": "view",
+    "hoursAgo": 6,
+    "active": true
+  }
+]
