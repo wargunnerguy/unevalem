@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { calculator, homepage, common, dailyTips } from '~/utils/copy'
-import type { Stat } from '~/types'
+import { calculator, homepage, common } from '~/utils/copy'
+import type { Stat, Tip } from '~/types'
 
 useHead({
   title: homepage.metaTitle,
@@ -15,54 +15,62 @@ useHead({
 const dayOfYear = Math.floor(
   (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86_400_000,
 )
-const dailyTip = dailyTips[dayOfYear % 30]
+
+const { data: tipsData } = useFetch<Tip[]>('/api/tips', { default: () => [] as Tip[] })
+const dailyTip = computed(() => {
+  const tips = tipsData.value ?? []
+  if (!tips.length) return ''
+  return tips[dayOfYear % tips.length].text
+})
 
 const { data: statsData } = useFetch<Stat[]>('/api/stats', {
   default: () => [] as Stat[],
 })
-const activeStats = computed(() => (statsData.value ?? []).filter(s => s.active))
+const calcStat = computed(() =>
+  (statsData.value ?? []).find(s => s.key === 'calculatorCompletions' && s.active),
+)
 
 const featuredPosts = useFeaturedPosts(5)
 
-// A/B variant — client-only (avoids SSR hydration flash for heading)
+// A/B variant label
 const { variant } = useABTest()
-const variantHeading = computed(() =>
-  calculator.variantHeadings[variant.value] ?? calculator.heroHeading,
-)
-const variantSubtext = computed(() =>
-  calculator.variantSubtexts[variant.value] ?? calculator.heroSubtext,
+const variantLabel = computed(() =>
+  calculator.variantLabels[variant.value] ?? calculator.heroLabel,
 )
 
-// Revisit banner — shown when visitor has completed the calc before
-interface LastCalc { pillow: string; blanket: string; score: number; improved: number; completedAt: string }
-const lastCalc = ref<LastCalc | null>(null)
+// Session — for revisit banner (client-only to avoid hydration mismatch)
+const { siteProfile, completedCount, activeCalcType } = useCalcSession()
+
 const showRevisit = ref(true)
 
-onMounted(() => {
-  try {
-    const raw = localStorage.getItem('unevalem-last-calc')
-    if (raw) lastCalc.value = JSON.parse(raw) as LastCalc
-  } catch {}
+const revisitSummary = computed(() => {
+  const p = siteProfile.value
+  const parts: string[] = []
+  if (p.pillow?.productName) parts.push(`Padi: ${p.pillow.productName}`)
+  if (p.blanket?.productName) parts.push(`Tekk: ${p.blanket.productName}`)
+  if (p.mattress?.productName) parts.push(`Madrats: ${p.mattress.productName}`)
+  return parts
 })
 </script>
 
 <template>
   <div>
 
-    <!-- ─── HERO — dark band, calculator as centrepiece ─── -->
-    <section class="bg-midnight px-4 pt-10 pb-12">
+    <!-- ─── HERO ─── -->
+    <section class="bg-midnight px-4 pt-8 pb-10">
 
-      <!-- Revisit banner — shows only if they've completed the calc before -->
+      <!-- Revisit banner — shown only on client after hydration -->
       <ClientOnly>
         <Transition name="toast">
           <div
-            v-if="lastCalc && showRevisit"
+            v-if="completedCount > 0 && showRevisit"
             class="max-w-xl mx-auto mb-5 bg-dusk/70 rounded-xl px-4 py-3 flex items-start justify-between gap-3"
           >
             <div class="text-sm text-foam leading-snug">
-              <span class="font-medium text-gold">Tere tagasi!</span>
-              Sinu eelmine tulemus: <span class="font-medium">{{ lastCalc.pillow }}</span> + <span class="font-medium">{{ lastCalc.blanket }}</span>
-              <span class="text-muted"> (skoor {{ lastCalc.improved }}/100)</span>
+              <span class="font-medium text-gold">Tere jälle!</span>
+              <span v-if="completedCount < 3"> Jätka oma une profiili täitmist — </span>
+              <span v-else> Sinu une profiil on täielik — </span>
+              <span class="text-muted text-xs">{{ revisitSummary.join(' · ') }}</span>
             </div>
             <button
               type="button"
@@ -76,22 +84,12 @@ onMounted(() => {
         </Transition>
       </ClientOnly>
 
-      <div class="max-w-xl mx-auto text-center mb-7">
-        <!-- Variant-specific heading (ClientOnly to avoid hydration mismatch) -->
+      <!-- Single short label -->
+      <div class="max-w-xl mx-auto text-center mb-4">
         <ClientOnly>
-          <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight mb-3">
-            {{ variantHeading }}
-          </h1>
-          <p class="text-lavender text-base md:text-lg">
-            {{ variantSubtext }}
-          </p>
+          <p class="text-lavender/70 text-sm tracking-wide">{{ variantLabel }}</p>
           <template #fallback>
-            <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight mb-3">
-              {{ calculator.heroHeading }}
-            </h1>
-            <p class="text-lavender text-base md:text-lg">
-              {{ calculator.heroSubtext }}
-            </p>
+            <p class="text-lavender/70 text-sm tracking-wide">{{ calculator.heroLabel }}</p>
           </template>
         </ClientOnly>
       </div>
@@ -100,23 +98,10 @@ onMounted(() => {
     </section>
 
     <!-- ─── STATS STRIP ─── -->
-    <section v-if="activeStats.length" class="bg-dusk px-4 py-6">
-      <div class="max-w-4xl mx-auto">
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div
-            v-for="stat in activeStats"
-            :key="stat.key"
-            class="text-center"
-          >
-            <p class="font-heading text-2xl sm:text-3xl text-foam font-bold leading-none mb-1">
-              {{ stat.value }}
-            </p>
-            <p class="text-xs text-lavender/80 leading-tight">
-              {{ stat.displayText }}
-            </p>
-          </div>
-        </div>
-      </div>
+    <section v-if="calcStat" class="bg-dusk px-4 py-5">
+      <p class="text-center text-sm text-lavender/80">
+        <span class="font-heading text-foam text-lg font-bold mr-1.5">{{ calcStat.value }}</span>{{ calcStat.displayText }}
+      </p>
     </section>
 
     <!-- ─── DAILY TIP ─── -->
@@ -134,7 +119,7 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- ─── FEATURED ARTICLES — vertical stacked list ─── -->
+    <!-- ─── FEATURED ARTICLES ─── -->
     <section v-if="featuredPosts.length" class="bg-moonlight px-4 pb-14 pt-2">
       <div class="max-w-2xl mx-auto">
         <h2 class="font-heading text-2xl md:text-3xl text-midnight mb-7">
@@ -162,7 +147,7 @@ onMounted(() => {
               </NuxtLink>
             </h3>
 
-            <p class="text-sm text-muted leading-relaxed mb-3 line-clamp-2">
+            <p class="text-sm text-midnight/70 leading-relaxed mb-3 line-clamp-2">
               {{ post.excerpt }}
             </p>
 

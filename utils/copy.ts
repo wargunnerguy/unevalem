@@ -25,129 +25,206 @@ export const common = {
 }
 
 export const calculator = {
-  heroHeading: 'Mis tüüpi padi sobib sulle kõige paremini?',
-  heroSubtext: 'Vasta 10 küsimusele — saad täpse soovituse padi, teki ja muu kohta.',
+  version: 'v2.5',
+  heroLabel: 'Leia täpselt sulle sobiv voodivara — 2 minutiga',
 
-  variantHeadings: {
-    pillow:  'Mis tüüpi padi sobib sulle kõige paremini?',
-    blanket: 'Mis tüüpi tekk sobib sulle kõige paremini?',
-    sleep:   'Kui hea on sinu une kvaliteet?',
-  } as Record<string, string>,
-  variantSubtexts: {
-    pillow:  'Vasta 10 küsimusele — saad täpse soovituse, milline padi, tekk ja muud voodimaterjalid sulle sobivad.',
-    blanket: 'Vasta 10 küsimusele — leia täpselt sobiv tekk, padi ja muud voodimaterjalid.',
-    sleep:   'Vasta 10 küsimusele — saa teada oma uneskoor ja personaalsed soovitused une parandamiseks.',
+  variantLabels: {
+    pillow:  'Leia oma ideaalne padi — 2 minutiga',
+    blanket: 'Leia oma ideaalne tekk — 2 minutiga',
+    sleep:   'Uuri, mis rikub sinu und — 2 minutiga',
   } as Record<string, string>,
   progressLabel: (step: number, total: number) => `Samm ${step} / ${total}`,
   timeLeft: (step: number): string => {
-    const sek = (11 - step) * 12
+    const sek = (6 - step) * 20
     if (sek >= 60) return `~${Math.ceil(sek / 60)} min`
     if (sek > 0) return `~${sek} sek`
     return ''
   },
 
-  steps: [
-    {
-      question: 'Kuidas sa üldjuhul magad?',
-      options: [
-        { label: 'Küljel', value: 'side' },
-        { label: 'Selili', value: 'back' },
-        { label: 'Kõhuli', value: 'stomach' },
-        { label: 'Vahelduvalt', value: 'combo' },
+  configs: {
+    pillow: {
+      icon: '🛏️',
+      title: 'Padi',
+      description: 'Leia täpselt sulle sobiv padi',
+      stepKeys: ['position', 'bodyType', 'neckPain', 'allergies', 'pillowAge'] as const,
+      steps: [
+        {
+          question: 'Kuidas sa üldjuhul magad?',
+          options: [
+            { label: 'Küljel', value: 'side' },
+            { label: 'Selili', value: 'back' },
+            { label: 'Kõhuli', value: 'stomach' },
+            { label: 'Vahelduvalt', value: 'combo' },
+          ],
+        },
+        {
+          question: 'Milline on sinu kehaehitus?',
+          options: [
+            { label: 'Peenike / kitsaste õlgadega', value: 'slim' },
+            { label: 'Keskmine', value: 'medium' },
+            { label: 'Tugevam / laiade õlgadega', value: 'broad' },
+          ],
+        },
+        {
+          question: 'Kas ärkad hommikul kaela- või õlavaluga?',
+          options: [
+            { label: 'Jah, sageli', value: 'often' },
+            { label: 'Mõnikord', value: 'sometimes' },
+            { label: 'Ei', value: 'never' },
+          ],
+        },
+        {
+          question: 'Kas sul esineb allergia või tundlikkus?',
+          options: [
+            { label: 'Tolmulestade suhtes', value: 'dust-mites' },
+            { label: 'Sünteetiliste materjalide suhtes', value: 'synthetic' },
+            { label: 'Pole', value: 'none' },
+          ],
+        },
+        {
+          question: 'Kui vana on sinu praegune padi?',
+          options: [
+            { label: 'Uus (alla 1 aasta)', value: 'new' },
+            { label: '1–3 aastat vana', value: '1-3y' },
+            { label: 'Üle 3 aasta vana', value: '3y+' },
+          ],
+        },
       ],
     },
-    {
-      question: 'Milline on sinu kehaehitus?',
-      options: [
-        { label: 'Peenike / kitsaste õlgadega', value: 'slim' },
-        { label: 'Keskmine', value: 'medium' },
-        { label: 'Tugevam / laiade õlgadega', value: 'broad' },
+    blanket: {
+      icon: '🌙',
+      title: 'Tekk',
+      description: 'Leia täpselt sulle sobiv tekk',
+      stepKeys: ['sweating', 'temp', 'blanketWeight', 'partner', 'allergies'] as const,
+      steps: [
+        {
+          question: 'Kas higistab öösel või ärkad kuumalt?',
+          options: [
+            { label: 'Jah, sageli', value: 'often' },
+            { label: 'Mõnikord', value: 'sometimes' },
+            { label: 'Harva', value: 'rarely' },
+          ],
+        },
+        {
+          question: 'Milline temperatuur sobib sulle magamiseks?',
+          options: [
+            { label: 'Jahe tuba (16–18 °C)', value: 'cold' },
+            { label: 'Mugav (18–20 °C)', value: 'normal' },
+            { label: 'Soe tuba (20 °C+)', value: 'hot' },
+          ],
+        },
+        {
+          question: 'Millist teki kaalu eelistad?',
+          options: [
+            { label: 'Kerget — tahan vaid kerget puudutust', value: 'light' },
+            { label: 'Keskmist — normaalne soojus', value: 'medium' },
+            { label: 'Rasket ja soojemat', value: 'heavy' },
+          ],
+        },
+        {
+          question: 'Kas magad üksi või koos partneriga?',
+          options: [
+            { label: 'Üksi', value: 'solo' },
+            { label: 'Koos — jagame tekki', value: 'shared' },
+            { label: 'Koos — eraldi tekid', value: 'separate' },
+          ],
+        },
+        {
+          question: 'Kas sul esineb allergia või tundlikkus?',
+          options: [
+            { label: 'Tolmulestade suhtes', value: 'dust-mites' },
+            { label: 'Sünteetiliste materjalide suhtes', value: 'synthetic' },
+            { label: 'Pole', value: 'none' },
+          ],
+        },
       ],
     },
-    {
-      question: 'Kas ärkad hommikul kaela- või õlavaluga?',
-      options: [
-        { label: 'Jah, sageli', value: 'often' },
-        { label: 'Mõnikord', value: 'sometimes' },
-        { label: 'Ei', value: 'never' },
+    mattress: {
+      icon: '💤',
+      title: 'Madrats',
+      description: 'Leia täpselt sulle sobiv madrats',
+      stepKeys: ['position', 'bodyType', 'backPain', 'partner', 'mattressAge'] as const,
+      steps: [
+        {
+          question: 'Kuidas sa üldjuhul magad?',
+          options: [
+            { label: 'Küljel', value: 'side' },
+            { label: 'Selili', value: 'back' },
+            { label: 'Kõhuli', value: 'stomach' },
+            { label: 'Vahelduvalt', value: 'combo' },
+          ],
+        },
+        {
+          question: 'Milline on sinu kehaehitus / kaal?',
+          options: [
+            { label: 'Kerge (alla 65 kg)', value: 'slim' },
+            { label: 'Keskmine (65–90 kg)', value: 'medium' },
+            { label: 'Raskem (üle 90 kg)', value: 'broad' },
+          ],
+        },
+        {
+          question: 'Kas ärkad hommikul seljavaluga?',
+          options: [
+            { label: 'Jah, sageli', value: 'often' },
+            { label: 'Mõnikord', value: 'sometimes' },
+            { label: 'Ei', value: 'never' },
+          ],
+        },
+        {
+          question: 'Kas magad üksi või koos partneriga?',
+          options: [
+            { label: 'Üksi', value: 'solo' },
+            { label: 'Koos', value: 'shared' },
+          ],
+        },
+        {
+          question: 'Kui vana on sinu praegune madrats?',
+          options: [
+            { label: 'Uus (alla 2 aasta)', value: 'new' },
+            { label: '2–5 aastat', value: '1-3y' },
+            { label: '5–8 aastat', value: '3-5y' },
+            { label: 'Üle 8 aasta', value: '5y+' },
+          ],
+        },
       ],
     },
-    {
-      question: 'Kas higistab öösel või ärkad kuumalt?',
-      options: [
-        { label: 'Jah, sageli', value: 'often' },
-        { label: 'Mõnikord', value: 'sometimes' },
-        { label: 'Harva', value: 'rarely' },
-      ],
-    },
-    {
-      question: 'Milline temperatuur sobib sulle magamiseks?',
-      options: [
-        { label: 'Jahe tuba (16–18 °C)', value: 'cold' },
-        { label: 'Mugav (18–20 °C)', value: 'normal' },
-        { label: 'Soe tuba (20 °C+)', value: 'hot' },
-      ],
-    },
-    {
-      question: 'Millist teki kaalu eelistad?',
-      options: [
-        { label: 'Kerget — soovin tunda ainult puudutust', value: 'light' },
-        { label: 'Keskmist — normaalne soojus', value: 'medium' },
-        { label: 'Rasket ja soojendavamat', value: 'heavy' },
-      ],
-    },
-    {
-      question: 'Kas magad üksi või koos partneriga?',
-      options: [
-        { label: 'Üksi', value: 'solo' },
-        { label: 'Koos — jagame tekki', value: 'shared' },
-        { label: 'Koos — eraldi tekid', value: 'separate' },
-      ],
-    },
-    {
-      question: 'Kas sul esineb allergia või tundlikkus?',
-      options: [
-        { label: 'Tolmulestade suhtes', value: 'dust-mites' },
-        { label: 'Sünteetiliste materjalide suhtes', value: 'synthetic' },
-        { label: 'Pole', value: 'none' },
-      ],
-    },
-    {
-      question: 'Kui vana on sinu praegune padi?',
-      options: [
-        { label: 'Uus (alla 1 aasta)', value: 'new' },
-        { label: '1–3 aastat vana', value: '1-3y' },
-        { label: 'Üle 3 aasta vana', value: '3y+' },
-      ],
-    },
-    {
-      question: 'Mis on sinu peamine uneprobleem?',
-      options: [
-        { label: 'Raske uinuda', value: 'cant-sleep' },
-        { label: 'Ärkan öösel üles', value: 'wake-at-night' },
-        { label: 'Ärkan väsinuna', value: 'wake-tired' },
-        { label: 'Pole probleeme', value: 'none' },
-      ],
-      submitLabel: 'Analüüsi minu und →',
-    },
-  ],
+  } as const,
+
+  session: {
+    profileHeading: 'Sinu une profiil',
+    progressOf: (done: number, total: number) => `${done}/${total} kalkulaatorit tehtud`,
+    doneAll: 'Kõik kolm kalkulaatorit tehtud!',
+    nextCalcLabel: {
+      pillow:   'Järgmisena: leia oma ideaalne tekk',
+      blanket:  'Järgmisena: leia oma ideaalne madrats',
+      mattress: 'Järgmisena: leia oma ideaalne padi',
+    } as Record<string, string>,
+    nextCalcBtn: {
+      pillow:   'Alusta tekikülkulaatoriga →',
+      blanket:  'Alusta madratsikülkulaatoriga →',
+      mattress: 'Alusta padjakülkulaatoriga →',
+    } as Record<string, string>,
+    doneLabel: {
+      pillow:   'Padi',
+      blanket:  'Tekk',
+      mattress: 'Madrats',
+    } as Record<string, string>,
+    redoButton: 'Tee test uuesti',
+  },
 
   result: {
     currentScoreLabel: 'Sinu praegune uneskoor',
     improvedScoreLabel: 'Pärast muutusi',
     scoreUnit: '/ 100',
-    pillowHeading: 'Sinu ideaalne padi',
-    blanketHeading: 'Sinu sobiv tekk',
+    resultHeadings: {
+      pillow:   'Sinu ideaalne padi',
+      blanket:  'Sinu ideaalne tekk',
+      mattress: 'Sinu ideaalne madrats',
+    } as Record<string, string>,
     tipsHeading: 'Isiklikud unenõuanded',
-    exploreHeading: 'Täienda oma unekeskkonda',
-    exploreItems: [
-      { label: 'Leia sobiv madrats', hint: 'Tulemas peagi', href: '/pood', disabled: true },
-      { label: 'Uuri voodipesu', hint: 'Bambuspadjapüürid ja tekikotid', href: '/pood', disabled: false },
-    ],
     ctaButton: 'Vaata kõiki tooteid →',
     mustHaveBadge: 'Oluline',
     niceToHaveBadge: 'Kasulik',
-    resetButton: 'Alusta uuesti',
   },
 }
 
@@ -310,37 +387,3 @@ export const footer = {
     contact: 'Kontakt',
   },
 }
-
-// 30 daily sleep tips, rotating by day-of-year: dailyTips[dayOfYear % 30]
-export const dailyTips: string[] = [
-  'Mine magama ja ärka iga päev samal kellaajal — ka nädalavahetusel. See tugevdab keha sisekella.',
-  'Hoia magamistoa temperatuur 16–19°C vahel — jahedam keskkond soodustab sügavamat und.',
-  'Väldi kofeiini pärast kella 14. Kofeiin püsib kehas kuni 8 tundi.',
-  'Loobu ekraanidest vähemalt 30 minutit enne magamaminekut. Sinine valgus pärsib melatoniini.',
-  'Tee magamistuba pimedaks. Isegi väike valgus võib katkestada une sügavad faasid.',
-  'Liigu päeva jooksul vähemalt 30 minutit — füüsiline aktiivsus parandab une kvaliteeti.',
-  'Väldi rasket söömist 2–3 tundi enne magamaminekut. Söömine aktiveerib seedesüsteemi.',
-  'Proovi "4-7-8" hingamist: hinga sisse 4 sekundit, hoia 7, hinga välja 8.',
-  'Kirjuta enne magamaminekut üles 3 asja, mille eest oled tänulik. See rahustab meelt.',
-  'Kui ärkan öösel, ei tasu vaadata kellaaega — see tekitab ärevust.',
-  'Bambusest valmistatud voodipesu reguleerib kehatemperatuuri paremini kui sünteetika.',
-  'Mürataustaks sobib valge müra või loodushääled — need blokeerivad ärritavaid helisid.',
-  'Päevane uinak kuni 20 minutit annab energiat ilma õhtust und rikkumata.',
-  'Alkohol aitab küll uinuda, kuid katkestab REM-une ja halvendab une kvaliteeti üldiselt.',
-  'Hommikune päikesevalgus esimese tunni jooksul pärast ärkamist aitab sisekellas ümber häälestuda.',
-  'Padi peaks toetama kaela nii, et lülisamba kaelaosa jääb sirgjoonesse — vaata oma asendit.',
-  'Mediteerimine vaid 10 minutit enne und vähendab ärkveloleku aega voodis kuni 20%.',
-  'Raamat paberil (mitte ekraanil) enne magamaminekut aitab ajul "välja lülituda".',
-  'Regulaarne magamaminekurituaal — ükskõik mis — annab ajule märgu, et uni on lähedal.',
-  'Magneesium aitab lihaste lõdvestumisel. Toitudes leidub seda rohelistes köögiviljades ja pähklites.',
-  'Arvuta oma unetsüklid: keskmiselt 90 minutit tükk — planeeri ärkamine tsükli lõppu.',
-  'Teki kaal mõjutab und — liiga kerge ei soojenda, liiga raske pigistab. Leia oma "kuldlukk".',
-  'Treeningu lõpetamise ja magamamineku vahel peaks olema vähemalt 2 tundi.',
-  'Lavendli lõhn lühendab uinumisaega — proovi lavendliõli difuusorit magamistoas.',
-  'Ühiskasutuslik tekk häirib sageli und — eraldi tekid vähendavad öiseid häireid kuni 30%.',
-  'Lugege sildi alt: hea padi on elueaga 1,5–2 aastat, mitte 10 aastat.',
-  'L-teaniin (rohelist teed leiduv aminohape) aitab lõdvestuda ilma unisust põhjustamata.',
-  'Väldi vaidlusi ja stressirikkaid vestlusi tunni jooksul enne magamaminekut.',
-  'Tuuluta magamistuba igal õhtul vähemalt 10 minutit — värske õhk parandab une kvaliteeti.',
-  'Uuringud näitavad, et regulaarne uneaeg aitab isegi rohkem kui une kestus.',
-]

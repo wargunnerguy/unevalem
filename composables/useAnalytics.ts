@@ -1,11 +1,9 @@
-import type { UserProfile, CalculatorResult } from '~/types'
+import type { UserProfile, CalculatorResult, CalcType } from '~/types'
 
 export function useAnalytics() {
   const { variant, sessionId } = useABTest()
   const config = useRuntimeConfig()
 
-  // Persists across HMR cycles — prevents duplicate submissions if the component
-  // remounts while step is already 11 (e.g. during active development)
   const submitted = useState('analytics-submitted', () => false)
 
   function resetSubmitted() {
@@ -15,6 +13,7 @@ export function useAnalytics() {
   async function submitCalcResult(
     answers: Partial<UserProfile>,
     result: CalculatorResult,
+    calcType: CalcType,
   ) {
     if (submitted.value) return
     submitted.value = true
@@ -24,6 +23,7 @@ export function useAnalytics() {
 
     const payload = {
       action:        'submit_calc',
+      calcType,
       sessionId:     sessionId.value,
       variant:       variant.value,
       position:      answers.position      ?? '',
@@ -35,9 +35,9 @@ export function useAnalytics() {
       partner:       answers.partner       ?? '',
       allergies:     answers.allergies     ?? '',
       pillowAge:     answers.pillowAge     ?? '',
-      complaint:     answers.complaint     ?? '',
-      pillow:        result.recommendations.find(r => r.category === 'pillow')?.id  ?? '',
-      blanket:       result.recommendations.find(r => r.category === 'blanket')?.id ?? '',
+      backPain:      answers.backPain      ?? '',
+      mattressAge:   answers.mattressAge   ?? '',
+      rec0:          result.recommendations[0]?.id ?? '',
       currentScore:  result.currentScore,
       improvedScore: result.improvedScore,
       completedAt:   new Date().toISOString(),
@@ -50,11 +50,7 @@ export function useAnalytics() {
     }
 
     try {
-      await fetch(url, {
-        method: 'POST',
-        mode:   'no-cors',
-        body:   JSON.stringify(payload),
-      })
+      await fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
       if (import.meta.dev) console.log('[useAnalytics] POST sent ✓')
     } catch (err) {
       if (import.meta.dev) console.warn('[useAnalytics] POST failed:', err)

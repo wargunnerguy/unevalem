@@ -8,33 +8,50 @@ export type BlanketWeight    = 'light' | 'medium' | 'heavy'
 export type AllergyProfile   = 'dust-mites' | 'synthetic' | 'none'
 export type PillowAge        = 'new' | '1-3y' | '3y+'
 export type MainComplaint    = 'cant-sleep' | 'wake-at-night' | 'wake-tired' | 'none'
+export type BackPain         = 'often' | 'sometimes' | 'never'
+export type MattressAge      = 'new' | '1-3y' | '3-5y' | '5y+'
+export type CalcType         = 'pillow' | 'blanket' | 'mattress'
 
 export interface UserProfile {
-  position:      SleepPosition      // Q1  sleep position
-  bodyType:      BodyType           // Q2  shoulder/body type
-  neckPain:      NeckPain           // Q3  morning neck/shoulder pain
-  sweating:      SweatingLevel      // Q4  night sweating
-  temp:          TempPreference     // Q5  room temperature preference
-  blanketWeight: BlanketWeight      // Q6  blanket weight preference
-  partner:       PartnerSituation   // Q7  sleeping alone or with partner
-  allergies:     AllergyProfile     // Q8  material sensitivities
-  pillowAge:     PillowAge          // Q9  current pillow age
-  complaint:     MainComplaint      // Q10 main sleep complaint
+  position:      SleepPosition
+  bodyType:      BodyType
+  neckPain:      NeckPain
+  sweating:      SweatingLevel
+  temp:          TempPreference
+  blanketWeight: BlanketWeight
+  partner:       PartnerSituation
+  allergies:     AllergyProfile
+  pillowAge:     PillowAge
+  complaint:     MainComplaint
+  backPain?:     BackPain
+  mattressAge?:  MattressAge
+}
+
+export interface CalcCompletion {
+  answers:     Record<string, string>
+  productName: string
+  completedAt: string
+}
+
+export interface SiteProfile {
+  pillow?:   CalcCompletion
+  blanket?:  CalcCompletion
+  mattress?: CalcCompletion
 }
 
 export interface Product {
-  id:           string
-  name:         string
-  category:     'pillow' | 'blanket' | 'mattress' | 'pillowcase' | 'duvetcover' | 'sheet'
-  subcategory:  string
-  description:  string
-  price:        number
-  priceText:    string
-  imageUrl?:    string
-  storeUrl:     string
-  tags:         string[]
-  active:       boolean
-  isFeatured:   boolean
+  id:          string
+  name:        string
+  category:    'pillow' | 'blanket' | 'mattress' | 'pillowcase' | 'duvetcover' | 'sheet'
+  subcategory: string
+  description: string
+  price:       number
+  priceText:   string
+  imageUrl?:   string
+  storeUrl:    string
+  tags:        string[]
+  active:      boolean
+  isFeatured:  boolean
 }
 
 export interface ProductRec {
@@ -42,7 +59,7 @@ export interface ProductRec {
   name:       string
   reason:     string
   urgency:    'must-have' | 'nice-to-have'
-  category:   'pillow' | 'blanket' | 'topper' | 'extra'
+  category:   'pillow' | 'blanket' | 'mattress' | 'topper' | 'extra'
   linkUrl?:   string
   priceText?: string
   imageUrl?:  string
@@ -84,4 +101,10 @@ export interface Stat {
   value:       string
   displayText: string
   active:      boolean
+}
+
+export interface Tip {
+  id:     number
+  text:   string
+  active: boolean
 }
