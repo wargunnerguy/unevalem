@@ -15,6 +15,7 @@ node_modules/
 public/data/posts.json
 public/data/notifications.json
 public/data/stats.json
+public/data/products.json
 
 # OS
 .DS_Store

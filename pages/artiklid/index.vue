@@ -20,7 +20,7 @@ const { posts, pending } = usePosts()
     <!-- Header band -->
     <div class="bg-midnight px-4 py-10">
       <div class="max-w-4xl mx-auto">
-        <h1 class="font-serif text-4xl md:text-5xl text-foam leading-tight">
+        <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight">
           {{ blogPage.heading }}
         </h1>
         <p class="mt-2 text-lavender text-base">

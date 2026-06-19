@@ -2,13 +2,55 @@
   --color-midnight:  #0D1B2A;
   --color-dusk:      #1B2D45;
   --color-lavender:  #B8A9C9;
-  --color-moonlight: #F0EDF5;
+  --color-moonlight: #F7F6F4;
   --color-foam:      #FFFFFF;
   --color-gold:      #C9A96E;
   --color-muted:     #7B8794;
   --color-success:   #4CAF7D;
 }
 
+/* ── Dark mode overrides ───────────────────────────────────────────────────── */
+html.dark {
+  color-scheme: dark;
+}
+
+/* Flip page/surface backgrounds */
+html.dark .bg-moonlight   { background-color: #0F172A; }
+html.dark .bg-foam        { background-color: #1E293B; }
+
+/* Flip text on light surfaces */
+html.dark .text-midnight  { color: #F1F5F9; }
+html.dark .text-muted     { color: #94A3B8; }
+
+/* Soften light borders */
+html.dark .border-gray-100 { border-color: rgba(255, 255, 255, 0.07); }
+html.dark .border-gray-200 { border-color: rgba(255, 255, 255, 0.10); }
+
+/* Nav hover in dark */
+html.dark .hover\:bg-moonlight:hover { background-color: rgba(255, 255, 255, 0.07); }
+html.dark .hover\:text-midnight:hover { color: #F1F5F9; }
+
+/* Prose in dark */
+html.dark .prose {
+  --tw-prose-body: #CBD5E1;
+  --tw-prose-headings: #F1F5F9;
+  --tw-prose-lead: #94A3B8;
+  --tw-prose-links: #E2E8F0;
+  --tw-prose-bold: #F1F5F9;
+  --tw-prose-counters: #94A3B8;
+  --tw-prose-bullets: #C4B5FD;
+  --tw-prose-hr: rgba(255, 255, 255, 0.12);
+  --tw-prose-quotes: #F1F5F9;
+  --tw-prose-quote-borders: #7C3AED;
+  --tw-prose-captions: #94A3B8;
+  --tw-prose-code: #F1F5F9;
+  --tw-prose-pre-code: #F1F5F9;
+  --tw-prose-pre-bg: #0F172A;
+  --tw-prose-th-borders: rgba(255, 255, 255, 0.15);
+  --tw-prose-td-borders: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -23,11 +65,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'DM Serif Display', serif;
+html.dark body {
+  background-color: #0F172A;
+  color: #F1F5F9;
 }
 
-/* Calculator slide transitions */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+}
+
+/* ── Calculator slide transitions ─────────────────────────────────────────── */
 .slide-left-enter-active,
 .slide-left-leave-active,
 .slide-right-enter-active,
@@ -35,43 +83,39 @@ h1, h2, h3, h4, h5, h6 {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.slide-left-enter-from {
-  opacity: 0;
-  transform: translateX(32px);
+.slide-left-enter-from  { opacity: 0; transform: translateX(32px); }
+.slide-left-leave-to    { opacity: 0; transform: translateX(-32px); }
+.slide-right-enter-from { opacity: 0; transform: translateX(-32px); }
+.slide-right-leave-to   { opacity: 0; transform: translateX(32px); }
+
+/* ── Analyzing progress bar (spurts, not smooth) ──────────────────────────── */
+@keyframes analyzing-progress {
+  0%   { width: 0% }
+  15%  { width: 23%; animation-timing-function: steps(1) }
+  22%  { width: 23% }
+  38%  { width: 51%; animation-timing-function: steps(1) }
+  46%  { width: 51% }
+  61%  { width: 74%; animation-timing-function: steps(1) }
+  69%  { width: 74% }
+  83%  { width: 92%; animation-timing-function: steps(1) }
+  90%  { width: 92% }
+  100% { width: 100% }
 }
 
-.slide-left-leave-to {
-  opacity: 0;
-  transform: translateX(-32px);
+.analyzing-bar {
+  animation: analyzing-progress 5.8s ease-out forwards;
 }
 
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(-32px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(32px);
-}
-
-/* Toast slide-up transition */
+/* ── Toast slide-up transition ────────────────────────────────────────────── */
 .toast-enter-active,
 .toast-leave-active {
   transition: all 0.35s ease;
 }
 
-.toast-enter-from {
-  opacity: 0;
-  transform: translateY(16px);
-}
+.toast-enter-from { opacity: 0; transform: translateY(16px); }
+.toast-leave-to   { opacity: 0; transform: translateY(16px); }
 
-.toast-leave-to {
-  opacity: 0;
-  transform: translateY(16px);
-}
-
-/* Prose (article content) — map to design tokens */
+/* ── Prose (article content) ──────────────────────────────────────────────── */
 .prose {
   --tw-prose-body: var(--color-midnight);
   --tw-prose-headings: var(--color-midnight);

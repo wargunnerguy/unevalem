@@ -5,9 +5,9 @@ const { current, visible, showNext, hide } = useNotifications()
 const { step } = useCalculator()
 const { width } = useWindowSize()
 
-// On mobile, suppress while the calculator is mid-flow (steps 1–5)
+// On mobile, suppress while the calculator is mid-flow (steps 1–10)
 const suppressed = computed(
-  () => width.value > 0 && width.value < 640 && step.value >= 1 && step.value <= 5,
+  () => width.value > 0 && width.value < 640 && step.value >= 1 && step.value <= 10,
 )
 
 const shouldShow = computed(() => visible.value && !suppressed.value)
@@ -21,7 +21,7 @@ let hideTimer: ReturnType<typeof setTimeout> | null = null
 
 function schedule(firstShow = false) {
   const delay = firstShow
-    ? 8_000 + Math.random() * 4_000    // 8–12 s initial delay
+    ? 4_000 + Math.random() * 2_000    // 4–6 s initial delay
     : 45_000 + Math.random() * 15_000  // 45–60 s between shows
   showTimer = setTimeout(() => {
     if (showNext()) {

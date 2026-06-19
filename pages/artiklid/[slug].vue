@@ -118,7 +118,7 @@ const facebookShareUrl = computed(
         </div>
 
         <!-- Title -->
-        <h1 class="font-serif text-3xl md:text-4xl text-midnight leading-snug mb-8">
+        <h1 class="font-heading text-3xl md:text-4xl text-midnight leading-snug mb-8">
           {{ post.title }}
         </h1>
 
@@ -155,7 +155,7 @@ const facebookShareUrl = computed(
 
       <!-- Related posts -->
       <section v-if="relatedPosts.length" class="max-w-4xl mx-auto px-4 pb-14">
-        <h2 class="font-serif text-2xl md:text-3xl text-midnight mb-6">
+        <h2 class="font-heading text-2xl md:text-3xl text-midnight mb-6">
           {{ blogPage.relatedHeading }}
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

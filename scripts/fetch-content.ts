@@ -16,7 +16,6 @@ function loadEnv(): void {
       if (eq < 0) continue
       const key = trimmed.slice(0, eq).trim()
       const raw = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '')
-      // Don't override vars that the OS / CI already set
       if (key && !(key in process.env)) process.env[key] = raw
     }
   } catch {
@@ -33,13 +32,60 @@ const DATA_DIR = resolve(process.cwd(), 'public/data')
 const BASE_URL = process.env.SHEETS_API_URL?.trim()
 
 // ---------------------------------------------------------------------------
+// Transformations (handle both raw Sheets strings and already-parsed values)
+// ---------------------------------------------------------------------------
+
+function parseBool(v: unknown): boolean {
+  if (typeof v === 'boolean') return v
+  if (typeof v === 'string') return v.toUpperCase() === 'TRUE' || v === '1'
+  return !!v
+}
+
+function parseTags(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map(String)
+  if (typeof v === 'string') return v.split(',').map(s => s.trim()).filter(Boolean)
+  return []
+}
+
+function parseDiveDeeper(v: unknown): { title: string; url: string }[] {
+  if (!v || typeof v !== 'string' || !v.trim()) return []
+  return v
+    .split(';')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(item => {
+      const [title, url] = item.split('|').map(s => s.trim())
+      return { title: title ?? '', url: url ?? '' }
+    })
+    .filter(item => item.title && item.url)
+}
+
+function transformPost(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...row,
+    tags:       parseTags(row.tags),
+    isFeatured: parseBool(row.isFeatured),
+    diveDeeper: parseDiveDeeper(row.diveDeeper),
+  }
+}
+
+function transformProduct(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...row,
+    tags:       parseTags(row.tags),
+    active:     parseBool(row.active),
+    isFeatured: parseBool(row.isFeatured),
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Fallback: no credentials → copy example files and exit cleanly
 // ---------------------------------------------------------------------------
 if (!BASE_URL) {
   console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
-  for (const name of ['posts', 'notifications', 'stats']) {
+  for (const name of ['posts', 'notifications', 'stats', 'products']) {
     const src = join(DATA_DIR, `${name}.example.json`)
     const dst = join(DATA_DIR, `${name}.json`)
     if (existsSync(src)) {
@@ -50,7 +96,7 @@ if (!BASE_URL) {
       console.warn(`  missing ${name}.example.json — skipping`)
     }
   }
-  console.log(`[fetch-content] done (${ok}/3 example files copied)`)
+  console.log(`[fetch-content] done (${ok}/4 example files copied)`)
   process.exit(0)
 }
 
@@ -95,6 +141,7 @@ const REQUIRED: Record<string, readonly string[]> = {
   posts:         ['id', 'slug', 'title', 'excerpt', 'content', 'category', 'status'],
   notifications: ['id', 'text', 'type', 'hoursAgo', 'active'],
   stats:         ['key', 'value', 'displayText', 'active'],
+  inventory:     ['id', 'name', 'category', 'price', 'active'],
 }
 
 // ---------------------------------------------------------------------------
@@ -103,25 +150,32 @@ const REQUIRED: Record<string, readonly string[]> = {
 async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
 
-  const [posts, notifications, stats] = await Promise.all([
+  const [posts, notifications, stats, inventory] = await Promise.all([
     fetchSheet('posts'),
     fetchSheet('notifications'),
     fetchSheet('stats'),
+    fetchSheet('inventory'),
   ])
 
-  requireFields('posts', posts, REQUIRED.posts)
+  requireFields('posts',         posts,         REQUIRED.posts)
   requireFields('notifications', notifications, REQUIRED.notifications)
-  requireFields('stats', stats, REQUIRED.stats)
+  requireFields('stats',         stats,         REQUIRED.stats)
+  requireFields('inventory',     inventory,     REQUIRED.inventory)
+
+  const transformedPosts    = (posts    as Record<string, unknown>[]).map(transformPost)
+  const transformedProducts = (inventory as Record<string, unknown>[]).map(transformProduct)
 
   mkdirSync(DATA_DIR, { recursive: true })
 
-  writeFileSync(join(DATA_DIR, 'posts.json'),         JSON.stringify(posts, null, 2), 'utf-8')
+  writeFileSync(join(DATA_DIR, 'posts.json'),         JSON.stringify(transformedPosts, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'notifications.json'), JSON.stringify(notifications, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'stats.json'),         JSON.stringify(stats, null, 2), 'utf-8')
+  writeFileSync(join(DATA_DIR, 'products.json'),      JSON.stringify(transformedProducts, null, 2), 'utf-8')
 
   console.log(
-    `[fetch-content] done — ${posts.length} posts · ` +
-    `${notifications.length} notifications · ${stats.length} stats`,
+    `[fetch-content] done — ${transformedPosts.length} posts · ` +
+    `${notifications.length} notifications · ${stats.length} stats · ` +
+    `${transformedProducts.length} products`,
   )
 }
 

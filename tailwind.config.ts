@@ -2,6 +2,7 @@ import type { Config } from 'tailwindcss'
 import typography from '@tailwindcss/typography'
 
 export default {
+  darkMode: 'class',
   content: [
     './components/**/*.{vue,js,ts}',
     './layouts/**/*.vue',
@@ -23,7 +24,7 @@ export default {
         success: 'var(--color-success)',
       },
       fontFamily: {
-        serif: ['"DM Serif Display"', 'serif'],
+        heading: ['Plus Jakarta Sans', 'sans-serif'],
         sans: ['Inter', 'sans-serif'],
       },
     },

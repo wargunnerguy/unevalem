@@ -3,7 +3,8 @@
 export const nav = {
   home: 'Avaleht',
   articles: 'Artiklid',
-  quiz: 'Viktoriin',
+  quiz: 'Unetest',
+  shop: 'Pood',
   logo: 'Unevalem',
   tagline: 'Sinu isiklik unevalem',
 }
@@ -24,56 +25,110 @@ export const common = {
 }
 
 export const calculator = {
-  heroHeading: 'Leia oma unelahendus',
-  heroSubtext: 'Vasta 5 küsimusele ja saad personaalse soovituse.',
+  heroHeading: 'Mis tüüpi padi sobib sulle kõige paremini?',
+  heroSubtext: 'Vasta 10 küsimusele — saad täpse soovituse padi, teki ja muu kohta.',
+
+  variantHeadings: {
+    pillow:  'Mis tüüpi padi sobib sulle kõige paremini?',
+    blanket: 'Mis tüüpi tekk sobib sulle kõige paremini?',
+    sleep:   'Kui hea on sinu une kvaliteet?',
+  } as Record<string, string>,
+  variantSubtexts: {
+    pillow:  'Vasta 10 küsimusele — saad täpse soovituse, milline padi, tekk ja muud voodimaterjalid sulle sobivad.',
+    blanket: 'Vasta 10 küsimusele — leia täpselt sobiv tekk, padi ja muud voodimaterjalid.',
+    sleep:   'Vasta 10 küsimusele — saa teada oma uneskoor ja personaalsed soovitused une parandamiseks.',
+  } as Record<string, string>,
   progressLabel: (step: number, total: number) => `Samm ${step} / ${total}`,
+  timeLeft: (step: number): string => {
+    const sek = (11 - step) * 12
+    if (sek >= 60) return `~${Math.ceil(sek / 60)} min`
+    if (sek > 0) return `~${sek} sek`
+    return ''
+  },
 
   steps: [
     {
-      question: 'Kuidas sa tavaliselt magad?',
+      question: 'Kuidas sa üldjuhul magad?',
       options: [
-        { emoji: '🫃', label: 'Küljel', value: 'side' },
-        { emoji: '🙆', label: 'Selili', value: 'back' },
-        { emoji: '😮‍💨', label: 'Kõhuli', value: 'stomach' },
-        { emoji: '🔄', label: 'Vahelduvalt', value: 'combo' },
+        { label: 'Küljel', value: 'side' },
+        { label: 'Selili', value: 'back' },
+        { label: 'Kõhuli', value: 'stomach' },
+        { label: 'Vahelduvalt', value: 'combo' },
       ],
     },
     {
-      question: 'Kas sa magad pigem soojalt või jahedalt?',
+      question: 'Milline on sinu kehaehitus?',
       options: [
-        { emoji: '🥶', label: 'Olen öösiti külm', value: 'cold' },
-        { emoji: '😊', label: 'Normaalselt', value: 'normal' },
-        { emoji: '🥵', label: 'Higistan öösel', value: 'hot' },
+        { label: 'Peenike / kitsaste õlgadega', value: 'slim' },
+        { label: 'Keskmine', value: 'medium' },
+        { label: 'Tugevam / laiade õlgadega', value: 'broad' },
       ],
     },
     {
-      question: 'Millist peatuge eelistad?',
+      question: 'Kas ärkad hommikul kaela- või õlavaluga?',
       options: [
-        { emoji: '📏', label: 'Madalat (alla 8 cm)', value: 'low' },
-        { emoji: '📐', label: 'Keskmist (8–12 cm)', value: 'medium' },
-        { emoji: '🛏️', label: 'Kõrget (üle 12 cm)', value: 'high' },
-        { emoji: '❓', label: 'Ei tea', value: 'unknown' },
+        { label: 'Jah, sageli', value: 'often' },
+        { label: 'Mõnikord', value: 'sometimes' },
+        { label: 'Ei', value: 'never' },
       ],
     },
     {
-      question: 'Kas magad üksi või kellegagi koos?',
+      question: 'Kas higistab öösel või ärkad kuumalt?',
       options: [
-        { emoji: '🛏️', label: 'Üksi', value: 'solo' },
-        { emoji: '👫', label: 'Kahekesi, ühine tekk', value: 'shared' },
-        { emoji: '💨', label: 'Kahekesi, eraldi tekid', value: 'separate' },
+        { label: 'Jah, sageli', value: 'often' },
+        { label: 'Mõnikord', value: 'sometimes' },
+        { label: 'Harva', value: 'rarely' },
       ],
     },
     {
-      question: 'Kas sul esineb mõni neist probleemidest?',
+      question: 'Milline temperatuur sobib sulle magamiseks?',
       options: [
-        { emoji: '🌡️', label: 'Ärkan kuumalt / higistades', value: 'hot' },
-        { emoji: '😣', label: 'Kaela- või õlavalu hommikul', value: 'neck' },
-        { emoji: '😴', label: 'Raske uinuda', value: 'insomnia' },
-        { emoji: '👂', label: 'Olen kergesti ärkav', value: 'light' },
-        { emoji: '✅', label: 'Pole probleeme', value: 'none' },
+        { label: 'Jahe tuba (16–18 °C)', value: 'cold' },
+        { label: 'Mugav (18–20 °C)', value: 'normal' },
+        { label: 'Soe tuba (20 °C+)', value: 'hot' },
       ],
-      multiSelect: true,
-      submitLabel: 'Kuva minu valem →',
+    },
+    {
+      question: 'Millist teki kaalu eelistad?',
+      options: [
+        { label: 'Kerget — soovin tunda ainult puudutust', value: 'light' },
+        { label: 'Keskmist — normaalne soojus', value: 'medium' },
+        { label: 'Rasket ja soojendavamat', value: 'heavy' },
+      ],
+    },
+    {
+      question: 'Kas magad üksi või koos partneriga?',
+      options: [
+        { label: 'Üksi', value: 'solo' },
+        { label: 'Koos — jagame tekki', value: 'shared' },
+        { label: 'Koos — eraldi tekid', value: 'separate' },
+      ],
+    },
+    {
+      question: 'Kas sul esineb allergia või tundlikkus?',
+      options: [
+        { label: 'Tolmulestade suhtes', value: 'dust-mites' },
+        { label: 'Sünteetiliste materjalide suhtes', value: 'synthetic' },
+        { label: 'Pole', value: 'none' },
+      ],
+    },
+    {
+      question: 'Kui vana on sinu praegune padi?',
+      options: [
+        { label: 'Uus (alla 1 aasta)', value: 'new' },
+        { label: '1–3 aastat vana', value: '1-3y' },
+        { label: 'Üle 3 aasta vana', value: '3y+' },
+      ],
+    },
+    {
+      question: 'Mis on sinu peamine uneprobleem?',
+      options: [
+        { label: 'Raske uinuda', value: 'cant-sleep' },
+        { label: 'Ärkan öösel üles', value: 'wake-at-night' },
+        { label: 'Ärkan väsinuna', value: 'wake-tired' },
+        { label: 'Pole probleeme', value: 'none' },
+      ],
+      submitLabel: 'Analüüsi minu und →',
     },
   ],
 
@@ -81,9 +136,15 @@ export const calculator = {
     currentScoreLabel: 'Sinu praegune uneskoor',
     improvedScoreLabel: 'Pärast muutusi',
     scoreUnit: '/ 100',
-    recommendationsHeading: 'Sinu personaalsed soovitused',
+    pillowHeading: 'Sinu ideaalne padi',
+    blanketHeading: 'Sinu sobiv tekk',
     tipsHeading: 'Isiklikud unenõuanded',
-    ctaButton: 'Vaata soovitatud tooteid →',
+    exploreHeading: 'Täienda oma unekeskkonda',
+    exploreItems: [
+      { label: 'Leia sobiv madrats', hint: 'Tulemas peagi', href: '/pood', disabled: true },
+      { label: 'Uuri voodipesu', hint: 'Bambuspadjapüürid ja tekikotid', href: '/pood', disabled: false },
+    ],
+    ctaButton: 'Vaata kõiki tooteid →',
     mustHaveBadge: 'Oluline',
     niceToHaveBadge: 'Kasulik',
     resetButton: 'Alusta uuesti',
@@ -122,9 +183,9 @@ export const homepage = {
 }
 
 export const quizPage = {
-  heading: 'Unviktoriin',
-  metaTitle: 'Unviktoriin – mis tüüpi magaja sa oled? | Unevalem',
-  metaDescription: 'Testi oma uneteadmisi ja avasta oma unetüüp. Lõbusad viktoriinid parema une nimel.',
+  heading: 'Unetest',
+  metaTitle: 'Unetest – mis tüüpi magaja sa oled? | Unevalem',
+  metaDescription: 'Testi oma uneteadmisi ja avasta oma unetüüp. Interaktiivsed unetestid parema une nimel.',
   backToQuizzes: 'Tagasi viktoriinide juurde',
   shareResult: 'Minu unetüüp',
   tryCalculator: 'Proovi ka Unevalemit →',

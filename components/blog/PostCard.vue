@@ -1,64 +1,113 @@
 <script setup lang="ts">
+import { marked } from 'marked'
 import type { Post } from '~/types'
 import { blogCategories, blogPage, common } from '~/utils/copy'
 
-defineProps<{
-  post: Post
-}>()
+const props = defineProps<{ post: Post }>()
+
+const { posts } = usePosts()
+const expanded = ref(false)
 
 const categoryLabel = (cat: Post['category']) =>
   blogCategories[cat as keyof typeof blogCategories] ?? cat
+
+const renderedContent = computed(() =>
+  expanded.value ? (marked.parse(props.post.content ?? '') as string) : '',
+)
+
+const relatedPosts = computed(() =>
+  (posts.value ?? [])
+    .filter(p => p.category === props.post.category && p.id !== props.post.id)
+    .slice(0, 3),
+)
+
+function toggle() {
+  expanded.value = !expanded.value
+}
 </script>
 
 <template>
-  <NuxtLink :to="`/artiklid/${post.slug}`" class="block group h-full">
-    <article class="bg-foam rounded-xl overflow-hidden border border-gray-100 hover:border-lavender/50 hover:shadow-md transition-all duration-200 h-full flex flex-col">
+  <article class="border-b border-gray-100 py-5">
 
-      <!-- Visual header -->
-      <div class="overflow-hidden shrink-0">
-        <img
-          v-if="post.coverImage"
-          :src="post.coverImage"
-          :alt="post.title"
-          class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        <div
-          v-else
-          class="h-32 bg-gradient-to-br from-midnight to-dusk flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <span class="text-5xl opacity-20 select-none">🌙</span>
-        </div>
+    <!-- Badges row -->
+    <div class="flex items-center gap-2 flex-wrap mb-2">
+      <span class="text-xs px-2 py-0.5 rounded-full border border-lavender/40 bg-moonlight text-midnight font-medium">
+        {{ categoryLabel(post.category) }}
+      </span>
+      <span v-if="post.isFeatured" class="text-xs px-2 py-0.5 rounded-full bg-gold text-midnight font-semibold">
+        {{ common.popularBadge }}
+      </span>
+      <span class="text-xs text-muted ml-auto">{{ blogPage.readingTime(post.readingTimeMin) }}</span>
+    </div>
+
+    <!-- Title -->
+    <h2 class="font-heading text-xl text-midnight leading-snug mb-2">{{ post.title }}</h2>
+
+    <!-- Excerpt (always visible) -->
+    <p class="text-sm text-muted leading-relaxed">{{ post.excerpt }}</p>
+
+    <!-- Expand toggle -->
+    <button
+      v-if="!expanded"
+      type="button"
+      class="mt-3 text-sm font-medium text-midnight hover:text-lavender transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+      @click="toggle"
+    >
+      Loe edasi →
+    </button>
+
+    <!-- Expanded section: max-height CSS transition -->
+    <div
+      class="overflow-hidden transition-[max-height] duration-500 ease-in-out"
+      :style="expanded ? 'max-height: 5000px' : 'max-height: 0'"
+    >
+      <!-- Full content -->
+      <div
+        class="prose prose-sm max-w-none mt-4 text-midnight"
+        v-html="renderedContent"
+      />
+
+      <!-- Dive deeper links -->
+      <div v-if="post.diveDeeper?.length" class="mt-6 pt-4 border-t border-gray-100">
+        <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-2">Sukelduge sügavamale</p>
+        <ul class="space-y-1.5">
+          <li v-for="link in post.diveDeeper" :key="link.url">
+            <a
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-midnight hover:text-lavender underline underline-offset-2 transition-colors"
+            >
+              {{ link.title }} →
+            </a>
+          </li>
+        </ul>
       </div>
 
-      <!-- Content -->
-      <div class="p-4 flex flex-col flex-1 gap-2">
-        <!-- Badges -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-xs px-2 py-0.5 rounded-full border border-lavender/40 bg-moonlight text-midnight font-medium">
-            {{ categoryLabel(post.category) }}
-          </span>
-          <span v-if="post.isFeatured" class="text-xs px-2 py-0.5 rounded-full bg-gold text-midnight font-semibold">
-            {{ common.popularBadge }}
-          </span>
-        </div>
-
-        <!-- Title -->
-        <h3 class="font-serif text-lg text-midnight leading-snug">
-          {{ post.title }}
-        </h3>
-
-        <!-- Excerpt -->
-        <p class="text-sm text-muted leading-relaxed line-clamp-2 flex-1">
-          {{ post.excerpt }}
-        </p>
-
-        <!-- Reading time -->
-        <p class="text-xs text-muted/70 mt-auto pt-1">
-          {{ blogPage.readingTime(post.readingTimeMin) }}
-        </p>
+      <!-- Related posts -->
+      <div v-if="relatedPosts.length" class="mt-6 pt-4 border-t border-gray-100">
+        <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Seotud artiklid</p>
+        <ul class="space-y-2">
+          <li v-for="p in relatedPosts" :key="p.id">
+            <NuxtLink
+              :to="`/artiklid/${p.slug}`"
+              class="text-sm text-midnight hover:text-lavender transition-colors leading-snug"
+            >
+              {{ p.title }}
+            </NuxtLink>
+          </li>
+        </ul>
       </div>
 
-    </article>
-  </NuxtLink>
+      <!-- Collapse -->
+      <button
+        type="button"
+        class="mt-5 text-sm text-muted hover:text-midnight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+        @click="toggle"
+      >
+        Sulge ↑
+      </button>
+    </div>
+
+  </article>
 </template>

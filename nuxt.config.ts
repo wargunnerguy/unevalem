@@ -9,10 +9,9 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
   ],
 
-  // DM Serif Display is a static (non-variable) font — can't use ital,wght axis syntax.
-  // We load it via a direct link instead; disable download to avoid the bad URL.
   googleFonts: {
     families: {
+      'Plus Jakarta Sans': [400, 500, 600, 700, 800],
       'Inter': [300, 400, 500, 600],
     },
     display: 'swap',
@@ -51,10 +50,6 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap',
-        },
         { rel: 'canonical', href: 'https://unevalem.ee' },
       ],
       script: [
@@ -69,7 +64,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee',
+      siteUrl:      process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee',
+      // Exposed to browser for fire-and-forget analytics POST (no-cors, not a secret)
+      sheetsApiUrl: process.env.SHEETS_API_URL ?? '',
     },
   },
 })

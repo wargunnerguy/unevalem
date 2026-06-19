@@ -1,59 +1,87 @@
-export type SleepPosition = 'side' | 'back' | 'stomach' | 'combo'
-export type TempPreference = 'cold' | 'normal' | 'hot'
-export type PillowLoft = 'low' | 'medium' | 'high'
+export type SleepPosition    = 'side' | 'back' | 'stomach' | 'combo'
+export type TempPreference   = 'cold' | 'normal' | 'hot'
 export type PartnerSituation = 'solo' | 'shared' | 'separate'
-export type SleepIssue = 'hot' | 'neck' | 'insomnia' | 'light'
+export type BodyType         = 'slim' | 'medium' | 'broad'
+export type NeckPain         = 'often' | 'sometimes' | 'never'
+export type SweatingLevel    = 'often' | 'sometimes' | 'rarely'
+export type BlanketWeight    = 'light' | 'medium' | 'heavy'
+export type AllergyProfile   = 'dust-mites' | 'synthetic' | 'none'
+export type PillowAge        = 'new' | '1-3y' | '3y+'
+export type MainComplaint    = 'cant-sleep' | 'wake-at-night' | 'wake-tired' | 'none'
 
 export interface UserProfile {
-  position: SleepPosition
-  temp: TempPreference
-  loft: PillowLoft
-  partner: PartnerSituation
-  issues: SleepIssue[]
+  position:      SleepPosition      // Q1  sleep position
+  bodyType:      BodyType           // Q2  shoulder/body type
+  neckPain:      NeckPain           // Q3  morning neck/shoulder pain
+  sweating:      SweatingLevel      // Q4  night sweating
+  temp:          TempPreference     // Q5  room temperature preference
+  blanketWeight: BlanketWeight      // Q6  blanket weight preference
+  partner:       PartnerSituation   // Q7  sleeping alone or with partner
+  allergies:     AllergyProfile     // Q8  material sensitivities
+  pillowAge:     PillowAge          // Q9  current pillow age
+  complaint:     MainComplaint      // Q10 main sleep complaint
+}
+
+export interface Product {
+  id:           string
+  name:         string
+  category:     'pillow' | 'blanket' | 'mattress' | 'pillowcase' | 'duvetcover' | 'sheet'
+  subcategory:  string
+  description:  string
+  price:        number
+  priceText:    string
+  imageUrl?:    string
+  storeUrl:     string
+  tags:         string[]
+  active:       boolean
+  isFeatured:   boolean
 }
 
 export interface ProductRec {
-  id: string
-  name: string
-  reason: string
-  urgency: 'must-have' | 'nice-to-have'
-  category: 'pillow' | 'blanket' | 'topper' | 'extra'
-  linkUrl?: string
+  id:         string
+  name:       string
+  reason:     string
+  urgency:    'must-have' | 'nice-to-have'
+  category:   'pillow' | 'blanket' | 'topper' | 'extra'
+  linkUrl?:   string
+  priceText?: string
+  imageUrl?:  string
 }
 
 export interface CalculatorResult {
-  currentScore: number
-  improvedScore: number
+  currentScore:    number
+  improvedScore:   number
   recommendations: ProductRec[]
-  personalTips: string[]
+  personalTips:    string[]
 }
 
 export interface Post {
-  id: number
-  slug: string
-  title: string
-  excerpt: string
-  content: string
-  category: 'teadus' | 'nõuanded' | 'tooted' | 'uneaeg'
-  publishDate: string
-  tags: string[]
-  coverImage: string
-  status: 'published' | 'draft'
-  isFeatured: boolean
+  id:             number
+  slug:           string
+  title:          string
+  excerpt:        string
+  content:        string
+  category:       'teadus' | 'nõuanded' | 'tooted' | 'uneaeg'
+  publishDate:    string
+  tags:           string[]
+  coverImage:     string
+  status:         'published' | 'draft'
+  isFeatured:     boolean
   readingTimeMin: number
+  diveDeeper:     { title: string; url: string }[]
 }
 
 export interface Notification {
-  id: number
-  text: string
-  type: 'purchase' | 'view' | 'quiz'
+  id:       number
+  text:     string
+  type:     'purchase' | 'view' | 'quiz'
   hoursAgo: number
-  active: boolean
+  active:   boolean
 }
 
 export interface Stat {
-  key: string
-  value: string
+  key:         string
+  value:       string
   displayText: string
-  active: boolean
+  active:      boolean
 }

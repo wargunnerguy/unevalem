@@ -1,14 +1,38 @@
 [
   {
-    "key": "calculatorCompletions",
-    "value": "Üle 1 200",
-    "displayText": "inimest on leidnud oma unevalemi",
+    "key": "posts",
+    "value": "48",
+    "displayText": "artikleid avaldatud",
     "active": true
   },
   {
-    "key": "articlesRead",
-    "value": "4 800+",
-    "displayText": "artiklilugemisel",
+    "key": "views",
+    "value": "124.5K",
+    "displayText": "vaatamist kokku",
+    "active": true
+  },
+  {
+    "key": "visitors",
+    "value": "18.2K",
+    "displayText": "külastajat kuus",
+    "active": true
+  },
+  {
+    "key": "readTime",
+    "value": "9 min",
+    "displayText": "keskmine lugemisaeg",
+    "active": true
+  },
+  {
+    "key": "subscribers",
+    "value": "3 420",
+    "displayText": "tellijat",
+    "active": false
+  },
+  {
+    "key": "calculatorCompletions",
+    "value": "1 200+",
+    "displayText": "inimest on leidnud oma unevalemi",
     "active": false
   }
 ]

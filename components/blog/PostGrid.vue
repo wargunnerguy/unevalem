@@ -2,11 +2,15 @@
 import type { Post } from '~/types'
 import { blogCategories, blogPage } from '~/utils/copy'
 
-defineProps<{
+const props = defineProps<{
   posts: Post[]
 }>()
 
+const PAGE_SIZE = 10
+
 const selectedCategory = ref<string>('all')
+const visibleCount = ref(PAGE_SIZE)
+const sentinel = ref<HTMLElement | null>(null)
 
 const categories = [
   { key: 'all',      label: blogCategories.all },
@@ -15,6 +19,23 @@ const categories = [
   { key: 'tooted',   label: blogCategories.tooted },
   { key: 'uneaeg',   label: blogCategories.uneaeg },
 ] as const
+
+watch(selectedCategory, () => { visibleCount.value = PAGE_SIZE })
+
+const filteredPosts = computed(() => {
+  if (selectedCategory.value === 'all') return props.posts
+  return props.posts.filter(p => p.category === selectedCategory.value)
+})
+
+const visiblePosts = computed(() => filteredPosts.value.slice(0, visibleCount.value))
+
+const hasMore = computed(() => visibleCount.value < filteredPosts.value.length)
+
+useIntersectionObserver(sentinel, ([entry]) => {
+  if (entry.isIntersecting && hasMore.value) {
+    visibleCount.value += PAGE_SIZE
+  }
+})
 </script>
 
 <template>
@@ -43,17 +64,22 @@ const categories = [
       </button>
     </div>
 
-    <!-- Grid -->
-    <div
-      v-if="posts.filter(p => selectedCategory === 'all' || p.category === selectedCategory).length"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-    >
+    <!-- Vertical list -->
+    <div v-if="filteredPosts.length">
       <PostCard
-        v-for="post in posts.filter(p => selectedCategory === 'all' || p.category === selectedCategory)"
+        v-for="post in visiblePosts"
         :key="post.id"
         :post="post"
       />
+
+      <!-- Infinite scroll sentinel -->
+      <div ref="sentinel" class="h-4 mt-4" aria-hidden="true" />
+
+      <p v-if="hasMore" class="py-4 text-center text-sm text-muted" aria-live="polite">
+        Laen rohkem...
+      </p>
     </div>
+
     <p v-else class="text-center py-14 text-muted">
       {{ blogPage.emptyCategory }}
     </p>

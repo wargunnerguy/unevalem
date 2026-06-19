@@ -1,73 +1,59 @@
-import type { UserProfile, CalculatorResult, SleepIssue, PillowLoft } from '~/types'
+import type { UserProfile, CalculatorResult, Product } from '~/types'
 import { getRecommendations } from '~/utils/calculator'
 
-function inferLoft(position?: UserProfile['position']): PillowLoft {
-  if (position === 'stomach') return 'low'
-  if (position === 'back') return 'medium'
-  if (position === 'side') return 'high'
-  return 'medium'
-}
-
-type AnswerKey = Exclude<keyof UserProfile, 'issues'>
+type AnswerKey = keyof UserProfile
 
 export function useCalculator() {
   const step = useState<number>('calc-step', () => 1)
   const answers = useState<Partial<UserProfile>>('calc-answers', () => ({}))
   const result = useState<CalculatorResult | null>('calc-result', () => null)
+  const analyzing = useState<boolean>('calc-analyzing', () => false)
 
   function selectOption(key: AnswerKey, value: string) {
-    if (key === 'loft' && value === 'unknown') {
-      // Infer loft from position; don't store 'unknown' (not a valid PillowLoft)
-      const inferred = inferLoft(answers.value.position)
-      answers.value = { ...answers.value, loft: inferred }
-    } else {
-      answers.value = { ...answers.value, [key]: value as any }
-    }
-    if (step.value < 5) step.value++
+    answers.value = { ...answers.value, [key]: value as any }
+    if (step.value < 10) step.value++
   }
 
-  function toggleIssue(value: SleepIssue | 'none') {
-    if (value === 'none') {
-      answers.value = { ...answers.value, issues: [] }
-      return
-    }
-    const current = answers.value.issues ?? []
-    const idx = current.indexOf(value)
-    answers.value = {
-      ...answers.value,
-      issues: idx >= 0 ? current.filter(i => i !== value) : [...current, value],
-    }
-  }
-
-  function submitIssues() {
+  function submitQuiz(products: Product[]) {
     const profile: UserProfile = {
-      position: answers.value.position ?? 'combo',
-      temp: answers.value.temp ?? 'normal',
-      loft: answers.value.loft ?? inferLoft(answers.value.position),
-      partner: answers.value.partner ?? 'solo',
-      issues: answers.value.issues ?? [],
+      position:      answers.value.position      ?? 'combo',
+      bodyType:      answers.value.bodyType      ?? 'medium',
+      neckPain:      answers.value.neckPain      ?? 'never',
+      sweating:      answers.value.sweating      ?? 'rarely',
+      temp:          answers.value.temp          ?? 'normal',
+      blanketWeight: answers.value.blanketWeight ?? 'medium',
+      partner:       answers.value.partner       ?? 'solo',
+      allergies:     answers.value.allergies     ?? 'none',
+      pillowAge:     answers.value.pillowAge     ?? 'new',
+      complaint:     answers.value.complaint     ?? 'none',
     }
-    result.value = getRecommendations(profile)
-    step.value = 6
+    result.value = getRecommendations(profile, products)
+    analyzing.value = true
+
+    setTimeout(() => {
+      analyzing.value = false
+      step.value = 11
+    }, 6000)
   }
 
   function goBack() {
-    if (step.value > 1) step.value--
+    if (step.value > 1 && step.value <= 10) step.value--
   }
 
   function reset() {
     step.value = 1
     answers.value = {}
     result.value = null
+    analyzing.value = false
   }
 
   return {
     step,
     answers,
     result,
+    analyzing,
     selectOption,
-    toggleIssue,
-    submitIssues,
+    submitQuiz,
     goBack,
     reset,
   }

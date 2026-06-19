@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { footer, nav } from '~/utils/copy'
 
 const year = new Date().getFullYear()
@@ -11,7 +11,7 @@ const year = new Date().getFullYear()
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <!-- Brand -->
         <div>
-          <span class="font-serif text-xl text-foam">{{ nav.logo }}</span>
+          <span class="font-heading text-xl text-foam">{{ nav.logo }}</span>
           <p class="text-sm text-muted mt-1 max-w-xs">{{ footer.tagline }}</p>
         </div>
 
@@ -24,7 +24,7 @@ const year = new Date().getFullYear()
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/viktoriin" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              <NuxtLink to="/unetest" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
                 {{ nav.quiz }}
               </NuxtLink>
             </li>
