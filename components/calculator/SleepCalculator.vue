@@ -12,7 +12,6 @@ const {
   siteProfile, activeCalcType, completedCount, allDone,
   syncActiveCalcType, getNextAfter, storeCompletion, getPrefilledAnswers,
 } = useCalcSession()
-const { submit: submitToSheets } = useSubmitCalc()
 
 // Sync active calc type from cookies on mount (avoids SSR mismatch).
 // If the type changed (returning visitor who completed a calc), also reset.
@@ -49,7 +48,6 @@ watch(step, (val, prev) => {
     const productName = result.value.recommendations[0]?.name ?? ''
     storeCompletion(activeCalcType.value, answers.value, productName)
     submitCalcResult(answers.value, result.value, activeCalcType.value)
-    submitToSheets(activeCalcType.value, answers.value, productName)
   }
   if (val === 1 && prev && prev > 1) resetSubmitted()
 })
