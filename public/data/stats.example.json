@@ -1,38 +1,26 @@
 [
   {
-    "key": "posts",
-    "value": "48",
-    "displayText": "artikleid avaldatud",
+    "key": "calculatorCompletions",
+    "value": "1 247",
+    "displayText": "inimest on leidnud oma unevalemi",
     "active": true
   },
   {
-    "key": "views",
-    "value": "124.5K",
-    "displayText": "vaatamist kokku",
-    "active": true
-  },
-  {
-    "key": "visitors",
-    "value": "18.2K",
+    "key": "monthlyVisitors",
+    "value": "17 843",
     "displayText": "külastajat kuus",
     "active": true
   },
   {
-    "key": "readTime",
-    "value": "9 min",
-    "displayText": "keskmine lugemisaeg",
+    "key": "totalViews",
+    "value": "118 463",
+    "displayText": "lugemist kokku",
     "active": true
   },
   {
-    "key": "subscribers",
-    "value": "3 420",
-    "displayText": "tellijat",
-    "active": false
-  },
-  {
-    "key": "calculatorCompletions",
-    "value": "1 200+",
-    "displayText": "inimest on leidnud oma unevalemi",
-    "active": false
+    "key": "announcement",
+    "value": "Uuendus",
+    "displayText": "Kalkulaator uuendati (v2.5) — täpsemad soovitused kaelavalu ja higistamise põhjal",
+    "active": true
   }
 ]
