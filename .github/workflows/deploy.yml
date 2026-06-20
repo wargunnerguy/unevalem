@@ -42,6 +42,7 @@ jobs:
         run: npm run generate
         env:
           NUXT_APP_BASE_URL: /
+          SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
 
       - uses: actions/configure-pages@v5
 
