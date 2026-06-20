@@ -7,7 +7,19 @@ const announcement = computed(() =>
   (statsData.value ?? []).find(s => s.key === 'announcement' && s.active),
 )
 
-const dismissed = ref(false)
+// Store the dismissed announcement text so a new message shows again automatically
+const dismissedText = useCookie('announcement-dismissed', {
+  maxAge: 60 * 60 * 24 * 365,
+  sameSite: 'lax',
+})
+
+const visible = computed(() =>
+  !!announcement.value && dismissedText.value !== announcement.value.displayText,
+)
+
+function dismiss() {
+  if (announcement.value) dismissedText.value = announcement.value.displayText
+}
 </script>
 
 <template>
@@ -21,18 +33,18 @@ const dismissed = ref(false)
       leave-to-class="opacity-0 -translate-y-2"
     >
       <div
-        v-if="announcement && !dismissed"
+        v-if="visible"
         class="bg-dusk border-b border-lavender/20 px-4 py-2.5"
       >
         <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <p class="text-sm text-foam/90 leading-snug">
-            <span class="font-semibold text-lavender mr-2">{{ announcement.value }}</span>{{ announcement.displayText }}
+            <span class="font-semibold text-lavender mr-2">{{ announcement!.value }}</span>{{ announcement!.displayText }}
           </p>
           <button
             type="button"
             class="shrink-0 text-muted hover:text-foam transition-colors text-xs leading-none p-1"
             aria-label="Sulge teadaanne"
-            @click="dismissed = true"
+            @click="dismiss"
           >
             ✕
           </button>
