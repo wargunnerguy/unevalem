@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { quizPage, quizzes, common } from '~/utils/copy'
+import { quizPage, common } from '~/utils/copy'
 
 useHead({
   title: quizPage.metaTitle,
@@ -10,37 +10,40 @@ useHead({
   ],
 })
 
-const quiz = quizzes.chronotype
-const totalQuestions = quiz.questions.length
+const { quiz, pending } = useQuiz()
 
 type Phase = 'intro' | 'quiz' | 'result'
 const phase = ref<Phase>('intro')
 const qIndex = ref(0)
-const scores = ref<number[]>(Array(totalQuestions).fill(0))
-const answered = ref<boolean[]>(Array(totalQuestions).fill(false))
+const scores = ref<number[]>([])
+const answered = ref<boolean[]>([])
 const transitionName = ref('slide-left')
+
+const totalQuestions = computed(() => quiz.value?.questions.length ?? 0)
 
 const totalScore = computed(() =>
   scores.value.reduce((sum, s, i) => sum + (answered.value[i] ? s : 0), 0),
 )
 
+// Results are sorted highest-band-first at build time; pick the band the score falls in
 const result = computed(() => {
+  const rs = quiz.value?.results ?? []
+  if (!rs.length) return null
   const s = totalScore.value
-  const r = quiz.results
-  if (s >= r.lark.range[0])        return r.lark
-  if (s >= r.intermediate.range[0]) return r.intermediate
-  return r.owl
+  return rs.find(r => s >= r.minScore && s <= r.maxScore) ?? rs[rs.length - 1]
 })
 
-const currentQuestion = computed(() => quiz.questions[qIndex.value])
+const currentQuestion = computed(() => quiz.value?.questions[qIndex.value] ?? null)
 
 const progress = computed(() =>
-  Math.round((answered.value.filter(Boolean).length / totalQuestions) * 100),
+  totalQuestions.value
+    ? Math.round((answered.value.filter(Boolean).length / totalQuestions.value) * 100)
+    : 0,
 )
 
 function startQuiz() {
-  scores.value = Array(totalQuestions).fill(0)
-  answered.value = Array(totalQuestions).fill(false)
+  scores.value = Array(totalQuestions.value).fill(0)
+  answered.value = Array(totalQuestions.value).fill(false)
   qIndex.value = 0
   transitionName.value = 'slide-left'
   phase.value = 'quiz'
@@ -50,7 +53,7 @@ function selectAnswer(score: number) {
   scores.value[qIndex.value] = score
   answered.value[qIndex.value] = true
   transitionName.value = 'slide-left'
-  if (qIndex.value < totalQuestions - 1) {
+  if (qIndex.value < totalQuestions.value - 1) {
     qIndex.value++
   } else {
     phase.value = 'result'
@@ -94,13 +97,18 @@ const screenKey = computed(() => {
 
     <!-- Quiz area -->
     <div class="max-w-2xl mx-auto px-4 py-10">
-      <Transition :name="transitionName" mode="out-in">
+
+      <!-- Loading / empty states -->
+      <p v-if="!quiz && pending" class="text-muted text-center py-10">{{ quizPage.loading }}</p>
+      <p v-else-if="!quiz" class="text-muted text-center py-10">{{ quizPage.empty }}</p>
+
+      <Transition v-else :name="transitionName" mode="out-in">
         <div :key="screenKey">
 
           <!-- ─── INTRO ─────────────────────────────────────────────── -->
           <div v-if="phase === 'intro'" class="bg-foam rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100">
             <p class="text-xs font-semibold text-lavender uppercase tracking-wider mb-3">
-              Unetest
+              {{ quizPage.eyebrow }}
             </p>
             <h2 class="font-heading text-2xl sm:text-3xl text-midnight mb-4 leading-snug">
               {{ quiz.title }}
@@ -113,12 +121,12 @@ const screenKey = computed(() => {
               class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gold text-midnight font-semibold text-base hover:bg-gold/90 active:scale-[.98] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
               @click="startQuiz"
             >
-              Alusta unetesti →
+              {{ quizPage.startButton }}
             </button>
           </div>
 
           <!-- ─── QUIZ ──────────────────────────────────────────────── -->
-          <div v-else-if="phase === 'quiz'">
+          <div v-else-if="phase === 'quiz' && currentQuestion">
             <div class="flex items-center gap-3 mb-6">
               <button
                 type="button"
@@ -164,7 +172,7 @@ const screenKey = computed(() => {
           </div>
 
           <!-- ─── RESULT ─────────────────────────────────────────────── -->
-          <div v-else-if="phase === 'result'">
+          <div v-else-if="phase === 'result' && result">
             <button
               type="button"
               class="text-sm text-muted hover:text-midnight transition-colors mb-6 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
@@ -175,7 +183,7 @@ const screenKey = computed(() => {
 
             <div class="bg-dusk rounded-2xl p-6 sm:p-8 mb-4 text-center">
               <p class="text-xs font-semibold text-lavender uppercase tracking-wider mb-3">
-                Sinu tulemus
+                {{ quizPage.resultLabel }}
               </p>
               <h2 class="font-heading text-3xl sm:text-4xl text-foam mb-4">
                 {{ result.type }}
@@ -186,7 +194,7 @@ const screenKey = computed(() => {
             </div>
 
             <div class="bg-foam rounded-2xl p-6 sm:p-8 border border-gray-100 mb-6">
-              <h3 class="font-heading text-xl text-midnight mb-4">Nõuanded sinu kronotüübile</h3>
+              <h3 class="font-heading text-xl text-midnight mb-4">{{ quiz.tipsHeading }}</h3>
               <ul class="space-y-3">
                 <li
                   v-for="(tip, i) in result.tips"
@@ -211,7 +219,7 @@ const screenKey = computed(() => {
                 class="flex-1 text-center px-6 py-3 rounded-xl border border-lavender/40 text-muted text-sm font-medium hover:border-lavender hover:text-midnight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
                 @click="restart"
               >
-                Alusta uuesti
+                {{ quizPage.restartButton }}
               </button>
             </div>
           </div>

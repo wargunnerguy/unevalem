@@ -17,6 +17,7 @@ public/data/notifications.json
 public/data/stats.json
 public/data/products.json
 public/data/tips.json
+public/data/quizzes.json
 
 # OS
 .DS_Store

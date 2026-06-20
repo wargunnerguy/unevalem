@@ -280,109 +280,12 @@ export const quizPage = {
   backToQuizzes: 'Tagasi viktoriinide juurde',
   shareResult: 'Minu unetüüp',
   tryCalculator: 'Proovi ka Unevalemit →',
-}
-
-export const quizzes = {
-  chronotype: {
-    title: 'Kas sa oled öökulli või lõoke?',
-    description: 'Vasta 8 küsimusele ja avasta oma kronotüüp — see selgitab, miks mõnel on hommikul energia ja teisel õhtul.',
-    questions: [
-      {
-        question: 'Millal ärkad eelistatult nädalavahetusel, kui kellaäratust pole?',
-        options: [
-          { label: 'Enne kella 7', value: 3 },
-          { label: 'Kella 7–9 vahel', value: 2 },
-          { label: 'Pärast kella 9', value: 1 },
-        ],
-      },
-      {
-        question: 'Millal tunned end oma parimas energias?',
-        options: [
-          { label: 'Hommikul (7–10)', value: 3 },
-          { label: 'Päeval (11–14)', value: 2 },
-          { label: 'Õhtul (18–22)', value: 1 },
-        ],
-      },
-      {
-        question: 'Kui raske on sul hommikul ärgata?',
-        options: [
-          { label: 'Üldse mitte raske — ärkan ise', value: 3 },
-          { label: 'Natuke raske, aga saan hakkama', value: 2 },
-          { label: 'Väga raske, vajan mitu äratust', value: 1 },
-        ],
-      },
-      {
-        question: 'Millal lähed tavaliselt magama tööpäeviti?',
-        options: [
-          { label: 'Enne kella 22', value: 3 },
-          { label: 'Kella 22–24 vahel', value: 2 },
-          { label: 'Pärast südaööd', value: 1 },
-        ],
-      },
-      {
-        question: 'Kui tihti tunned end hommikusöögil täiesti ärkvel?',
-        options: [
-          { label: 'Alati', value: 3 },
-          { label: 'Mõnikord', value: 2 },
-          { label: 'Harva või mitte kunagi', value: 1 },
-        ],
-      },
-      {
-        question: 'Millal sooviksid teha kõige tähtsamat tööd?',
-        options: [
-          { label: 'Varahommikul', value: 3 },
-          { label: 'Keskpäeval', value: 2 },
-          { label: 'Hilisõhtul', value: 1 },
-        ],
-      },
-      {
-        question: 'Mis juhtub, kui pead nädalavahetusel enne kella 7 ärkama?',
-        options: [
-          { label: 'Pole probleem', value: 3 },
-          { label: 'Natuke tüütu, aga talutav', value: 2 },
-          { label: 'Õudus — olen järgmisel päeval täiesti kurnatud', value: 1 },
-        ],
-      },
-      {
-        question: 'Millal tunned end kõige unisemana?',
-        options: [
-          { label: 'Õhtul pärast kella 21', value: 3 },
-          { label: 'Pärast lõunat kella 14–15 paiku', value: 2 },
-          { label: 'Hommikul kuni kella 10-ni', value: 1 },
-        ],
-      },
-    ],
-    results: {
-      lark: {
-        range: [20, 24],
-        type: 'Lõoke 🐦',
-        description: 'Sa oled selge hommikuinimene — lõoke! Ärkad kergelt, oled hommikuti produktiivne ja väsid õhtuti varakult. See on geneetiliselt määratud ja täiesti normaalne. Sinu suurim väljakutse on hilisõhtused sotsiaalsed kohustused, mis lükkavad und hilisemaks.',
-        tips: [
-          'Kasuta oma hommikust tipphetke tähtsamate ülesannete jaoks.',
-          'Õhtustel üritustel jälgi, et magama jõuaksid siiski oma tavalisel ajal.',
-        ],
-      },
-      intermediate: {
-        range: [15, 19],
-        type: 'Vahelpealne 🌅',
-        description: 'Sa oled vahepealne tüüp — ei liiga vara, ei liiga hilja. Enamik inimesi kuulub siia kategooriasse. Sul on paindlikkus kohaneda nii hommiku- kui õhtugraafikutega, kuigi suurim produktiivsus on tavaliselt hommikupoolikul.',
-        tips: [
-          'Säilita regulaarne unegraafik, et keha sisemine kell püsiks stabiilsena.',
-          'Väldi enne magamaminekut ekraane — see aitab kiiremini uinuda.',
-        ],
-      },
-      owl: {
-        range: [8, 14],
-        type: 'Öökull 🦉',
-        description: 'Sa oled öökull — loomuliku kalduvusega hilisele ärkvelolekule ja hilisele magamaminekule. Õhtuti on sul energia tipptasemel. Ühiskonna varane päevagraafik võib sulle olla väljakutse, aga see pole iseloogipuudus — see on bioloogia.',
-        tips: [
-          'Proovi järk-järgult magamaminekuaega 15 minutit varasemaks nihutada.',
-          'Hommikune valgus aitab sisekellas nihkuda — ava kardinad kohe pärast ärkamist.',
-        ],
-      },
-    },
-    sharePrefix: 'Minu unetüüp:',
-  },
+  eyebrow: 'Unetest',
+  startButton: 'Alusta unetesti →',
+  resultLabel: 'Sinu tulemus',
+  restartButton: 'Alusta uuesti',
+  loading: 'Laen unetesti...',
+  empty: 'Unetest pole hetkel saadaval.',
 }
 
 export const socialProof = {

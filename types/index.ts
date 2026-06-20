@@ -110,3 +110,34 @@ export interface Tip {
   text:   string
   active: boolean
 }
+
+export interface QuizOption {
+  label: string
+  value: number
+}
+
+export interface QuizQuestion {
+  question: string
+  options:  QuizOption[]
+}
+
+export interface QuizResult {
+  key:         string
+  minScore:    number
+  maxScore:    number
+  type:        string
+  description: string
+  tips:        string[]
+}
+
+// Fully assembled at build time from the quizzes / quiz_questions / quiz_results
+// Sheets tabs, so the frontend receives ready-to-render nested objects.
+export interface Quiz {
+  id:           string
+  title:        string
+  description:  string
+  tipsHeading:  string
+  sharePrefix:  string
+  questions:    QuizQuestion[]
+  results:      QuizResult[]
+}

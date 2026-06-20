@@ -22,5 +22,11 @@
     "value": "Uuendus",
     "displayText": "Kalkulaator uuendati (v2.5) — täpsemad soovitused kaelavalu ja higistamise põhjal",
     "active": true
+  },
+  {
+    "key": "calculatorVersion",
+    "value": "v2.5",
+    "displayText": "Kalkulaatori versioon",
+    "active": true
   }
 ]

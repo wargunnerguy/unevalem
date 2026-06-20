@@ -471,14 +471,60 @@ Post page features: reading time shown, related posts at bottom (same category),
 
 ---
 
-## Quizzes (`pages/viktoriin/index.vue`)
+## Quizzes (`pages/unetest/index.vue`)
 
-Quizzes are hardcoded in `utils/copy.ts` — they're stable content, not from Sheets.
+Quizzes are **content from Google Sheets** (migrated out of `utils/copy.ts`).
+They live across three tabs, assembled at build time by `fetch-content.ts` into
+a single `public/data/quizzes.json` (array of nested `Quiz` objects), served via
+`/api/quizzes` and consumed with the `useQuizzes()` / `useQuiz(id?)` composable.
+The page renders the first active quiz; pass an id to `useQuiz` to target a specific one.
 
-**Planned:**
-1. "Kas sa oled öökulli või lõoke?" — Chronotype (8 questions, 3 results)
-2. "Mitu punkti saad oma une hügieenis?" — Sleep hygiene score (10 questions, score out of 100)
-3. "Mis on sinu unepersoonalitsus?" — Sleep personality (6 questions, 4 types)
+Only the quiz **UI chrome** stays in `copy.ts` (`quizPage.*`: headings, button
+labels, loading/empty states). All editorial content (questions, options, result
+bands, tips) is editable in Sheets without a developer.
+
+### Sheets schema
+
+**Tab: `quizzes`** (one row per quiz)
+| Col | Field | Example |
+|-----|-------|---------|
+| A | id | `chronotype` |
+| B | title | `Kas sa oled öökulli või lõoke?` |
+| C | description | Intro paragraph |
+| D | tipsHeading | `Nõuanded sinu kronotüübile` |
+| E | sharePrefix | `Minu unetüüp:` |
+| F | active | `TRUE` / `FALSE` |
+
+**Tab: `quiz_questions`** (one row per question)
+| Col | Field | Example |
+|-----|-------|---------|
+| A | quizId | `chronotype` |
+| B | order | `1` |
+| C | question | `Millal ärkad eelistatult…?` |
+| D | options | `Enne kella 7\|3;Kella 7–9 vahel\|2;Pärast kella 9\|1` (`;` separates options, `\|` splits label\|value) |
+
+**Tab: `quiz_results`** (one row per result band)
+| Col | Field | Example |
+|-----|-------|---------|
+| A | quizId | `chronotype` |
+| B | key | `lark` |
+| C | minScore | `20` |
+| D | maxScore | `24` |
+| E | type | `Lõoke 🐦` |
+| F | description | Result paragraph |
+| G | tips | `Tip one.;Tip two.` (`;` separated) |
+
+Result selection: bands are sorted highest-`minScore` first at build time; the
+page picks the band where `minScore ≤ score ≤ maxScore`. If the quiz tabs are
+absent, the build falls back to the committed `quizzes.example.json`.
+
+**Calculator version** is likewise a single source of truth in the `stats` tab:
+add a `calculatorVersion` row (value e.g. `v2.5`). `SleepCalculator.vue` reads it,
+falling back to the `calculator.version` constant in `copy.ts` when absent.
+
+**Planned additional quizzes** (just add rows to the three tabs):
+1. "Mitu punkti saad oma une hügieenis?" — Sleep hygiene score
+2. "Mis on sinu unepersoonalitsus?" — Sleep personality
 
 Each quiz ends with personalized advice + soft link back to the Fit Calculator.
 

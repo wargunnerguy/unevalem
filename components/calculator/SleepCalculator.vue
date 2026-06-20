@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import type { CalcType } from '~/types'
+import type { CalcType, Stat } from '~/types'
 import { calculator, common } from '~/utils/copy'
 
-const calcVersion = calculator.version
+// Single source of truth for the version: the `calculatorVersion` stats row.
+// Falls back to the copy.ts constant when the sheet has no such row (e.g. dev).
+const { data: calcStatsData } = useFetch<Stat[]>('/api/stats', { default: () => [] as Stat[] })
+const calcVersion = computed(() => {
+  const row = (calcStatsData.value ?? []).find(s => s.key === 'calculatorVersion' && s.active)
+  return row?.value || calculator.version
+})
 
 const { step, answers, result, analyzing, selectOption, submitQuiz, finishAnalysis, goBack, reset } = useCalculator()
 const { products } = useProducts()

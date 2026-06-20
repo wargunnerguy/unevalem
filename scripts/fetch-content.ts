@@ -60,6 +60,66 @@ function parseDiveDeeper(v: unknown): { title: string; url: string }[] {
     .filter(item => item.title && item.url)
 }
 
+// Quiz option encoding: "Label A|3;Label B|2;Label C|1"  (";" separates options, "|" splits label/value)
+function parseQuizOptions(v: unknown): { label: string; value: number }[] {
+  if (!v || typeof v !== 'string') return []
+  return v
+    .split(';')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(item => {
+      const [label, value] = item.split('|').map(s => s.trim())
+      return { label: label ?? '', value: Number(value ?? 0) }
+    })
+    .filter(o => o.label)
+}
+
+// Tips encoding: "Tip one.;Tip two."  (";" separates tips)
+function parseTipsList(v: unknown): string[] {
+  if (Array.isArray(v)) return v.map(String)
+  if (typeof v !== 'string') return []
+  return v.split(';').map(s => s.trim()).filter(Boolean)
+}
+
+// Join the three flat quiz tabs into ready-to-render nested Quiz objects
+function assembleQuizzes(
+  meta: Record<string, unknown>[],
+  questions: Record<string, unknown>[],
+  results: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  return meta
+    .filter(m => parseBool(m.active))
+    .map(m => {
+      const id = String(m.id ?? '')
+      const qs = questions
+        .filter(q => String(q.quizId ?? '') === id)
+        .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
+        .map(q => ({ question: String(q.question ?? ''), options: parseQuizOptions(q.options) }))
+      const rs = results
+        .filter(r => String(r.quizId ?? '') === id)
+        .map(r => ({
+          key:         String(r.key ?? ''),
+          minScore:    Number(r.minScore ?? 0),
+          maxScore:    Number(r.maxScore ?? 0),
+          type:        String(r.type ?? ''),
+          description: String(r.description ?? ''),
+          tips:        parseTipsList(r.tips),
+        }))
+        .sort((a, b) => b.minScore - a.minScore)  // highest band first for lookup
+      if (!qs.length)  console.warn(`  ⚠ quiz "${id}" has no questions`)
+      if (!rs.length)  console.warn(`  ⚠ quiz "${id}" has no results`)
+      return {
+        id,
+        title:       String(m.title ?? ''),
+        description: String(m.description ?? ''),
+        tipsHeading: String(m.tipsHeading ?? 'Nõuanded sulle'),
+        sharePrefix: String(m.sharePrefix ?? ''),
+        questions:   qs,
+        results:     rs,
+      }
+    })
+}
+
 function transformPost(row: Record<string, unknown>): Record<string, unknown> {
   return {
     ...row,
@@ -85,7 +145,7 @@ if (!BASE_URL) {
   console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
-  for (const name of ['posts', 'stats', 'products', 'tips']) {
+  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes']) {
     const src = join(DATA_DIR, `${name}.example.json`)
     const dst = join(DATA_DIR, `${name}.json`)
     if (existsSync(src)) {
@@ -116,7 +176,7 @@ if (!BASE_URL) {
   } else {
     console.warn('  missing notifications.example.json — skipping')
   }
-  console.log(`[fetch-content] done (${ok}/5 example files processed)`)
+  console.log(`[fetch-content] done (${ok}/6 example files processed)`)
   process.exit(0)
 }
 
@@ -151,6 +211,32 @@ async function fetchSheet(sheet: string, outputName: string): Promise<unknown[]>
   return []
 }
 
+// Quizzes live across three tabs and are assembled into nested objects here.
+// Falls back to the (already assembled) quizzes.example.json if the tabs are absent.
+async function fetchQuizzes(): Promise<unknown[]> {
+  const [meta, questions, results] = await Promise.all([
+    tryFetchSheet('quizzes'),
+    tryFetchSheet('quiz_questions'),
+    tryFetchSheet('quiz_results'),
+  ])
+  if (meta && questions && results) {
+    const assembled = assembleQuizzes(
+      meta      as Record<string, unknown>[],
+      questions as Record<string, unknown>[],
+      results   as Record<string, unknown>[],
+    )
+    console.log(`  ✓ quizzes (${assembled.length} assembled from ${meta.length} meta rows)`)
+    return assembled
+  }
+  const examplePath = join(DATA_DIR, 'quizzes.example.json')
+  if (existsSync(examplePath)) {
+    console.warn('  ⚠ quiz tabs not available — using quizzes.example.json')
+    return JSON.parse(readFileSync(examplePath, 'utf-8')) as unknown[]
+  }
+  console.warn('  ⚠ quiz tabs not available and no example file — skipping')
+  return []
+}
+
 // ---------------------------------------------------------------------------
 // Validation: warn (don't throw) if required fields are missing
 // ---------------------------------------------------------------------------
@@ -180,12 +266,13 @@ async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
   mkdirSync(DATA_DIR, { recursive: true })
 
-  const [posts, notifications, stats, inventory, tipsRaw] = await Promise.all([
+  const [posts, notifications, stats, inventory, tipsRaw, quizzes] = await Promise.all([
     fetchSheet('posts',         'posts'),
     fetchSheet('notifications', 'notifications'),
     fetchSheet('stats',         'stats'),
     fetchSheet('inventory',     'products'),
     fetchSheet('tips',          'tips'),
+    fetchQuizzes(),
   ])
 
   validateFields('posts',         posts,         REQUIRED.posts)
@@ -203,11 +290,13 @@ async function main(): Promise<void> {
   writeFileSync(join(DATA_DIR, 'stats.json'),         JSON.stringify(stats, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'products.json'),      JSON.stringify(transformedProducts, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'tips.json'),          JSON.stringify(tips, null, 2), 'utf-8')
+  writeFileSync(join(DATA_DIR, 'quizzes.json'),       JSON.stringify(quizzes, null, 2), 'utf-8')
 
   console.log(
     `[fetch-content] done — ${transformedPosts.length} posts · ` +
     `${notifications.length} notifications · ${stats.length} stats · ` +
-    `${transformedProducts.length} products · ${tips.length} tips`,
+    `${transformedProducts.length} products · ${tips.length} tips · ` +
+    `${quizzes.length} quizzes`,
   )
 }
 
