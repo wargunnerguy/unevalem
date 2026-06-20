@@ -85,7 +85,7 @@ if (!BASE_URL) {
   console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
-  for (const name of ['posts', 'notifications', 'stats', 'products']) {
+  for (const name of ['posts', 'stats', 'products', 'tips']) {
     const src = join(DATA_DIR, `${name}.example.json`)
     const dst = join(DATA_DIR, `${name}.json`)
     if (existsSync(src)) {
@@ -96,42 +96,70 @@ if (!BASE_URL) {
       console.warn(`  missing ${name}.example.json — skipping`)
     }
   }
-  console.log(`[fetch-content] done (${ok}/4 example files copied)`)
+  // notifications: convert hoursAgo offsets to real ISO timestamps so the
+  // browser can compute "X hours ago" accurately even from example data
+  const notifSrc = join(DATA_DIR, 'notifications.example.json')
+  const notifDst = join(DATA_DIR, 'notifications.json')
+  if (existsSync(notifSrc)) {
+    const now = Date.now()
+    const rows = JSON.parse(readFileSync(notifSrc, 'utf-8')) as Record<string, unknown>[]
+    const converted = rows.map(r => {
+      const { hoursAgo, ...rest } = r as Record<string, unknown> & { hoursAgo?: number }
+      return {
+        ...rest,
+        timestamp: new Date(now - (hoursAgo ?? 0) * 3_600_000).toISOString(),
+      }
+    })
+    writeFileSync(notifDst, JSON.stringify(converted, null, 2), 'utf-8')
+    console.log(`  converted notifications.example.json → notifications.json (${converted.length} rows)`)
+    ok++
+  } else {
+    console.warn('  missing notifications.example.json — skipping')
+  }
+  console.log(`[fetch-content] done (${ok}/5 example files processed)`)
   process.exit(0)
 }
 
 // ---------------------------------------------------------------------------
-// Fetch one sheet endpoint
+// Fetch one sheet — returns null if the sheet doesn't exist or returns non-array
 // ---------------------------------------------------------------------------
-async function fetchSheet(sheet: string): Promise<unknown[]> {
+async function tryFetchSheet(sheet: string): Promise<unknown[] | null> {
   const url = `${BASE_URL}?sheet=${sheet}`
-  let res: Response
   try {
-    res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
-  } catch (err) {
-    throw new Error(`Network error fetching "${sheet}": ${(err as Error).message}`)
+    const res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
+    if (!res.ok) return null
+    const body = (await res.json()) as unknown
+    return Array.isArray(body) ? body : null
+  } catch {
+    return null
   }
-  if (!res.ok) {
-    throw new Error(
-      `HTTP ${res.status} fetching "${sheet}" — check SHEETS_API_URL and Apps Script deployment`,
-    )
+}
+
+// Fetch with per-sheet fallback to example file
+async function fetchSheet(sheet: string, outputName: string): Promise<unknown[]> {
+  const data = await tryFetchSheet(sheet)
+  if (data !== null) {
+    console.log(`  ✓ ${sheet} (${data.length} rows)`)
+    return data
   }
-  const body = (await res.json()) as unknown
-  if (!Array.isArray(body)) {
-    throw new Error(`Expected JSON array from "${sheet}", got ${typeof body}`)
+  const examplePath = join(DATA_DIR, `${outputName}.example.json`)
+  if (existsSync(examplePath)) {
+    console.warn(`  ⚠ sheet "${sheet}" not available — using ${outputName}.example.json`)
+    return JSON.parse(readFileSync(examplePath, 'utf-8')) as unknown[]
   }
-  return body
+  console.warn(`  ⚠ sheet "${sheet}" not available and no example file — skipping`)
+  return []
 }
 
 // ---------------------------------------------------------------------------
-// Validation: ensure required fields are present on every row
+// Validation: warn (don't throw) if required fields are missing
 // ---------------------------------------------------------------------------
-function requireFields(sheet: string, rows: unknown[], fields: readonly string[]): void {
+function validateFields(sheet: string, rows: unknown[], fields: readonly string[]): void {
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i] as Record<string, unknown>
     for (const field of fields) {
       if (!(field in row)) {
-        throw new Error(`${sheet}[${i}] is missing required field "${field}"`)
+        console.warn(`  ⚠ ${sheet}[${i}] missing field "${field}" — row skipped`)
       }
     }
   }
@@ -139,9 +167,10 @@ function requireFields(sheet: string, rows: unknown[], fields: readonly string[]
 
 const REQUIRED: Record<string, readonly string[]> = {
   posts:         ['id', 'slug', 'title', 'excerpt', 'content', 'category', 'status'],
-  notifications: ['id', 'text', 'type', 'hoursAgo', 'active'],
+  notifications: ['id', 'text', 'type', 'timestamp', 'active'],
   stats:         ['key', 'value', 'displayText', 'active'],
   inventory:     ['id', 'name', 'category', 'price', 'active'],
+  tips:          ['id', 'text', 'active'],
 }
 
 // ---------------------------------------------------------------------------
@@ -149,33 +178,36 @@ const REQUIRED: Record<string, readonly string[]> = {
 // ---------------------------------------------------------------------------
 async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
+  mkdirSync(DATA_DIR, { recursive: true })
 
-  const [posts, notifications, stats, inventory] = await Promise.all([
-    fetchSheet('posts'),
-    fetchSheet('notifications'),
-    fetchSheet('stats'),
-    fetchSheet('inventory'),
+  const [posts, notifications, stats, inventory, tipsRaw] = await Promise.all([
+    fetchSheet('posts',         'posts'),
+    fetchSheet('notifications', 'notifications'),
+    fetchSheet('stats',         'stats'),
+    fetchSheet('inventory',     'products'),
+    fetchSheet('tips',          'tips'),
   ])
 
-  requireFields('posts',         posts,         REQUIRED.posts)
-  requireFields('notifications', notifications, REQUIRED.notifications)
-  requireFields('stats',         stats,         REQUIRED.stats)
-  requireFields('inventory',     inventory,     REQUIRED.inventory)
+  validateFields('posts',         posts,         REQUIRED.posts)
+  validateFields('notifications', notifications, REQUIRED.notifications)
+  validateFields('stats',         stats,         REQUIRED.stats)
+  validateFields('inventory',     inventory,     REQUIRED.inventory)
+  validateFields('tips',          tipsRaw,       REQUIRED.tips)
 
-  const transformedPosts    = (posts    as Record<string, unknown>[]).map(transformPost)
+  const transformedPosts    = (posts     as Record<string, unknown>[]).map(transformPost)
   const transformedProducts = (inventory as Record<string, unknown>[]).map(transformProduct)
-
-  mkdirSync(DATA_DIR, { recursive: true })
+  const tips = (tipsRaw as Record<string, unknown>[]).filter(r => parseBool(r.active))
 
   writeFileSync(join(DATA_DIR, 'posts.json'),         JSON.stringify(transformedPosts, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'notifications.json'), JSON.stringify(notifications, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'stats.json'),         JSON.stringify(stats, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'products.json'),      JSON.stringify(transformedProducts, null, 2), 'utf-8')
+  writeFileSync(join(DATA_DIR, 'tips.json'),          JSON.stringify(tips, null, 2), 'utf-8')
 
   console.log(
     `[fetch-content] done — ${transformedPosts.length} posts · ` +
     `${notifications.length} notifications · ${stats.length} stats · ` +
-    `${transformedProducts.length} products`,
+    `${transformedProducts.length} products · ${tips.length} tips`,
   )
 }
 

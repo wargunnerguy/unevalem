@@ -112,6 +112,9 @@ const facebookShareUrl = computed(
           >
             {{ categoryLabel }}
           </span>
+          <span v-if="post.isMyth" class="text-xs px-2.5 py-0.5 rounded-full bg-midnight text-gold font-bold uppercase tracking-wide">
+            ✕ MÜÜT
+          </span>
           <span class="text-sm text-muted">
             {{ blogPage.readingTime(post.readingTimeMin) }}
           </span>

@@ -17,9 +17,21 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
 <template>
   <div class="py-2 space-y-6">
 
+    <!-- Good shape banner -->
+    <div
+      v-if="result.noUrgentNeed"
+      class="flex items-start gap-2.5 bg-success/10 border border-success/25 rounded-xl px-4 py-3"
+    >
+      <span class="text-success font-bold shrink-0 mt-0.5">✓</span>
+      <p class="text-sm text-midnight leading-snug">
+        <strong class="font-semibold">Sinu praegune olukord on hea.</strong>
+        {{ calculator.result.noUrgentNeedMessage }}
+      </p>
+    </div>
+
     <!-- Score comparison -->
     <div class="bg-midnight rounded-xl p-5 text-foam">
-      <h2 class="font-heading text-xl mb-4 text-center">Sinu uneskoor</h2>
+      <h2 class="font-heading text-xl mb-4 text-center text-gold">Sinu uneskoor</h2>
       <div class="space-y-4">
         <div>
           <div class="flex justify-between items-baseline mb-1.5 text-sm">
@@ -68,7 +80,7 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
               : calculator.result.niceToHaveBadge }}
           </span>
         </div>
-        <p class="text-sm text-lavender leading-relaxed mb-3">{{ mainRec.reason }}</p>
+        <p class="text-sm text-foam/85 leading-relaxed mb-3">{{ mainRec.reason }}</p>
         <div class="flex items-center justify-between">
           <span v-if="mainRec.priceText" class="font-semibold text-gold text-base">{{ mainRec.priceText }}</span>
           <a

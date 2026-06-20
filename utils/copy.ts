@@ -21,17 +21,20 @@ export const common = {
   allArticles: 'Loe kõiki artikleid →',
   popularBadge: 'Populaarne',
   minutesShort: 'min',
-  hoursAgo: 'tundi tagasi',
+  justNow:      'just äsja',
+  minutesAgo:   'minutit tagasi',
+  hoursAgo:     'tundi tagasi',
+  daysAgo:      'päeva tagasi',
 }
 
 export const calculator = {
   version: 'v2.5',
-  heroLabel: 'Leia täpselt sulle sobiv voodivara — 2 minutiga',
+  heroLabel: 'Leia oma ideaalne padi, tekk ja madrats — 3 lühikest testi',
 
   variantLabels: {
-    pillow:  'Leia oma ideaalne padi — 2 minutiga',
-    blanket: 'Leia oma ideaalne tekk — 2 minutiga',
-    sleep:   'Uuri, mis rikub sinu und — 2 minutiga',
+    pillow:  'Leia oma ideaalne padi — alusta siit',
+    blanket: 'Leia oma ideaalne tekk — alusta siit',
+    sleep:   'Ehita oma täielik une profiil — 3 testi',
   } as Record<string, string>,
   progressLabel: (step: number, total: number) => `Samm ${step} / ${total}`,
   timeLeft: (step: number): string => {
@@ -78,7 +81,8 @@ export const calculator = {
           options: [
             { label: 'Tolmulestade suhtes', value: 'dust-mites' },
             { label: 'Sünteetiliste materjalide suhtes', value: 'synthetic' },
-            { label: 'Pole', value: 'none' },
+            { label: 'Muu allergia või tundlikkus', value: 'other' },
+            { label: 'Pole teadaolevaid allergiaid', value: 'none' },
           ],
         },
         {
@@ -134,7 +138,8 @@ export const calculator = {
           options: [
             { label: 'Tolmulestade suhtes', value: 'dust-mites' },
             { label: 'Sünteetiliste materjalide suhtes', value: 'synthetic' },
-            { label: 'Pole', value: 'none' },
+            { label: 'Muu allergia või tundlikkus', value: 'other' },
+            { label: 'Pole teadaolevaid allergiaid', value: 'none' },
           ],
         },
       ],
@@ -225,6 +230,7 @@ export const calculator = {
     ctaButton: 'Vaata kõiki tooteid →',
     mustHaveBadge: 'Oluline',
     niceToHaveBadge: 'Kasulik',
+    noUrgentNeedMessage: 'Sul pole praegu kiireloomulist vajadust — aga saad alati edasi täiustada.',
   },
 }
 
@@ -255,8 +261,16 @@ export const homepage = {
   metaTitle: 'Unevalem – Leia oma personaalne unelahendus',
   metaDescription: 'Vasta 5 küsimusele ja saad personaalse soovituse parema une jaoks. Eesti parim unenõuannete ressurss.',
   dailyTipHeading: 'Päeva unenipp',
-  statsSection: 'inimest on leidnud oma unevalemi',
   featuredPostsHeading: 'Populaarseimad artiklid',
+
+  // Stats strip: show these 3 keys in this order, with Estonian labels.
+  // Values come from Sheets; labels are defined here (override Sheets displayText).
+  featuredStatKeys: ['calculatorCompletions', 'monthlyVisitors', 'totalViews'] as const,
+  statLabels: {
+    calculatorCompletions: 'inimest leidnud oma unevalemi',
+    monthlyVisitors:       'külastajat kuus',
+    totalViews:            'lugemist kokku',
+  } as Record<string, string>,
 }
 
 export const quizPage = {

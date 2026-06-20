@@ -375,13 +375,23 @@ The Google Sheet has 3 tabs. A pre-build Node script reads them and writes stati
 | K | isFeatured | boolean | `TRUE` / `FALSE` |
 | L | readingTimeMin | number | `4` |
 
+**Content convention — myth-busting posts:**
+Post titles prefixed with `MÜÜT: ` in the Sheet mark myth-busting content
+(e.g. `MÜÜT: Saan hakkama viie tunni unega`). Parsed once in
+`composables/usePosts.ts` via `/^MÜÜT:\s*/i`: sets `isMyth = true` on the
+`Post` object and strips the prefix from `title`. All consumers (PostCard,
+article page, related posts, search) receive clean data. Rendered as a
+`✕ MÜÜT` pill badge (`bg-midnight text-gold`) next to the category chip —
+never as title text or page metadata. No separate Sheet column needed;
+a dedicated `isMyth` boolean column is a future option if prefix styles vary.
+
 ### Tab: `notifications`
 | Col | Field | Type | Example |
 |-----|-------|------|---------|
 | A | id | number | 1 |
 | B | text | string | `Kristina ostis bambuspadja` |
 | C | type | string | `purchase` / `view` / `quiz` |
-| D | hoursAgo | number | `2` (shown as "2 tundi tagasi") |
+| D | timestamp | string | `2025-06-20T10:30:00` (exact event time; browser computes "X tundi tagasi" at runtime) |
 | E | active | boolean | `TRUE` / `FALSE` |
 
 ### Tab: `stats`
@@ -426,7 +436,7 @@ Add to `package.json`:
 - **Source:** `public/data/notifications.json` (baked in at build, same for all users)
 - **Position:** bottom-left corner, `fixed`, z-50
 - **Animation:** slide up + fade in via Vue `<Transition>`
-- **Timing:** show one every 45–60s (random), visible for 6s, then slide out
+- **Timing:** show one every 15–25s (random), visible for 6s, then slide out
 - **Rotation:** random order, loop after all shown
 - **Mobile (< 640px):** hide while calculator is in progress to avoid covering it
 - **Design:** ~280px wide, `bg-dusk` dark card, white text, small icon per type:

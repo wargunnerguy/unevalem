@@ -7,7 +7,7 @@ const { width } = useWindowSize()
 
 // On mobile, suppress while the calculator is mid-flow (steps 1–10)
 const suppressed = computed(
-  () => width.value > 0 && width.value < 640 && step.value >= 1 && step.value <= 10,
+  () => width.value > 0 && width.value < 640 && step.value >= 1 && step.value <= 5,
 )
 
 const shouldShow = computed(() => visible.value && !suppressed.value)
@@ -16,13 +16,27 @@ const icon = computed(() =>
   current.value ? socialProof.typeIcons[current.value.type] : '',
 )
 
+function formatRelativeTime(timestamp: string): string {
+  const diffMs = Date.now() - new Date(timestamp).getTime()
+  const diffMins = Math.round(diffMs / 60_000)
+  if (diffMins < 5)  return common.justNow
+  if (diffMins < 60) return `${diffMins} ${common.minutesAgo}`
+  const diffHours = Math.round(diffMs / 3_600_000)
+  if (diffHours < 48) return `${diffHours} ${common.hoursAgo}`
+  return `${Math.floor(diffHours / 24)} ${common.daysAgo}`
+}
+
+const relativeLabel = computed(() =>
+  current.value ? formatRelativeTime(current.value.timestamp) : '',
+)
+
 let showTimer: ReturnType<typeof setTimeout> | null = null
 let hideTimer: ReturnType<typeof setTimeout> | null = null
 
 function schedule(firstShow = false) {
   const delay = firstShow
     ? 4_000 + Math.random() * 2_000    // 4–6 s initial delay
-    : 45_000 + Math.random() * 15_000  // 45–60 s between shows
+    : 15_000 + Math.random() * 10_000  // 15–25 s between shows
   showTimer = setTimeout(() => {
     if (showNext()) {
       hideTimer = setTimeout(() => {
@@ -58,9 +72,7 @@ onUnmounted(() => {
           <span class="text-xl shrink-0 mt-0.5" aria-hidden="true">{{ icon }}</span>
           <div class="min-w-0">
             <p class="text-sm text-foam leading-snug">{{ current.text }}</p>
-            <p class="text-xs text-muted mt-0.5">
-              {{ current.hoursAgo }} {{ common.hoursAgo }}
-            </p>
+            <p class="text-xs text-muted mt-0.5">{{ relativeLabel }}</p>
           </div>
         </div>
       </div>

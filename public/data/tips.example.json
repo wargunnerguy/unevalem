@@ -1,0 +1,22 @@
+[
+  { "id": 1,  "text": "Hoia magamistuba jahedana — ideaalne temperatuur on 16–19°C. Jahe keskkond aitab kehal uinuda kiiremini.", "active": true },
+  { "id": 2,  "text": "Proovi minna magama ja ärgata iga päev samal ajal, ka nädalavahetustel. Regulaarne unetsükkel on parim viis enesetunde parandamiseks.", "active": true },
+  { "id": 3,  "text": "Väldi ekraane (telefon, arvuti, teler) vähemalt 45 minutit enne magamaminekut. Sinine valgus pärsib melatoniini tootmist.", "active": true },
+  { "id": 4,  "text": "Kui jääd 20 minutiga uinuma, tõuse voodist välja ja tee midagi rahulikku. Pikali lamamine ilma uneta treenib aju seostama voodit ärkvelolekuga.", "active": true },
+  { "id": 5,  "text": "Magneesium aitab lihaseid lõdvestada ja toetab rahulikku und. Proovi magneesiumglütsinaati 200–400 mg õhtul.", "active": true },
+  { "id": 6,  "text": "Päikesevalgus hommikul (15–30 minutit väljas) seab sinu sisemise kella täpsemalt — see teeb ka õhtul uinumise lihtsamaks.", "active": true },
+  { "id": 7,  "text": "Ära joo kohvi pärast kella 14. Kofeiini poolväärtusaeg on 5–6 tundi, mis tähendab, et pool kofeiinist on veel veres ka kella 20 ajal.", "active": true },
+  { "id": 8,  "text": "Alkohol aitab uinuda, aga halvendab une kvaliteeti — REM-uni jääb lühemaks. Hea uni ja alkohol ei sobi hästi kokku.", "active": true },
+  { "id": 9,  "text": "Külilimagajana asetage padi põlvede vahele — see vähendab survet puusadele ja alaselgale ning hoiab selgroo neutraalses asendis.", "active": true },
+  { "id": 10, "text": "Loe raamatut enne und — see on üks efektiivsemaid viise stressitaseme langetamiseks. Paber parem kui e-luger, aga mõlemad töötavad.", "active": true },
+  { "id": 11, "text": "Kui su padi on üle 2 aasta vana ja kaotanud oma kuju, on aeg see välja vahetada. Vana padi ei hoia pead õigel kõrgusel.", "active": true },
+  { "id": 12, "text": "4-7-8 hingamine aitab ärevust vähendada: hingata sisse 4 sekundit, hoia hinge kinni 7 sekundit, hinga välja 8 sekundit.", "active": true },
+  { "id": 13, "text": "Tumedate kardinate kasutamine magamistoas aitab organismil toota rohkem melatoniini — eriti suvel, kui on hele.", "active": true },
+  { "id": 14, "text": "Ärka nädalavahetustel kuni tund hiljem kui tööpäeviti — rohkem kui tund nihutatuna tekitab 'sotsiaalset jeti lagi', mis kurnab.", "active": true },
+  { "id": 15, "text": "Märja sokkide trikk: kasta sokid külmas vees, pigista välja ja pane jalga. Keha soojendab need kiiresti — see toob verd jalgadesse ja aitab uinuda.", "active": true },
+  { "id": 16, "text": "Töötamine või telefonil kerimine voodis teeb ajule selgeks, et voodi = aktiivsus. Kasuta voodit ainult magamiseks.", "active": true },
+  { "id": 17, "text": "Treeni regulaarselt, aga väldi intensiivset treeningut 2–3 tundi enne magamaminekut — see tõstab kehatemperatuuri ja kortisooli.", "active": true },
+  { "id": 18, "text": "Lavendliõli difuusoris või padi spreid võib aidata kiiremini uinuda — uuringud kinnitavad kerget rahustavat toimet.", "active": true },
+  { "id": 19, "text": "Valge müra (ventilaator, rakendus) aitab kergesti ärkajatel ja mürarikkamas keskkonnas magajatel — maskeerib ootamatuid helisid.", "active": true },
+  { "id": 20, "text": "Kirjuta enne und 5 asja, mis täna hästi läks. Tänulikkuse harjutus vähendab negatiivset mäletsemist ja kiirendab uinumist.", "active": true }
+]

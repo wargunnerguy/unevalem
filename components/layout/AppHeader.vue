@@ -30,7 +30,7 @@ const { isDark, toggleTheme } = useTheme()
                 :to="link.to"
                 class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
                 :class="isActive(link.to)
-                  ? 'bg-midnight text-foam'
+                  ? 'bg-midnight text-gold'
                   : 'text-muted hover:text-midnight hover:bg-moonlight'"
               >
                 {{ link.label }}

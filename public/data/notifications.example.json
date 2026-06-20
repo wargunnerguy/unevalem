@@ -1,58 +1,52 @@
 [
-  {
-    "id": 1,
-    "text": "Kristina ostis bambuspadja",
-    "type": "purchase",
-    "hoursAgo": 2,
-    "active": true
-  },
-  {
-    "id": 2,
-    "text": "Marten leidis oma unevalemi",
-    "type": "quiz",
-    "hoursAgo": 1,
-    "active": true
-  },
-  {
-    "id": 3,
-    "text": "Liis vaatas bambusteki tootelehte",
-    "type": "view",
-    "hoursAgo": 3,
-    "active": true
-  },
-  {
-    "id": 4,
-    "text": "Andres ostis nelja aastaaegade teki",
-    "type": "purchase",
-    "hoursAgo": 5,
-    "active": true
-  },
-  {
-    "id": 5,
-    "text": "Mari tegi kronotüübi viktoriini",
-    "type": "quiz",
-    "hoursAgo": 1,
-    "active": true
-  },
-  {
-    "id": 6,
-    "text": "Taavi ostis universaalse bambuspadja",
-    "type": "purchase",
-    "hoursAgo": 4,
-    "active": true
-  },
-  {
-    "id": 7,
-    "text": "Kati leidis oma unevalemi",
-    "type": "quiz",
-    "hoursAgo": 2,
-    "active": true
-  },
-  {
-    "id": 8,
-    "text": "Jaak vaatas külilimagaja padja",
-    "type": "view",
-    "hoursAgo": 6,
-    "active": true
-  }
+  { "id": 1,  "text": "Kristiina Tallinnast ostis bambuspadja",                    "type": "purchase", "hoursAgo": 2,  "active": true },
+  { "id": 2,  "text": "Keegi Tartust täitis padjakalkulaatori",                    "type": "quiz",     "hoursAgo": 1,  "active": true },
+  { "id": 3,  "text": "Marten Tartust ostis bambusteki",                           "type": "purchase", "hoursAgo": 3,  "active": true },
+  { "id": 4,  "text": "Keegi Tallinnast täitis tekikalkulaatori",                  "type": "quiz",     "hoursAgo": 1,  "active": true },
+  { "id": 5,  "text": "Liis ostis bambuspadjapüüri",                               "type": "purchase", "hoursAgo": 1,  "active": true },
+  { "id": 6,  "text": "Keegi vaatas bambusteki tootelehte",                        "type": "view",     "hoursAgo": 4,  "active": true },
+  { "id": 7,  "text": "Andres Pärnust ostis nelja aastaaegade teki",              "type": "purchase", "hoursAgo": 5,  "active": true },
+  { "id": 8,  "text": "Keegi Pärnust täitis une profiili",                        "type": "quiz",     "hoursAgo": 2,  "active": true },
+  { "id": 9,  "text": "Moonika ostis külilimagaja padja",                          "type": "purchase", "hoursAgo": 4,  "active": true },
+  { "id": 10, "text": "Keegi vaatas külilimagaja padja tootelehte",                "type": "view",     "hoursAgo": 2,  "active": true },
+  { "id": 11, "text": "Rene Tallinnast ostis bambusteki",                          "type": "purchase", "hoursAgo": 6,  "active": true },
+  { "id": 12, "text": "Keegi Viljandist täitis padjakalkulaatori",                "type": "quiz",     "hoursAgo": 3,  "active": true },
+  { "id": 13, "text": "Piret ostis bambuspadja",                                   "type": "purchase", "hoursAgo": 2,  "active": true },
+  { "id": 14, "text": "Keegi Rakvere lähedalt täitis une profiili",               "type": "quiz",     "hoursAgo": 1,  "active": true },
+  { "id": 15, "text": "Siim Tallinnast ostis kaks bambuspadjapüüri",              "type": "purchase", "hoursAgo": 8,  "active": true },
+  { "id": 16, "text": "Keegi vaatas bambuspadja tootelehte",                       "type": "view",     "hoursAgo": 5,  "active": true },
+  { "id": 17, "text": "Eva Tartust ostis nelja aastaaegade teki",                 "type": "purchase", "hoursAgo": 1,  "active": true },
+  { "id": 18, "text": "Keegi Narvast täitis tekikalkulaatori",                    "type": "quiz",     "hoursAgo": 4,  "active": true },
+  { "id": 19, "text": "Marko ostis külilimagaja padja",                            "type": "purchase", "hoursAgo": 7,  "active": true },
+  { "id": 20, "text": "Keegi Haapsalust täitis une profiili",                     "type": "quiz",     "hoursAgo": 2,  "active": true },
+  { "id": 21, "text": "Kati Viljandist ostis bambuspadja",                        "type": "purchase", "hoursAgo": 3,  "active": true },
+  { "id": 22, "text": "Keegi vaatas padjapüüride valikut",                         "type": "view",     "hoursAgo": 3,  "active": true },
+  { "id": 23, "text": "Rasmus Tallinnast ostis bambusteki",                        "type": "purchase", "hoursAgo": 9,  "active": true },
+  { "id": 24, "text": "Keegi Kuressaarest täitis padjakalkulaatori",              "type": "quiz",     "hoursAgo": 1,  "active": true },
+  { "id": 25, "text": "Anne Tartust ostis bambuspadjapüüri",                       "type": "purchase", "hoursAgo": 2,  "active": true },
+  { "id": 26, "text": "Keegi vaatas nelja aastaaegade teki tootelehte",           "type": "view",     "hoursAgo": 6,  "active": true },
+  { "id": 27, "text": "Mihkel Tallinnast ostis bambuspadja",                       "type": "purchase", "hoursAgo": 5,  "active": true },
+  { "id": 28, "text": "Keegi Jõhvist täitis une profiili täielikult",            "type": "quiz",     "hoursAgo": 3,  "active": true },
+  { "id": 29, "text": "Marit Tartust ostis bambusteki",                            "type": "purchase", "hoursAgo": 2,  "active": true },
+  { "id": 30, "text": "Keegi Tapalt vaatas bambuspadja tootelehte",               "type": "view",     "hoursAgo": 1,  "active": true },
+  { "id": 31, "text": "Taavi Tallinnast täitis padjakalkulaatori",                "type": "quiz",     "hoursAgo": 4,  "active": true },
+  { "id": 32, "text": "Ingrid Tartust ostis bambuspadja",                          "type": "purchase", "hoursAgo": 1,  "active": true },
+  { "id": 33, "text": "Keegi Saaremaalt täitis tekikalkulaatori",                 "type": "quiz",     "hoursAgo": 5,  "active": true },
+  { "id": 34, "text": "Jaanus Pärnust ostis bambuspadjapüüri",                    "type": "purchase", "hoursAgo": 2,  "active": true },
+  { "id": 35, "text": "Keegi vaatas selilimagaja padja tootelehte",               "type": "view",     "hoursAgo": 3,  "active": true },
+  { "id": 36, "text": "Merle Viljandist ostis bambusteki",                         "type": "purchase", "hoursAgo": 6,  "active": true },
+  { "id": 37, "text": "Keegi Keilast täitis une profiili",                        "type": "quiz",     "hoursAgo": 2,  "active": true },
+  { "id": 38, "text": "Priit Tallinnast ostis bambuspadja",                        "type": "purchase", "hoursAgo": 4,  "active": true },
+  { "id": 39, "text": "Keegi vaatas bambusteki kataloogi",                         "type": "view",     "hoursAgo": 1,  "active": true },
+  { "id": 40, "text": "Riina Tartust täitis padjakalkulaatori",                   "type": "quiz",     "hoursAgo": 3,  "active": true },
+  { "id": 41, "text": "Karl Tallinnast ostis kaks bambuspadjapüüri",              "type": "purchase", "hoursAgo": 7,  "active": true },
+  { "id": 42, "text": "Keegi Võrust vaatas une profiili tootelehti",             "type": "view",     "hoursAgo": 2,  "active": true },
+  { "id": 43, "text": "Sirje Nõmmelt ostis bambusteki",                           "type": "purchase", "hoursAgo": 1,  "active": true },
+  { "id": 44, "text": "Keegi Türilt täitis tekikalkulaatori",                     "type": "quiz",     "hoursAgo": 4,  "active": true },
+  { "id": 45, "text": "Urmas Tartust ostis bambuspadja",                           "type": "purchase", "hoursAgo": 3,  "active": true },
+  { "id": 46, "text": "Keegi vaatas selilimagaja padja sobivust",                 "type": "view",     "hoursAgo": 5,  "active": true },
+  { "id": 47, "text": "Helve Tallinnast ostis bambuspadjapüüri",                  "type": "purchase", "hoursAgo": 2,  "active": true },
+  { "id": 48, "text": "Keegi Läänemaa lähedalt täitis une profiili",             "type": "quiz",     "hoursAgo": 1,  "active": true },
+  { "id": 49, "text": "Tõnis Tallinnast ostis bambusteki",                        "type": "purchase", "hoursAgo": 8,  "active": true },
+  { "id": 50, "text": "Keegi Jõgevalt vaatas bambuspadja tootelehte",            "type": "view",     "hoursAgo": 3,  "active": true }
 ]

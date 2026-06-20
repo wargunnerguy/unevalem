@@ -2,6 +2,9 @@
 import { calculator, homepage, common } from '~/utils/copy'
 import type { Stat, Tip } from '~/types'
 
+const { incrementVisit } = useReadHistory()
+onMounted(() => incrementVisit())
+
 useHead({
   title: homepage.metaTitle,
   meta: [
@@ -26,9 +29,13 @@ const dailyTip = computed(() => {
 const { data: statsData } = useFetch<Stat[]>('/api/stats', {
   default: () => [] as Stat[],
 })
-const calcStat = computed(() =>
-  (statsData.value ?? []).find(s => s.key === 'calculatorCompletions' && s.active),
-)
+
+const featuredStats = computed(() => {
+  const all = statsData.value ?? []
+  return homepage.featuredStatKeys
+    .map(key => all.find(s => s.key === key && s.active))
+    .filter(Boolean)
+})
 
 const featuredPosts = useFeaturedPosts(5)
 
@@ -87,9 +94,9 @@ const revisitSummary = computed(() => {
       <!-- Single short label -->
       <div class="max-w-xl mx-auto text-center mb-4">
         <ClientOnly>
-          <p class="text-lavender/70 text-sm tracking-wide">{{ variantLabel }}</p>
+          <p class="text-gold/80 text-sm tracking-wide">{{ variantLabel }}</p>
           <template #fallback>
-            <p class="text-lavender/70 text-sm tracking-wide">{{ calculator.heroLabel }}</p>
+            <p class="text-gold/80 text-sm tracking-wide">{{ calculator.heroLabel }}</p>
           </template>
         </ClientOnly>
       </div>
@@ -98,10 +105,21 @@ const revisitSummary = computed(() => {
     </section>
 
     <!-- ─── STATS STRIP ─── -->
-    <section v-if="calcStat" class="bg-dusk px-4 py-5">
-      <p class="text-center text-sm text-lavender/80">
-        <span class="font-heading text-foam text-lg font-bold mr-1.5">{{ calcStat.value }}</span>{{ calcStat.displayText }}
-      </p>
+    <section v-if="featuredStats.length" class="bg-dusk px-4 py-6">
+      <div class="max-w-xl mx-auto flex justify-center gap-6 sm:gap-10">
+        <div
+          v-for="stat in featuredStats"
+          :key="stat!.key"
+          class="text-center"
+        >
+          <p class="font-heading text-gold text-2xl sm:text-3xl font-bold leading-none tabular-nums">
+            {{ stat!.value }}
+          </p>
+          <p class="text-lavender/70 text-xs mt-1.5 leading-snug max-w-[90px]">
+            {{ homepage.statLabels[stat!.key] ?? stat!.displayText }}
+          </p>
+        </div>
+      </div>
     </section>
 
     <!-- ─── DAILY TIP ─── -->
@@ -110,7 +128,7 @@ const revisitSummary = computed(() => {
         <div class="flex gap-3 items-start p-4 rounded-xl border border-lavender/25 bg-foam shadow-sm">
           <span class="text-xl shrink-0 mt-0.5" aria-hidden="true">🌙</span>
           <div>
-            <p class="text-xs font-semibold text-lavender uppercase tracking-wider mb-1.5">
+            <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
               {{ homepage.dailyTipHeading }}
             </p>
             <p class="text-sm text-midnight leading-relaxed">{{ dailyTip }}</p>
@@ -147,7 +165,7 @@ const revisitSummary = computed(() => {
               </NuxtLink>
             </h3>
 
-            <p class="text-sm text-midnight/70 leading-relaxed mb-3 line-clamp-2">
+            <p class="text-sm text-midnight leading-relaxed mb-3 line-clamp-2">
               {{ post.excerpt }}
             </p>
 

@@ -173,10 +173,30 @@ function getProductName(type: CalcType): string {
   <div class="w-full max-w-xl mx-auto">
     <div class="bg-foam rounded-2xl shadow-lg overflow-hidden">
 
+      <!-- Calc journey breadcrumb (steps 1–5) -->
+      <div v-if="step <= 5 && !analyzing" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
+        <template v-for="(type, idx) in (['pillow', 'blanket', 'mattress'] as const)" :key="type">
+          <span
+            class="flex items-center gap-0.5 transition-colors"
+            :class="
+              type === activeCalcType
+                ? 'text-midnight font-semibold'
+                : isCalcDone(type)
+                ? 'text-success'
+                : 'text-gray-300'
+            "
+          >
+            <span v-if="isCalcDone(type) && type !== activeCalcType" aria-hidden="true">✓ </span>
+            {{ calculator.configs[type].icon }} {{ calculator.session.doneLabel[type] }}
+          </span>
+          <span v-if="idx < 2" class="text-gray-200" aria-hidden="true">›</span>
+        </template>
+      </div>
+
       <!-- Progress header (steps 1–5 only) -->
       <div
         v-if="step <= 5 && !analyzing"
-        class="flex items-center gap-3 px-5 pt-4 pb-0"
+        class="flex items-center gap-3 px-5 pt-2 pb-0"
       >
         <button
           v-if="step > 1"

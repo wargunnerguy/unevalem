@@ -6,6 +6,7 @@ import { blogCategories, blogPage, common } from '~/utils/copy'
 const props = defineProps<{ post: Post }>()
 
 const { posts } = usePosts()
+const { markRead, isRead } = useReadHistory()
 const expanded = ref(false)
 
 const categoryLabel = (cat: Post['category']) =>
@@ -22,6 +23,7 @@ const relatedPosts = computed(() =>
 )
 
 function toggle() {
+  if (!expanded.value) markRead(props.post.slug)
   expanded.value = !expanded.value
 }
 </script>
@@ -37,20 +39,23 @@ function toggle() {
       <span v-if="post.isFeatured" class="text-xs px-2 py-0.5 rounded-full bg-gold text-midnight font-semibold">
         {{ common.popularBadge }}
       </span>
+      <span v-if="post.isMyth" class="text-xs px-2.5 py-0.5 rounded-full bg-midnight text-gold font-bold uppercase tracking-wide">
+        ✕ MÜÜT
+      </span>
       <span class="text-xs text-muted ml-auto">{{ blogPage.readingTime(post.readingTimeMin) }}</span>
     </div>
 
     <!-- Title -->
-    <h2 class="font-heading text-xl text-midnight leading-snug mb-2">{{ post.title }}</h2>
+    <h2 class="font-heading text-xl leading-snug mb-2" :class="isRead(post.slug) ? 'text-midnight/60' : 'text-midnight'">{{ post.title }}</h2>
 
     <!-- Excerpt (always visible) -->
-    <p class="text-sm text-muted leading-relaxed">{{ post.excerpt }}</p>
+    <p class="text-sm text-midnight leading-relaxed">{{ post.excerpt }}</p>
 
     <!-- Expand toggle -->
     <button
       v-if="!expanded"
       type="button"
-      class="mt-3 text-sm font-medium text-midnight hover:text-lavender transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+      class="mt-3 text-sm font-medium text-midnight hover:text-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded"
       @click="toggle"
     >
       Loe edasi →
@@ -76,7 +81,7 @@ function toggle() {
               :href="link.url"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-sm text-midnight hover:text-lavender underline underline-offset-2 transition-colors"
+              class="text-sm text-midnight hover:text-gold underline underline-offset-2 transition-colors"
             >
               {{ link.title }} →
             </a>
@@ -91,7 +96,7 @@ function toggle() {
           <li v-for="p in relatedPosts" :key="p.id">
             <NuxtLink
               :to="`/artiklid/${p.slug}`"
-              class="text-sm text-midnight hover:text-lavender transition-colors leading-snug"
+              class="text-sm text-midnight hover:text-gold transition-colors leading-snug"
             >
               {{ p.title }}
             </NuxtLink>

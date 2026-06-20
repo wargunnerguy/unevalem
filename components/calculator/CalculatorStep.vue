@@ -45,8 +45,8 @@ const gridClass = computed(() => {
             ? 'flex flex-col items-center justify-center gap-2 p-4 min-h-[88px]'
             : 'flex items-center p-4 text-left',
           selected === opt.value
-            ? 'bg-midnight border-midnight text-foam shadow-sm'
-            : 'bg-foam border-gray-200 text-midnight hover:border-lavender hover:bg-moonlight active:scale-95',
+            ? 'bg-gold border-gold text-midnight shadow-sm'
+            : 'bg-foam border-gray-300 text-midnight hover:border-gold/50 hover:bg-gold/5 active:scale-95',
         ]"
         @click="emit('select', opt.value)"
       >

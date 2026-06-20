@@ -5,7 +5,7 @@ export type BodyType         = 'slim' | 'medium' | 'broad'
 export type NeckPain         = 'often' | 'sometimes' | 'never'
 export type SweatingLevel    = 'often' | 'sometimes' | 'rarely'
 export type BlanketWeight    = 'light' | 'medium' | 'heavy'
-export type AllergyProfile   = 'dust-mites' | 'synthetic' | 'none'
+export type AllergyProfile   = 'dust-mites' | 'synthetic' | 'other' | 'none'
 export type PillowAge        = 'new' | '1-3y' | '3y+'
 export type MainComplaint    = 'cant-sleep' | 'wake-at-night' | 'wake-tired' | 'none'
 export type BackPain         = 'often' | 'sometimes' | 'never'
@@ -70,6 +70,7 @@ export interface CalculatorResult {
   improvedScore:   number
   recommendations: ProductRec[]
   personalTips:    string[]
+  noUrgentNeed:    boolean
 }
 
 export interface Post {
@@ -84,16 +85,17 @@ export interface Post {
   coverImage:     string
   status:         'published' | 'draft'
   isFeatured:     boolean
+  isMyth:         boolean
   readingTimeMin: number
   diveDeeper:     { title: string; url: string }[]
 }
 
 export interface Notification {
-  id:       number
-  text:     string
-  type:     'purchase' | 'view' | 'quiz'
-  hoursAgo: number
-  active:   boolean
+  id:        number
+  text:      string
+  type:      'purchase' | 'view' | 'quiz'
+  timestamp: string  // ISO 8601, e.g. "2025-06-20T10:30:00"
+  active:    boolean
 }
 
 export interface Stat {
