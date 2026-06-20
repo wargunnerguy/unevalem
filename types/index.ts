@@ -91,11 +91,12 @@ export interface Post {
 }
 
 export interface Notification {
-  id:        number
-  text:      string
-  type:      'purchase' | 'view' | 'quiz'
-  timestamp: string  // ISO 8601, e.g. "2025-06-20T10:30:00"
-  active:    boolean
+  id:     number
+  text:   string
+  type:   'purchase' | 'view' | 'quiz'
+  active: boolean
+  // No time field: the toast renders a fresh random "X ago" each show so social
+  // proof always feels live (see SocialProofToast.vue). Don't add one back.
 }
 
 export interface Stat {

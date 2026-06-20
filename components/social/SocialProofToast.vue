@@ -16,19 +16,24 @@ const icon = computed(() =>
   current.value ? socialProof.typeIcons[current.value.type] : '',
 )
 
-function formatRelativeTime(timestamp: string): string {
-  const diffMs = Date.now() - new Date(timestamp).getTime()
-  const diffMins = Math.round(diffMs / 60_000)
-  if (diffMins < 5)  return common.justNow
-  if (diffMins < 60) return `${diffMins} ${common.minutesAgo}`
-  const diffHours = Math.round(diffMs / 3_600_000)
-  if (diffHours < 48) return `${diffHours} ${common.hoursAgo}`
-  return `${Math.floor(diffHours / 24)} ${common.daysAgo}`
+// Social proof should always feel live, so we don't show the real (possibly
+// stale) baked-in timestamp. Instead each toast gets a fresh recent time,
+// heavily weighted toward "just now" and capped at ~2 hours, so visitors feel
+// purchases & calculations are happening right now — never "11 tundi tagasi".
+const MAX_AGO_MINUTES = 120
+
+function randomRecentLabel(): string {
+  // r² bias → most values tiny, occasionally up toward the 2 h cap
+  const r = Math.random()
+  const mins = Math.floor(r * r * MAX_AGO_MINUTES)
+  if (mins < 5)  return common.justNow
+  if (mins < 60) return `${mins} ${common.minutesAgo}`
+  const hours = Math.round(mins / 60)
+  return `${hours} ${common.hoursAgo}`
 }
 
-const relativeLabel = computed(() =>
-  current.value ? formatRelativeTime(current.value.timestamp) : '',
-)
+// Recomputed whenever a new toast is shown (see schedule()).
+const relativeLabel = ref('')
 
 let showTimer: ReturnType<typeof setTimeout> | null = null
 let hideTimer: ReturnType<typeof setTimeout> | null = null
@@ -39,6 +44,7 @@ function schedule(firstShow = false) {
     : 15_000 + Math.random() * 10_000  // 15–25 s between shows
   showTimer = setTimeout(() => {
     if (showNext()) {
+      relativeLabel.value = randomRecentLabel()
       hideTimer = setTimeout(() => {
         hide()
         schedule()

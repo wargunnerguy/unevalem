@@ -156,22 +156,13 @@ if (!BASE_URL) {
       console.warn(`  missing ${name}.example.json — skipping`)
     }
   }
-  // notifications: convert hoursAgo offsets to real ISO timestamps so the
-  // browser can compute "X hours ago" accurately even from example data
+  // notifications: plain copy (no time field — the toast fabricates a fresh
+  // "X ago" at render time, so there's nothing to convert)
   const notifSrc = join(DATA_DIR, 'notifications.example.json')
   const notifDst = join(DATA_DIR, 'notifications.json')
   if (existsSync(notifSrc)) {
-    const now = Date.now()
-    const rows = JSON.parse(readFileSync(notifSrc, 'utf-8')) as Record<string, unknown>[]
-    const converted = rows.map(r => {
-      const { hoursAgo, ...rest } = r as Record<string, unknown> & { hoursAgo?: number }
-      return {
-        ...rest,
-        timestamp: new Date(now - (hoursAgo ?? 0) * 3_600_000).toISOString(),
-      }
-    })
-    writeFileSync(notifDst, JSON.stringify(converted, null, 2), 'utf-8')
-    console.log(`  converted notifications.example.json → notifications.json (${converted.length} rows)`)
+    copyFileSync(notifSrc, notifDst)
+    console.log('  copied notifications.example.json → notifications.json')
     ok++
   } else {
     console.warn('  missing notifications.example.json — skipping')
@@ -253,7 +244,7 @@ function validateFields(sheet: string, rows: unknown[], fields: readonly string[
 
 const REQUIRED: Record<string, readonly string[]> = {
   posts:         ['id', 'slug', 'title', 'excerpt', 'content', 'category', 'status'],
-  notifications: ['id', 'text', 'type', 'timestamp', 'active'],
+  notifications: ['id', 'text', 'type', 'active'],
   stats:         ['key', 'value', 'displayText', 'active'],
   inventory:     ['id', 'name', 'category', 'price', 'active'],
   tips:          ['id', 'text', 'active'],

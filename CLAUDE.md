@@ -391,8 +391,11 @@ a dedicated `isMyth` boolean column is a future option if prefix styles vary.
 | A | id | number | 1 |
 | B | text | string | `Kristina ostis bambuspadja` |
 | C | type | string | `purchase` / `view` / `quiz` |
-| D | timestamp | string | `2025-06-20T10:30:00` (exact event time; browser computes "X tundi tagasi" at runtime) |
-| E | active | boolean | `TRUE` / `FALSE` |
+| D | active | boolean | `TRUE` / `FALSE` |
+
+**No time column.** The toast fabricates a fresh random "X ago" (capped ~2 h,
+heavily weighted toward "just now") on every show, so social proof always reads
+as live activity. A real/stale timestamp would undermine that — don't add one.
 
 ### Tab: `stats`
 | Col | Field | Type | Example |
