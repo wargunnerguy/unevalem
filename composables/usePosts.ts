@@ -1,4 +1,5 @@
 import type { Post } from '~/types'
+import { interestTags, affinityScore, dailyRotationJitter, dayOfYear } from '~/utils/affinity'
 
 const MYTH_RE = /^MÜÜT:\s*/i
 
@@ -27,21 +28,35 @@ export function usePost(slug: string) {
 
 export function useFeaturedPosts(limit = 5) {
   const { posts } = usePosts()
-  const { reads, visits, sortUnreadFirst } = useReadHistory()
+  const { reads } = useReadHistory()
+  const { mergedAnswers } = useCalcSession()
+  const { lastQuiz } = useQuizHistory()
 
+  // A fresh seed per page load so equally-ranked posts visibly reshuffle each
+  // visit — the "feels alive" effect. Generated in onMounted (not at setup) so
+  // it's genuinely random on the client and never differs from SSR mid-render.
+  const seed = ref(dayOfYear())
+  onMounted(() => { seed.value = dayOfYear() + Math.floor(Math.random() * 1000) })
+
+  // Personalized ordering. Relevance (affinity to the visitor's calc/quiz
+  // results) dominates; a featured boost keeps flagship posts up for cold
+  // visitors; an unread bonus avoids re-surfacing read posts; a sub-1 jitter
+  // breaks ties using the per-load seed. See utils/affinity.ts.
   return computed(() => {
-    const all = posts.value
-    const featured = all.filter(p => p.isFeatured)
-    const others = all.filter(p => !p.isFeatured)
+    const interest = interestTags(mergedAnswers.value, lastQuiz.value)
 
-    // After 3 visits where all featured posts have already been read, blend in others
-    const v = visits.value ?? 0
-    const allFeaturedRead = featured.length > 0 && featured.every(p => (reads.value[p.slug] ?? 0) > 0)
-    const pool = (v >= 3 && allFeaturedRead)
-      ? sortUnreadFirst([...featured, ...others])
-      : [...sortUnreadFirst(featured), ...others]
-
-    return pool.slice(0, limit)
+    return [...posts.value]
+      .map(post => ({
+        post,
+        score:
+          affinityScore(post, interest) +
+          (post.isFeatured ? 2 : 0) +
+          ((reads.value[post.slug] ?? 0) === 0 ? 1 : 0) +
+          dailyRotationJitter(post.id, seed.value),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(x => x.post)
   })
 }
 

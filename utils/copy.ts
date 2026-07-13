@@ -31,14 +31,23 @@ export const calculator = {
   version: 'v2.5',
   heroLabel: 'Leia oma ideaalne padi, tekk ja madrats — 3 lühikest testi',
 
+  heroTitle: {
+    pillow:   'Leia endale parim padi',
+    blanket:  'Leia endale parim tekk',
+    mattress: 'Leia endale parim madrats',
+  } as Record<string, string>,
+
+  researchBadge: 'Soovitustest põhineb 60+ rahvusvahelisel uneuuringul',
+  researchResultNote: 'Soovitus on koostatud teadusuuringute põhjal.',
+
   variantLabels: {
     pillow:  'Leia oma ideaalne padi — alusta siit',
     blanket: 'Leia oma ideaalne tekk — alusta siit',
     sleep:   'Ehita oma täielik une profiil — 3 testi',
   } as Record<string, string>,
   progressLabel: (step: number, total: number) => `Samm ${step} / ${total}`,
-  timeLeft: (step: number): string => {
-    const sek = (6 - step) * 20
+  timeLeft: (step: number, total: number): string => {
+    const sek = (total + 1 - step) * 20
     if (sek >= 60) return `~${Math.ceil(sek / 60)} min`
     if (sek > 0) return `~${sek} sek`
     return ''
@@ -49,8 +58,16 @@ export const calculator = {
       icon: '🛏️',
       title: 'Padi',
       description: 'Leia täpselt sulle sobiv padi',
-      stepKeys: ['position', 'bodyType', 'neckPain', 'allergies', 'pillowAge'] as const,
+      stepKeys: ['neckPain', 'position', 'bodyType', 'age', 'complaint', 'pillowCount', 'allergies', 'pillowAge'] as const,
       steps: [
+        {
+          question: 'Kas ärkad hommikul kaela- või õlavaluga?',
+          options: [
+            { label: 'Jah, sageli', value: 'often' },
+            { label: 'Mõnikord', value: 'sometimes' },
+            { label: 'Ei, ärkan valutu', value: 'never' },
+          ],
+        },
         {
           question: 'Kuidas sa üldjuhul magad?',
           options: [
@@ -69,11 +86,28 @@ export const calculator = {
           ],
         },
         {
-          question: 'Kas ärkad hommikul kaela- või õlavaluga?',
+          question: 'Kui vana sa oled?',
           options: [
-            { label: 'Jah, sageli', value: 'often' },
-            { label: 'Mõnikord', value: 'sometimes' },
-            { label: 'Ei', value: 'never' },
+            { label: '18–30', value: 'young' },
+            { label: '31–45', value: 'adult' },
+            { label: '46–60', value: 'middle' },
+            { label: '60+', value: 'senior' },
+          ],
+        },
+        {
+          question: 'Mis häirib sind une osas kõige rohkem?',
+          options: [
+            { label: 'Raske uinuda', value: 'cant-sleep' },
+            { label: 'Ärkan öösel üles', value: 'wake-at-night' },
+            { label: 'Ärkan väsinuna', value: 'wake-tired' },
+            { label: 'Pole erilisi probleeme', value: 'none' },
+          ],
+        },
+        {
+          question: 'Mitu patja kasutad korraga?',
+          options: [
+            { label: 'Ühte patja', value: 'one' },
+            { label: 'Kahte või rohkem', value: 'two-plus' },
           ],
         },
         {
@@ -99,7 +133,7 @@ export const calculator = {
       icon: '🌙',
       title: 'Tekk',
       description: 'Leia täpselt sulle sobiv tekk',
-      stepKeys: ['sweating', 'temp', 'blanketWeight', 'partner', 'allergies'] as const,
+      stepKeys: ['sweating', 'temp', 'age', 'blanketWeight', 'partner', 'roomTemp', 'allergies', 'problemSeason'] as const,
       steps: [
         {
           question: 'Kas higistab öösel või ärkad kuumalt?',
@@ -115,6 +149,15 @@ export const calculator = {
             { label: 'Jahe tuba (16–18 °C)', value: 'cold' },
             { label: 'Mugav (18–20 °C)', value: 'normal' },
             { label: 'Soe tuba (20 °C+)', value: 'hot' },
+          ],
+        },
+        {
+          question: 'Kui vana sa oled?',
+          options: [
+            { label: '18–30', value: 'young' },
+            { label: '31–45', value: 'adult' },
+            { label: '46–60', value: 'middle' },
+            { label: '60+', value: 'senior' },
           ],
         },
         {
@@ -134,6 +177,14 @@ export const calculator = {
           ],
         },
         {
+          question: 'Milline on sinu magamistoa tavatemperatuur?',
+          options: [
+            { label: 'Pigem jahe', value: 'cool' },
+            { label: 'Keskmiselt soe', value: 'moderate' },
+            { label: 'Pigem soe', value: 'warm' },
+          ],
+        },
+        {
           question: 'Kas sul esineb allergia või tundlikkus?',
           options: [
             { label: 'Tolmulestade suhtes', value: 'dust-mites' },
@@ -142,14 +193,30 @@ export const calculator = {
             { label: 'Pole teadaolevaid allergiaid', value: 'none' },
           ],
         },
+        {
+          question: 'Mis aastaajal on sul kõige rohkem uneprobleeme?',
+          options: [
+            { label: 'Talvel — on liiga külm', value: 'winter' },
+            { label: 'Suvel — on liiga palav', value: 'summer' },
+            { label: 'Aastaringselt ühtlaselt', value: 'year-round' },
+          ],
+        },
       ],
     },
     mattress: {
       icon: '💤',
       title: 'Madrats',
       description: 'Leia täpselt sulle sobiv madrats',
-      stepKeys: ['position', 'bodyType', 'backPain', 'partner', 'mattressAge'] as const,
+      stepKeys: ['sleepQuality', 'position', 'bodyType', 'backPain', 'age', 'partner', 'mattressAge', 'currentMattress'] as const,
       steps: [
+        {
+          question: 'Kuidas hindad oma praegust une kvaliteeti?',
+          options: [
+            { label: 'Halb — ärkan väsinuna', value: 'poor' },
+            { label: 'Keskpärane — võiks parem olla', value: 'fair' },
+            { label: 'Hea — ärkan puhanuna', value: 'good' },
+          ],
+        },
         {
           question: 'Kuidas sa üldjuhul magad?',
           options: [
@@ -176,6 +243,15 @@ export const calculator = {
           ],
         },
         {
+          question: 'Kui vana sa oled?',
+          options: [
+            { label: '18–30', value: 'young' },
+            { label: '31–45', value: 'adult' },
+            { label: '46–60', value: 'middle' },
+            { label: '60+', value: 'senior' },
+          ],
+        },
+        {
           question: 'Kas magad üksi või koos partneriga?',
           options: [
             { label: 'Üksi', value: 'solo' },
@@ -189,6 +265,15 @@ export const calculator = {
             { label: '2–5 aastat', value: '1-3y' },
             { label: '5–8 aastat', value: '3-5y' },
             { label: 'Üle 8 aasta', value: '5y+' },
+          ],
+        },
+        {
+          question: 'Millist madratsit kasutad praegu?',
+          options: [
+            { label: 'Vedrumadratsit', value: 'spring' },
+            { label: 'Vahtmadratsit', value: 'foam' },
+            { label: 'Hübriidmadratsit', value: 'hybrid' },
+            { label: 'Ei tea / ei ole kindel', value: 'unknown' },
           ],
         },
       ],
@@ -262,6 +347,7 @@ export const homepage = {
   metaDescription: 'Vasta 5 küsimusele ja saad personaalse soovituse parema une jaoks. Eesti parim unenõuannete ressurss.',
   dailyTipHeading: 'Päeva unenipp',
   featuredPostsHeading: 'Populaarseimad artiklid',
+  personalizedNote: 'Sinu vastuste põhjal',
 
   // Stats strip: show these 3 keys in this order, with Estonian labels.
   // Values come from Sheets; labels are defined here (override Sheets displayText).
@@ -294,6 +380,60 @@ export const socialProof = {
     view: '👁️',
     quiz: '🎯',
   },
+}
+
+export const cookieConsent = {
+  text: 'Kasutame küpsiseid, et mõista, kuidas lehte kasutatakse, ja seda paremaks muuta.',
+  accept: 'Nõustun',
+  decline: 'Ainult vajalikud',
+  learnMore: 'Loe lähemalt',
+}
+
+export const privacyPage = {
+  metaTitle: 'Privaatsuspoliitika | Unevalem',
+  metaDescription: 'Kuidas Unevalem kogub ja kasutab andmeid ning milliseid küpsiseid kasutame.',
+  heading: 'Privaatsuspoliitika',
+  lastUpdated: 'Viimati uuendatud: 13. juuli 2026',
+  intro:
+    'Sinu privaatsus on meile oluline. Siin selgitame lihtsalt ja ausalt, milliseid andmeid Unevalem kogub, miks ja kuidas saad seda ise kontrollida.',
+  sections: [
+    {
+      heading: 'Milliseid andmeid kogume',
+      body: 'Unevalem ei küsi ega salvesta sinu nime, e-posti ega muid isikut tuvastavaid andmeid. Kogume ainult anonüümset statistikat lehe kasutuse kohta ning sinu unekalkulaatori vastuseid, et anda personaalseid soovitusi.',
+      items: [
+        'Kalkulaatori vastused (nt magamisasend, temperatuurieelistus) — hoitakse sinu seadmes küpsistes ja saadetakse meile üksnes anonüümselt koondstatistikana.',
+        'Anonüümne külastusstatistika — milliseid lehti vaadatakse ja kust külastajad tulevad.',
+      ],
+    },
+    {
+      heading: 'Küpsised',
+      body: 'Küpsis on väike tekstifail sinu seadmes. Kasutame kahte tüüpi küpsiseid:',
+      items: [
+        'Vajalikud küpsised — salvestavad sinu kalkulaatori edenemise, eelistused (nt tume/hele režiim) ja küpsisevaliku. Need töötavad alati ega vaja nõusolekut.',
+        'Analüütika küpsised — Google Analytics kasutab neid külastuste mõõtmiseks. Neid seatakse alles siis, kui annad selleks nõusoleku.',
+      ],
+    },
+    {
+      heading: 'Nõusolek ja selle muutmine',
+      body: 'Kuni sa pole nõusolekut andnud, töötab Google Analytics küpsisteta režiimis ega salvesta sinu seadmesse midagi. Kui vajutad „Nõustun\", lubad analüütika küpsised. Oma valikut saad igal ajal muuta, kustutades brauseris selle lehe küpsised — seejärel küsime nõusolekut uuesti.',
+    },
+    {
+      heading: 'Kolmandad osapooled',
+      body: 'Anonüümse statistika kogumiseks kasutame kahte teenust:',
+      items: [
+        'Google Analytics (Google Ireland Ltd.) — veebiliikluse analüüs. IP-aadressid anonümiseeritakse.',
+        'Plausible Analytics — privaatsussõbralik, küpsisevaba analüütika, mis ei jälgi üksikkasutajaid.',
+      ],
+    },
+    {
+      heading: 'Sinu õigused',
+      body: 'Kuna me ei salvesta sinu isikuandmeid, ei ole meil sinuga seotud profiili. Sul on siiski õigus keelduda analüütikast (vali „Ainult vajalikud\") ja kustutada kõik küpsised oma brauseri seadetest. Küsimuste korral võta meiega ühendust.',
+    },
+    {
+      heading: 'Kontakt',
+      body: 'Privaatsusküsimustes kirjuta meile: info@unevalem.ee',
+    },
+  ],
 }
 
 export const footer = {

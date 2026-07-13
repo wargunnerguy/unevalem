@@ -11,20 +11,32 @@ export type MainComplaint    = 'cant-sleep' | 'wake-at-night' | 'wake-tired' | '
 export type BackPain         = 'often' | 'sometimes' | 'never'
 export type MattressAge      = 'new' | '1-3y' | '3-5y' | '5y+'
 export type CalcType         = 'pillow' | 'blanket' | 'mattress'
+export type AgeGroup         = 'young' | 'adult' | 'middle' | 'senior'
+export type SleepQuality     = 'poor' | 'fair' | 'good'
+export type PillowCount      = 'one' | 'two-plus'
+export type CurrentMattress  = 'spring' | 'foam' | 'hybrid' | 'unknown'
+export type RoomTemp         = 'cool' | 'moderate' | 'warm'
+export type ProblemSeason    = 'winter' | 'summer' | 'year-round'
 
 export interface UserProfile {
-  position:      SleepPosition
-  bodyType:      BodyType
-  neckPain:      NeckPain
-  sweating:      SweatingLevel
-  temp:          TempPreference
-  blanketWeight: BlanketWeight
-  partner:       PartnerSituation
-  allergies:     AllergyProfile
-  pillowAge:     PillowAge
-  complaint:     MainComplaint
-  backPain?:     BackPain
-  mattressAge?:  MattressAge
+  position:        SleepPosition
+  bodyType:        BodyType
+  neckPain:        NeckPain
+  sweating:        SweatingLevel
+  temp:            TempPreference
+  blanketWeight:   BlanketWeight
+  partner:         PartnerSituation
+  allergies:       AllergyProfile
+  pillowAge:       PillowAge
+  complaint:       MainComplaint
+  backPain?:       BackPain
+  mattressAge?:    MattressAge
+  age?:            AgeGroup
+  sleepQuality?:   SleepQuality
+  pillowCount?:    PillowCount
+  currentMattress?: CurrentMattress
+  roomTemp?:       RoomTemp
+  problemSeason?:  ProblemSeason
 }
 
 export interface CalcCompletion {

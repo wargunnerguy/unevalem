@@ -125,5 +125,10 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
       {{ calculator.result.ctaButton }}
     </NuxtLink>
 
+    <!-- Research trust note -->
+    <p class="text-center text-[11px] text-muted/60 flex items-center justify-center gap-1.5">
+      <span aria-hidden="true">🔬</span>{{ calculator.researchResultNote }}
+    </p>
+
   </div>
 </template>

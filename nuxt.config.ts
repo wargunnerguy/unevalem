@@ -40,6 +40,9 @@ export default defineNuxtConfig({
     baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
     head: {
       htmlAttrs: { lang: 'et' },
+      // Default browser-tab title; every page overrides it via useHead. Guards
+      // against an untitled route ever showing a stale/blank tab name.
+      title: 'Unevalem',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { property: 'og:site_name', content: 'Unevalem' },
@@ -50,7 +53,8 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'canonical', href: 'https://unevalem.ee' },
+        // Canonical is set per-route in app.vue (a global one here would make every
+        // page claim the homepage as canonical and suppress article indexing).
       ],
       script: [
         {
@@ -67,6 +71,10 @@ export default defineNuxtConfig({
       siteUrl:      process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee',
       // Exposed to browser for fire-and-forget analytics POST (no-cors, not a secret)
       sheetsApiUrl: process.env.SHEETS_API_URL ?? '',
+      // Google Analytics 4 Measurement ID (public, not a secret). Loaded via
+      // plugins/analytics.client.ts behind Consent Mode. Override with
+      // NUXT_PUBLIC_GA_ID; set it empty in a local .env to disable GA in dev.
+      gaId:         process.env.NUXT_PUBLIC_GA_ID ?? 'G-D921C30JEQ',
     },
   },
 })

@@ -97,6 +97,8 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
     else if (profile.pillowAge === '1-3y') score -= 4
     else if (profile.pillowAge === '3y+') score -= 12
     if (profile.allergies !== 'none') score -= 3
+    if (profile.age === 'senior' && profile.pillowAge !== 'new') score -= 5
+    if (profile.pillowCount === 'two-plus') score -= 4
     score = Math.max(20, Math.min(98, score))
 
     const goodShape = score >= 85
@@ -169,6 +171,9 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
   else if (profile.mattressAge === '1-3y') score += 5
   else if (profile.mattressAge === '3-5y') score -= 6
   else if (profile.mattressAge === '5y+') score -= 15
+  if (profile.sleepQuality === 'poor') score -= 8
+  else if (profile.sleepQuality === 'good') score += 6
+  if (profile.age === 'senior') score -= 5
   score = Math.max(20, Math.min(98, score))
 
   const goodShape = score >= 85

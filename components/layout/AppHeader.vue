@@ -12,7 +12,8 @@ const { isDark, toggleTheme } = useTheme()
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
       <!-- Logo -->
-      <NuxtLink to="/" class="shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+      <NuxtLink to="/" class="shrink-0 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+        <img src="/unevalem_logo.png" alt="" aria-hidden="true" class="h-8 w-auto" />
         <span class="font-heading text-2xl text-midnight leading-none">{{ nav.logo }}</span>
       </NuxtLink>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CalcType, Stat } from '~/types'
+import type { CalcType, Stat, UserProfile } from '~/types'
 import { calculator, common } from '~/utils/copy'
 
 // Single source of truth for the version: the `calculatorVersion` stats row.
@@ -10,7 +10,12 @@ const calcVersion = computed(() => {
   return row?.value || calculator.version
 })
 
-const { step, answers, result, analyzing, selectOption, submitQuiz, finishAnalysis, goBack, reset } = useCalculator()
+const versionChangelog = computed(() => {
+  const row = (calcStatsData.value ?? []).find(s => s.key === 'announcement' && s.active)
+  return row?.displayText ?? null
+})
+
+const { step, answers, result, analyzing, selectOption, submitQuiz, restore, finishAnalysis, goBack, reset } = useCalculator()
 const { products } = useProducts()
 const { variant } = useABTest()
 const { submitCalcResult, resetSubmitted } = useAnalytics()
@@ -19,38 +24,72 @@ const {
   syncActiveCalcType, getNextAfter, storeCompletion, getPrefilledAnswers,
 } = useCalcSession()
 
-// Sync active calc type from cookies on mount (avoids SSR mismatch).
-// If the type changed (returning visitor who completed a calc), also reset.
-onMounted(() => {
-  const prevType = activeCalcType.value
-  syncActiveCalcType()
-  if (activeCalcType.value !== prevType) {
-    const prefill = getPrefilledAnswers(activeCalcType.value)
-    reset(prefill)
-  }
+// True while restoring a saved result, so the storeCompletion/analytics watch
+// below doesn't re-fire on the synthetic jump to the result step.
+const restoring = ref(false)
+let didInit = false
+
+// The most recently completed calc (by timestamp), if any.
+const latestCompletion = computed(() => {
+  const done = (['pillow', 'blanket', 'mattress'] as const)
+    .map(t => ({ t, c: siteProfile.value[t] }))
+    .filter((x): x is { t: CalcType; c: NonNullable<typeof x.c> } => !!x.c)
+  if (!done.length) return null
+  return [...done].sort((a, b) => b.c.completedAt.localeCompare(a.c.completedAt))[0]
 })
+
+// On load: if the visitor already finished a calc, restore that result screen
+// (so a refresh keeps it). Otherwise resume the funnel at the first uncompleted
+// calc. Restoring needs the product list, which may still be loading — the
+// products watcher retries once it arrives.
+function initFromProfile() {
+  if (didInit) return
+  const latest = latestCompletion.value
+
+  if (!latest) {
+    const prevType = activeCalcType.value
+    syncActiveCalcType()
+    if (activeCalcType.value !== prevType) reset(getPrefilledAnswers(activeCalcType.value))
+    didInit = true
+    return
+  }
+
+  const prods = products.value ?? []
+  if (!prods.length) return // wait for products; retried by the watcher below
+
+  restoring.value = true
+  activeCalcType.value = latest.t
+  restore(latest.c.answers as Partial<UserProfile>, prods, latest.t, totalSteps.value)
+  didInit = true
+  nextTick(() => { restoring.value = false })
+}
+
+onMounted(initFromProfile)
+watch(products, () => { if (!didInit) initFromProfile() })
 
 const calcConfig = computed(() => calculator.configs[activeCalcType.value])
 const stepKeys = computed(() => calcConfig.value.stepKeys as readonly string[])
+const totalSteps = computed(() => calcConfig.value.steps.length)
 
 const currentStepData = computed(() => calcConfig.value.steps[step.value - 1])
 
 const currentAnswer = computed<string | undefined>(() => {
-  if (step.value >= 1 && step.value <= 5) {
+  if (step.value >= 1 && step.value <= totalSteps.value) {
     const key = stepKeys.value[step.value - 1]
     return (answers.value as Record<string, string>)[key]
   }
   return undefined
 })
 
-const timeLeft = computed(() => calculator.timeLeft(step.value))
+const timeLeft = computed(() => calculator.timeLeft(step.value, totalSteps.value))
 
 // The next calc type to offer after this one completes
 const nextCalcType = computed(() => getNextAfter(activeCalcType.value))
 
 // Save + submit when result screen appears
 watch(step, (val, prev) => {
-  if (val === 6 && result.value) {
+  if (restoring.value) return
+  if (val === totalSteps.value + 1 && result.value) {
     const productName = result.value.recommendations[0]?.name ?? ''
     storeCompletion(activeCalcType.value, answers.value, productName)
     submitCalcResult(answers.value, result.value, activeCalcType.value)
@@ -65,8 +104,8 @@ const transitionName = computed(() => goingForward.value ? 'slide-left' : 'slide
 
 function handleSelect(value: string) {
   const key = stepKeys.value[step.value - 1]
-  const isLastStep = step.value === 5
-  selectOption(key as keyof typeof answers.value, value)
+  const isLastStep = step.value === totalSteps.value
+  selectOption(key as keyof typeof answers.value, value, totalSteps.value)
   if (isLastStep) {
     setTimeout(() => submitQuiz(products.value ?? [], activeCalcType.value), 350)
   }
@@ -158,7 +197,7 @@ watch(analyzing, (val) => {
     })
     const total = elapsed + 600
     analysisDuration.value = total
-    timers.push(setTimeout(() => finishAnalysis(), total))
+    timers.push(setTimeout(() => finishAnalysis(totalSteps.value), total))
   } else {
     timers.forEach(clearTimeout)
     timers.length = 0
@@ -179,29 +218,35 @@ function getProductName(type: CalcType): string {
   <div class="w-full max-w-xl mx-auto">
     <div class="bg-foam rounded-2xl shadow-lg overflow-hidden">
 
-      <!-- Calc journey breadcrumb (steps 1–5) -->
-      <div v-if="step <= 5 && !analyzing" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
+      <!-- Calc journey breadcrumb — each type is clickable to switch -->
+      <div v-if="step <= totalSteps && !analyzing" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
         <template v-for="(type, idx) in (['pillow', 'blanket', 'mattress'] as const)" :key="type">
+          <!-- Active type: plain label, not clickable -->
           <span
-            class="flex items-center gap-0.5 transition-colors"
-            :class="
-              type === activeCalcType
-                ? 'text-midnight font-semibold'
-                : isCalcDone(type)
-                ? 'text-success'
-                : 'text-gray-300'
-            "
+            v-if="type === activeCalcType"
+            class="flex items-center gap-0.5 text-midnight font-semibold"
           >
-            <span v-if="isCalcDone(type) && type !== activeCalcType" aria-hidden="true">✓ </span>
             {{ calculator.configs[type].icon }} {{ calculator.session.doneLabel[type] }}
           </span>
+          <!-- Other types: button to switch -->
+          <button
+            v-else
+            type="button"
+            class="flex items-center gap-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+            :class="isCalcDone(type) ? 'text-success hover:text-midnight' : 'text-gray-300 hover:text-muted'"
+            :aria-label="`Lülitu ${calculator.session.doneLabel[type]} kalkulaatorile`"
+            @click="() => { const prefill = getPrefilledAnswers(type); activeCalcType = type; reset(prefill) }"
+          >
+            <span v-if="isCalcDone(type)" aria-hidden="true">✓ </span>
+            {{ calculator.configs[type].icon }} {{ calculator.session.doneLabel[type] }}
+          </button>
           <span v-if="idx < 2" class="text-gray-200" aria-hidden="true">›</span>
         </template>
       </div>
 
       <!-- Progress header (steps 1–5 only) -->
       <div
-        v-if="step <= 5 && !analyzing"
+        v-if="step <= totalSteps && !analyzing"
         class="flex items-center gap-3 px-5 pt-2 pb-0"
       >
         <button
@@ -209,7 +254,7 @@ function getProductName(type: CalcType): string {
           type="button"
           class="shrink-0 flex items-center gap-1 text-sm text-muted hover:text-midnight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded px-1 py-0.5"
           :aria-label="`Mine samm ${step - 1} juurde`"
-          @click="goBack"
+          @click="goBack(totalSteps)"
         >
           <span aria-hidden="true">←</span>
           <span>{{ common.back }}</span>
@@ -221,17 +266,17 @@ function getProductName(type: CalcType): string {
           role="progressbar"
           :aria-valuenow="step"
           aria-valuemin="1"
-          aria-valuemax="5"
-          :aria-label="calculator.progressLabel(step, 5)"
+          :aria-valuemax="totalSteps"
+          :aria-label="calculator.progressLabel(step, totalSteps)"
         >
           <div
             class="h-full bg-midnight rounded-full transition-all duration-300"
-            :style="{ width: (step / 5 * 100) + '%' }"
+            :style="{ width: (step / totalSteps * 100) + '%' }"
           />
         </div>
 
         <div class="shrink-0 text-right" aria-hidden="true">
-          <span class="block text-xs text-midnight/60 tabular-nums">{{ step }} / 5</span>
+          <span class="block text-xs text-midnight/60 tabular-nums">{{ step }} / {{ totalSteps }}</span>
           <span v-if="timeLeft" class="block text-[10px] text-midnight/40 leading-none mt-0.5">{{ timeLeft }}</span>
         </div>
       </div>
@@ -241,9 +286,9 @@ function getProductName(type: CalcType): string {
         <Transition :name="transitionName" mode="out-in">
           <div :key="analyzing ? 'analyzing' : step">
 
-            <!-- Steps 1–5: auto-advance on click -->
+            <!-- Steps: auto-advance on click -->
             <CalculatorStep
-              v-if="step >= 1 && step <= 5 && !analyzing"
+              v-if="step >= 1 && step <= totalSteps && !analyzing"
               :question="currentStepData.question"
               :options="(currentStepData.options as any)"
               :selected="currentAnswer"
@@ -280,8 +325,8 @@ function getProductName(type: CalcType): string {
               </TransitionGroup>
             </div>
 
-            <!-- Step 6: result + profile progress -->
-            <div v-else-if="step === 6 && result">
+            <!-- Result screen -->
+            <div v-else-if="step === totalSteps + 1 && result">
               <!-- Main result -->
               <CalculatorResult
                 :result="result"
@@ -347,8 +392,18 @@ function getProductName(type: CalcType): string {
       </div>
 
       <!-- Version stamp -->
-      <div class="flex justify-end px-3 pb-1.5 -mt-1">
+      <div class="flex justify-end items-center gap-1 px-3 pb-1.5 -mt-1">
         <span class="text-[9px] text-midnight/20 select-none tracking-wide">{{ calcVersion }}</span>
+        <div v-if="versionChangelog" class="relative group">
+          <button
+            type="button"
+            class="p-0 m-0 text-[9px] text-midnight/20 hover:text-midnight/50 transition-colors leading-none flex items-center focus:outline-none"
+            aria-label="Mis on uut selles versioonis"
+          >ℹ</button>
+          <div class="absolute bottom-full right-0 mb-1.5 w-56 bg-midnight text-foam text-[11px] leading-snug rounded-lg px-3 py-2 shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 z-10">
+            {{ versionChangelog }}
+          </div>
+        </div>
       </div>
     </div>
   </div>

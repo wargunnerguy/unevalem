@@ -43,6 +43,10 @@ jobs:
         env:
           NUXT_APP_BASE_URL: /
           SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
+          # Google Analytics id is baked into the build from the nuxt.config
+          # runtimeConfig.public.gaId default (G-D921C30JEQ) — no secret needed.
+          # To change it, set a NUXT_PUBLIC_GA_ID repo variable and reference it
+          # here as ${{ vars.NUXT_PUBLIC_GA_ID }} (only if the variable is set).
 
       - uses: actions/configure-pages@v5
 

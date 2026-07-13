@@ -28,6 +28,11 @@ const year = new Date().getFullYear()
                 {{ nav.quiz }}
               </NuxtLink>
             </li>
+            <li>
+              <NuxtLink to="/privaatsus" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+                {{ footer.links.privacy }}
+              </NuxtLink>
+            </li>
           </ul>
         </nav>
       </div>

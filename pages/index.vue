@@ -39,6 +39,20 @@ const featuredStats = computed(() => {
 
 const featuredPosts = useFeaturedPosts(5)
 
+// The personalized order depends on cookies, so it must only apply on the client
+// after mount. Until then we render a cookie/date-independent base order (still
+// puts the post links in the static HTML for SEO). Swapping on `isMounted`
+// avoids any hydration mismatch since server and pre-mount client agree.
+const { posts: allPosts } = usePosts()
+const basePosts = computed(() =>
+  [...allPosts.value]
+    .sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))
+    .slice(0, 5),
+)
+const isMounted = useMounted()
+const displayPosts = computed(() => (isMounted.value ? featuredPosts.value : basePosts.value))
+const showPersonalizedNote = computed(() => isMounted.value && completedCount.value > 0)
+
 // A/B variant label
 const { variant } = useABTest()
 const variantLabel = computed(() =>
@@ -91,12 +105,23 @@ const revisitSummary = computed(() => {
         </Transition>
       </ClientOnly>
 
-      <!-- Single short label -->
-      <div class="max-w-xl mx-auto text-center mb-4">
+      <!-- Hero heading — updates as active calc type changes -->
+      <div class="max-w-xl mx-auto text-center mb-6">
         <ClientOnly>
-          <p class="text-gold/80 text-sm tracking-wide">{{ variantLabel }}</p>
+          <Transition name="slide-left" mode="out-in">
+            <div :key="activeCalcType">
+              <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight mb-2">
+                {{ calculator.heroTitle[activeCalcType] }}
+              </h1>
+            </div>
+          </Transition>
+          <p class="mt-2 text-lavender/40 text-xs flex items-center justify-center gap-1.5">
+            <span aria-hidden="true">🔬</span>{{ calculator.researchBadge }}
+          </p>
           <template #fallback>
-            <p class="text-gold/80 text-sm tracking-wide">{{ calculator.heroLabel }}</p>
+            <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight mb-2">
+              {{ calculator.heroTitle.pillow }}
+            </h1>
           </template>
         </ClientOnly>
       </div>
@@ -138,15 +163,18 @@ const revisitSummary = computed(() => {
     </section>
 
     <!-- ─── FEATURED ARTICLES ─── -->
-    <section v-if="featuredPosts.length" class="bg-moonlight px-4 pb-14 pt-2">
+    <section v-if="displayPosts.length" class="bg-moonlight px-4 pb-14 pt-2">
       <div class="max-w-2xl mx-auto">
+        <p v-if="showPersonalizedNote" class="text-xs font-semibold text-lavender uppercase tracking-wider mb-2">
+          {{ homepage.personalizedNote }}
+        </p>
         <h2 class="font-heading text-2xl md:text-3xl text-midnight mb-7">
           {{ homepage.featuredPostsHeading }}
         </h2>
 
         <div class="space-y-0 divide-y divide-gray-100">
           <article
-            v-for="post in featuredPosts"
+            v-for="post in displayPosts"
             :key="post.id"
             class="py-5 first:pt-0"
           >

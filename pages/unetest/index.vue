@@ -35,6 +35,15 @@ const result = computed(() => {
 
 const currentQuestion = computed(() => quiz.value?.questions[qIndex.value] ?? null)
 
+// Persist the result so it can personalize which posts surface across the site
+const { saveQuizResult } = useQuizHistory()
+watch(
+  () => (phase.value === 'result' ? result.value : null),
+  (r) => {
+    if (r && quiz.value) saveQuizResult(quiz.value.id, r.key)
+  },
+)
+
 const progress = computed(() =>
   totalQuestions.value
     ? Math.round((answered.value.filter(Boolean).length / totalQuestions.value) * 100)
