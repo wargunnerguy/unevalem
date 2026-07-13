@@ -257,13 +257,14 @@ async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
   mkdirSync(DATA_DIR, { recursive: true })
 
-  const [posts, notifications, stats, inventory, tipsRaw, quizzes] = await Promise.all([
+  const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats] = await Promise.all([
     fetchSheet('posts',         'posts'),
     fetchSheet('notifications', 'notifications'),
     fetchSheet('stats',         'stats'),
     fetchSheet('inventory',     'products'),
     fetchSheet('tips',          'tips'),
     fetchQuizzes(),
+    tryFetchSheet('post_stats'),   // best-effort; absent until the sheet exists
   ])
 
   validateFields('posts',         posts,         REQUIRED.posts)
@@ -272,7 +273,18 @@ async function main(): Promise<void> {
   validateFields('inventory',     inventory,     REQUIRED.inventory)
   validateFields('tips',          tipsRaw,       REQUIRED.tips)
 
-  const transformedPosts    = (posts     as Record<string, unknown>[]).map(transformPost)
+  // Build a slug → view-count map from the post_stats sheet (columns: slug, views)
+  const viewsBySlug = new Map<string, number>()
+  for (const row of (postStats ?? []) as Record<string, unknown>[]) {
+    const slug = String(row.slug ?? '').trim()
+    if (slug) viewsBySlug.set(slug, Number(row.views ?? 0) || 0)
+  }
+
+  const transformedPosts = (posts as Record<string, unknown>[]).map(row => {
+    const post = transformPost(row)
+    post.popularity = viewsBySlug.get(String(row.slug ?? '')) ?? 0
+    return post
+  })
   const transformedProducts = (inventory as Record<string, unknown>[]).map(transformProduct)
   const tips = (tipsRaw as Record<string, unknown>[]).filter(r => parseBool(r.active))
 

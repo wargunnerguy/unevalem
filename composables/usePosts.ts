@@ -39,17 +39,20 @@ export function useFeaturedPosts(limit = 5) {
   onMounted(() => { seed.value = dayOfYear() + Math.floor(Math.random() * 1000) })
 
   // Personalized ordering. Relevance (affinity to the visitor's calc/quiz
-  // results) dominates; a featured boost keeps flagship posts up for cold
-  // visitors; an unread bonus avoids re-surfacing read posts; a sub-1 jitter
-  // breaks ties using the per-load seed. See utils/affinity.ts.
+  // results) dominates; popularity (aggregate views from post_stats) surfaces
+  // what interests people most; a featured boost keeps flagship posts up for
+  // cold visitors; an unread bonus avoids re-surfacing read posts; a sub-1
+  // jitter breaks ties using the per-load seed. See utils/affinity.ts.
   return computed(() => {
     const interest = interestTags(mergedAnswers.value, lastQuiz.value)
+    const maxPop = Math.max(1, ...posts.value.map(p => p.popularity ?? 0))
 
     return [...posts.value]
       .map(post => ({
         post,
         score:
           affinityScore(post, interest) +
+          ((post.popularity ?? 0) / maxPop) * 3 +   // up to +3 for the most-viewed
           (post.isFeatured ? 2 : 0) +
           ((reads.value[post.slug] ?? 0) === 0 ? 1 : 0) +
           dailyRotationJitter(post.id, seed.value),

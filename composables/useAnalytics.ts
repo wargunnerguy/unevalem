@@ -64,5 +64,27 @@ export function useAnalytics() {
     }
   }
 
-  return { submitCalcResult, resetSubmitted }
+  // Fire-and-forget post-view ping so the Apps Script can tally which articles
+  // draw the most interest (used to rank posts on the homepage). Deduped per
+  // browser session per slug so refreshes don't inflate the count. No cookies,
+  // no PII — just an anonymous increment, same channel as submitCalcResult.
+  function trackPostView(slug: string) {
+    if (!import.meta.client || !slug) return
+    const url = config.public.sheetsApiUrl as string
+    if (!url) return
+
+    const key = `uva-viewed-${slug}`
+    try {
+      if (sessionStorage.getItem(key)) return
+      sessionStorage.setItem(key, '1')
+    } catch {
+      // sessionStorage unavailable (private mode edge cases) — still send once
+    }
+
+    const payload = { action: 'post_view', slug, viewedAt: new Date().toISOString() }
+    fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
+      .catch(() => { /* fire-and-forget */ })
+  }
+
+  return { submitCalcResult, resetSubmitted, trackPostView }
 }

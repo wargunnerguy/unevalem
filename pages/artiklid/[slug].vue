@@ -14,10 +14,15 @@ const { posts, pending } = usePosts()
 
 const post = computed<Post | null>(() => posts.value.find(p => p.slug === slug) ?? null)
 
-// Mark the article read so it isn't re-surfaced to the top of homepage picks
+// Mark the article read so it isn't re-surfaced to the top of homepage picks,
+// and record an anonymous view so popular posts rank higher site-wide.
 const { markRead } = useReadHistory()
+const { trackPostView } = useAnalytics()
 watch(post, (p) => {
-  if (p && import.meta.client) markRead(p.slug)
+  if (p && import.meta.client) {
+    markRead(p.slug)
+    trackPostView(p.slug)
+  }
 }, { immediate: true })
 
 const relatedPosts = computed<Post[]>(() => {

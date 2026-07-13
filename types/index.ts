@@ -100,6 +100,7 @@ export interface Post {
   isMyth:         boolean
   readingTimeMin: number
   diveDeeper:     { title: string; url: string }[]
+  popularity?:    number   // aggregate view count from the post_stats sheet
 }
 
 export interface Notification {
