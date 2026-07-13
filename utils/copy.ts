@@ -383,9 +383,9 @@ export const socialProof = {
 }
 
 export const cookieConsent = {
-  text: 'Kasutame küpsiseid, et mõista, kuidas lehte kasutatakse, ja seda paremaks muuta.',
-  accept: 'Nõustun',
-  decline: 'Ainult vajalikud',
+  text: 'Kasutame analüütikat, et mõista, kuidas lehte kasutatakse, ja seda paremaks muuta. Võid soovi korral keelduda.',
+  accept: 'Selge',
+  decline: 'Keeldun',
   learnMore: 'Loe lähemalt',
 }
 

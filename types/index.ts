@@ -86,7 +86,7 @@ export interface CalculatorResult {
 }
 
 export interface Post {
-  id:             number
+  id:             string
   slug:           string
   title:          string
   excerpt:        string

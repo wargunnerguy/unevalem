@@ -1,7 +1,8 @@
 // Google Analytics 4 with Consent Mode v2. Loads only when NUXT_PUBLIC_GA_ID is
-// set. Everything is denied by default — GA runs cookieless (modeled pings) and
-// sets no cookies until the visitor accepts via the consent banner. See
-// composables/useConsent.ts and components/layout/CookieConsent.vue.
+// set. Opt-out model: analytics is granted by default (so GA works immediately
+// and Realtime populates) and only disabled if the visitor explicitly opts out
+// via the banner. Ad/advertising storage stays denied always — we never run
+// ads. See composables/useConsent.ts and components/layout/CookieConsent.vue.
 export default defineNuxtPlugin(() => {
   const gaId = useRuntimeConfig().public.gaId as string
   if (!gaId) return
@@ -14,16 +15,13 @@ export default defineNuxtPlugin(() => {
     window.dataLayer.push(arguments)
   }
 
-  // Deny all storage by default; a prior "granted" choice re-enables analytics.
+  // Analytics granted unless the visitor explicitly opted out; ad storage never used.
   window.gtag('consent', 'default', {
     ad_storage: 'denied',
     ad_user_data: 'denied',
     ad_personalization: 'denied',
-    analytics_storage: 'denied',
+    analytics_storage: consent.value === 'denied' ? 'denied' : 'granted',
   })
-  if (consent.value === 'granted') {
-    window.gtag('consent', 'update', { analytics_storage: 'granted' })
-  }
 
   window.gtag('js', new Date())
   window.gtag('config', gaId, { anonymize_ip: true })

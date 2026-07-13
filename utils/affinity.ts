@@ -104,13 +104,21 @@ export function dayOfYear(now: Date = new Date()): number {
   )
 }
 
+/** Stable numeric hash of a post id (ids are strings like "post-001"). */
+function hashId(id: string | number): number {
+  const s = String(id)
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) | 0
+  return Math.abs(h)
+}
+
 /**
- * Deterministic pseudo-random value in [0, 1) from a post id + daily seed.
- * Kept strictly below 1 so it only ever breaks ties between equally-scored
- * posts — never overriding affinity, featured, or unread weighting. The daily
- * seed makes tied posts reshuffle each day so the list never feels frozen.
+ * Deterministic pseudo-random value in [0, 1) from a post id + seed. Kept
+ * strictly below 1 so it only ever breaks ties between equally-scored posts —
+ * never overriding affinity, featured, or unread weighting. A fresh seed per
+ * page load reshuffles tied posts so the list never feels frozen.
  */
-export function dailyRotationJitter(postId: number, seed: number): number {
-  const x = Math.sin((postId + 1) * 12.9898 + seed * 78.233) * 43_758.5453
+export function dailyRotationJitter(postId: string | number, seed: number): number {
+  const x = Math.sin(hashId(postId) * 12.9898 + seed * 78.233) * 43_758.5453
   return x - Math.floor(x)
 }
