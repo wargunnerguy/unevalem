@@ -380,9 +380,12 @@ The Google Sheet has 3 tabs. A pre-build Node script reads them and writes stati
 **Citations live in the `sources` tab** (one row per citation):
 | Col | Field | Example |
 |-----|-------|---------|
-| A | slug | `kohvi-ajastus-ja-uni` (must match a posts-tab slug) |
-| B | title | `Kofeiini mõju unele (Drake et al., 2013)` — blank → hostname is used |
+| A | slug | `kohvi-ajastus-ja-uni` (foreign key — must match a posts-tab slug) |
+| B | title | `Caffeine effects on sleep taken 0, 3, or 6 hours before going to bed` — blank → hostname is used |
 | C | url | `https://pubmed.ncbi.nlm.nih.gov/24235903/` |
+
+Source titles stay in the study's **original language** (usually English) — they
+are citations, not article copy. Only the articles themselves are Estonian.
 
 Rendered under "Uuri lähemalt" as "Allikas: <title> →" on the article page and
 in expanded PostCards. Multiple rows per slug = multiple citations, in row order.
