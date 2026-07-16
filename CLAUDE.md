@@ -374,6 +374,14 @@ The Google Sheet has 3 tabs. A pre-build Node script reads them and writes stati
 | J | status | string | `published` / `draft` |
 | K | isFeatured | boolean | `TRUE` / `FALSE` |
 | L | readingTimeMin | number | `4` |
+| M | diveDeeper | string | `Kofeiini uuring\|https://pubmed…;https://doi.org/…` |
+
+**`diveDeeper` needs its header cell.** The column holds source links rendered
+under "Sukelduge sügavamale" in `PostCard.vue`. Rows are `;`-separated; each is
+either `Title|URL` or a bare `URL` (the parser then labels it with the hostname).
+If the header cell in row 1 is blank, Apps Script keys the column as `""`, the
+parser never sees it, and every link silently disappears — this was the state
+until 2026-07-16.
 
 **Content convention — myth-busting posts:**
 Post titles prefixed with `MÜÜT: ` in the Sheet mark myth-busting content
@@ -670,23 +678,37 @@ The Google Sheets content backend uses an **Apps Script Web App** as a proxy,
 not the Sheets API v4 with an API key. The sheet is private; the script filters
 and serves only publishable content.
 
-Env var is a single URL:
+Env var is a single URL (the sheet moved to the dedicated Unevalem Google
+account on 2026-07-16; this is that account's deployment):
 ```bash
-SHEETS_API_URL=https://script.google.com/macros/s/AKfycbx6m86JxaQo3n9WGFJwk6bvkCDOw3bLxGK7b92xw7H2ijYDsGwIgYf5YPlKlL8k2sW72Q/exec
+SHEETS_API_URL=https://script.google.com/macros/s/AKfycbxacVFUEpBK1rpkOwUF8_-0YHgtizXqz0TE9NosgsARQiNHbMeFOZ4sxt7dD48023DNpQ/exec
 ```
 
-The fetch-content script calls three endpoints:
-${SHEETS_API_URL}?sheet=posts
+The fetch-content script calls one endpoint per tab:
+${SHEETS_API_URL}?sheet=<posts|notifications|stats|inventory|tips|quizzes|quiz_questions|quiz_results>
 
-${SHEETS_API_URL}?sheet=notifications
+An unknown tab returns `{"error":"Unknown sheet: <name>"}` rather than an array;
+`tryFetchSheet` treats any non-array as absent and falls back to the example file.
 
-${SHEETS_API_URL}?sheet=stats
-
-Each returns a JSON array already filtered server-side (published posts only,
-active notifications/stats only). The script should still type-check and
-validate the response before writing to public/data/*.json.
+**Do not trust the script to filter drafts.** Despite the intent above, the
+deployed Apps Script returns `status: draft` posts as well as published ones.
+`fetch-content.ts` filters to `status === 'published'` before writing
+`public/data/posts.json`, which is the single choke point that `/api/posts`,
+`server/routes/sitemap.xml.ts` and the prerenderer all read. Keep the filter
+there even if the Apps Script is later fixed — defence in depth against a draft
+becoming a public page.
 
 No Google Cloud project, no API key, no OAuth. Just the URL.
+
+### Prerendering articles
+
+`crawlLinks` alone is not sufficient. `PostGrid.vue` paginates (`PAGE_SIZE = 10`
+plus infinite scroll), so the server-rendered listing only links the first page
+of posts and the crawler never discovers the rest — they 404 on GitHub Pages
+while still being advertised in `sitemap.xml`. `nuxt.config.ts` therefore reads
+`public/data/posts.json` and passes every `/artiklid/<slug>` explicitly in
+`nitro.prerender.routes`. This is why `fetch-content` must run before
+`generate` (`npm run build:full` does both, in that order).
 
 ### GitHub Actions Secret
 

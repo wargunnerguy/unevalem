@@ -1,3 +1,28 @@
+import { readFileSync, existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+// Article routes must be listed explicitly: the blog listing paginates (PostGrid
+// renders PAGE_SIZE at a time and appends on scroll), so crawlLinks alone only
+// ever discovers the first page of posts and silently 404s the rest on a static
+// host. Reads the file fetch-content.ts writes; empty until that has run.
+function articleRoutes(): string[] {
+  const path = resolve(__dirname, 'public/data/posts.json')
+  if (!existsSync(path)) {
+    console.warn('[nuxt.config] public/data/posts.json missing — article routes will rely on crawling')
+    return []
+  }
+  try {
+    const posts = JSON.parse(readFileSync(path, 'utf-8')) as { slug?: string }[]
+    return posts
+      .map(p => p.slug)
+      .filter((s): s is string => !!s)
+      .map(s => `/artiklid/${s}`)
+  } catch (err) {
+    console.warn('[nuxt.config] could not parse posts.json:', (err as Error).message)
+    return []
+  }
+}
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -32,7 +57,7 @@ export default defineNuxtConfig({
     preset: 'static',
     prerender: {
       crawlLinks: true,
-      routes: ['/sitemap.xml'],
+      routes: ['/sitemap.xml', ...articleRoutes()],
     },
   },
 

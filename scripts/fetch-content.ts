@@ -47,6 +47,9 @@ function parseTags(v: unknown): string[] {
   return []
 }
 
+// Accepts "Title|URL;Title|URL" and, for rows that carry only a bare link,
+// "URL;URL" — falling back to the hostname as the label so a source without an
+// editorial title still renders instead of vanishing.
 function parseDiveDeeper(v: unknown): { title: string; url: string }[] {
   if (!v || typeof v !== 'string' || !v.trim()) return []
   return v
@@ -54,8 +57,13 @@ function parseDiveDeeper(v: unknown): { title: string; url: string }[] {
     .map(s => s.trim())
     .filter(Boolean)
     .map(item => {
-      const [title, url] = item.split('|').map(s => s.trim())
-      return { title: title ?? '', url: url ?? '' }
+      const [first, second] = item.split('|').map(s => s.trim())
+      if (second) return { title: first ?? '', url: second }
+      const url = first ?? ''
+      if (!/^https?:\/\//i.test(url)) return { title: '', url: '' }
+      let title = url
+      try { title = new URL(url).hostname.replace(/^www\./, '') } catch {}
+      return { title, url }
     })
     .filter(item => item.title && item.url)
 }
@@ -280,7 +288,17 @@ async function main(): Promise<void> {
     if (slug) viewsBySlug.set(slug, Number(row.views ?? 0) || 0)
   }
 
-  const transformedPosts = (posts as Record<string, unknown>[]).map(row => {
+  // Drop drafts here rather than trusting the Apps Script to do it: posts.json is
+  // the single artifact the /api/posts route, sitemap.xml and the prerenderer all
+  // read, so an unpublished row that survives this line becomes a public page.
+  const publishedPosts = (posts as Record<string, unknown>[]).filter(row => {
+    const status = String(row.status ?? '').trim().toLowerCase()
+    if (status === 'published') return true
+    console.log(`  · skipping non-published post "${String(row.slug ?? '?')}" (status: ${status || 'empty'})`)
+    return false
+  })
+
+  const transformedPosts = publishedPosts.map(row => {
     const post = transformPost(row)
     post.popularity = viewsBySlug.get(String(row.slug ?? '')) ?? 0
     return post
