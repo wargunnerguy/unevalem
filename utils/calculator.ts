@@ -84,6 +84,66 @@ function mattressReason(profile: UserProfile, goodShape: boolean): string {
   return 'Hea madrats kohandub sinu kehakujuga ja toetab lülisamba loomulikku kumerust.'
 }
 
+// 1–2 sentence Estonian recap of what the answers say about the sleeper and
+// what matters most for them — shown before any product on the result screen.
+function buildProfileSummary(profile: UserProfile, calcType: CalcType): string {
+  const position: Record<string, string> = {
+    side:    'magad enamasti küljel',
+    back:    'magad enamasti selili',
+    stomach: 'magad enamasti kõhuli',
+    combo:   'magad vahelduvates asendites',
+  }
+
+  if (calcType === 'pillow') {
+    const facts: string[] = [position[profile.position]]
+    if (profile.bodyType === 'broad') facts.push('sul on laiemad õlad')
+    if (profile.neckPain === 'often') facts.push('hommikune kaelavalu on sagedane')
+    else if (profile.neckPain === 'sometimes') facts.push('kaelavalu esineb aeg-ajalt')
+    if (profile.pillowAge === '3y+') facts.push('sinu padi on üle kolme aasta vana')
+    if (profile.allergies === 'dust-mites') facts.push('tolmulestad kimbutavad')
+
+    const need = profile.neckPain !== 'never'
+      ? 'õige kõrgusega padi, mis hoiab kaela neutraalses asendis'
+      : profile.position === 'side'
+        ? 'piisavalt kõrge tugi, mis täidab õla ja pea vahe'
+        : profile.position === 'stomach'
+          ? 'madal padi, mis ei suru kaela üles'
+          : 'tugi, mis hoiab lülisamba loomulikus joones'
+    return `Sina ${facts.join(', ')}. Sinu une jaoks on kõige olulisem ${need}.`
+  }
+
+  if (calcType === 'blanket') {
+    const facts: string[] = []
+    if (profile.sweating === 'often') facts.push('higistad öösiti sageli')
+    else if (profile.sweating === 'sometimes') facts.push('higistad öösiti aeg-ajalt')
+    if (profile.temp === 'hot') facts.push('magad pigem soojalt')
+    else if (profile.temp === 'cold') facts.push('kipud öösiti külmetama')
+    else if (!facts.length) facts.push('sinu kehatemperatuur on öösiti tasakaalus')
+    if (profile.partner === 'shared') facts.push('jagad tekki partneriga')
+
+    const need = (profile.sweating === 'often' || profile.temp === 'hot')
+      ? 'hingav materjal, mis juhib niiskuse ja liigse soojuse kehast eemale'
+      : profile.temp === 'cold'
+        ? 'tekk, mis hoiab soojust ühtlaselt kogu öö'
+        : 'aastaringselt tasakaalus temperatuur teki all'
+    return `Sina ${facts.join(', ')}. Sinu une jaoks on kõige olulisem ${need}.`
+  }
+
+  // mattress
+  const facts: string[] = [position[profile.position]]
+  if (profile.backPain === 'often') facts.push('hommikune seljavalu on sagedane')
+  else if (profile.backPain === 'sometimes') facts.push('seljavalu esineb aeg-ajalt')
+  if (profile.mattressAge === '5y+') facts.push('sinu madrats on üle viie aasta vana')
+  if (profile.partner === 'shared') facts.push('jagad voodit partneriga')
+
+  const need = profile.backPain !== 'never'
+    ? 'madrats, mis toetab lülisammast neutraalses asendis'
+    : profile.position === 'side'
+      ? 'pehmem tsoonimine, mis vähendab survet õlgadele ja puusadele'
+      : 'ühtlane tugi, mis kohandub sinu kehakujuga'
+  return `Sina ${facts.join(', ')}. Sinu une jaoks on kõige olulisem ${need}.`
+}
+
 export function getRecommendations(profile: UserProfile, products: Product[], calcType: CalcType): CalculatorResult {
   const active = products.filter(p => p.active)
 
@@ -122,7 +182,7 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
     const finalTips = fillTips(tips, ['Hoia magamistuba jahedana (16–19 °C) — see on üks olulisimaid unekeskkonna tegureid.', 'Regulaarne unegraafik tugevdab keha sisekella paremini kui ükski lisand.'])
     const improvedScore = Math.min(98, score + calcImprovement(score))
 
-    return { currentScore: score, improvedScore, recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
+    return { currentScore: score, improvedScore, profileSummary: buildProfileSummary(profile, calcType), recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
   }
 
   if (calcType === 'blanket') {
@@ -159,7 +219,7 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
     const finalTips = fillTips(tips, ['Hoia magamistuba jahedana (16–19 °C) — see on üks olulisimaid unekeskkonna tegureid.', 'Bambusvoodipesu on hingavam kui puuvill ja sobib nii sooja- kui jahedamale magajale.'])
     const improvedScore = Math.min(98, score + calcImprovement(score))
 
-    return { currentScore: score, improvedScore, recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
+    return { currentScore: score, improvedScore, profileSummary: buildProfileSummary(profile, calcType), recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
   }
 
   // mattress
@@ -195,5 +255,5 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
   const finalTips = fillTips(tips, ['Madratsi vahetamise märgid: voodiservad vajuvad, hommikul tuimus või valu, keeruline mugavat asendit leida.', 'Hoia magamistuba jahedana (16–19 °C) — see on üks olulisimaid unekeskkonna tegureid.'])
   const improvedScore = Math.min(98, score + calcImprovement(score))
 
-  return { currentScore: score, improvedScore, recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
+  return { currentScore: score, improvedScore, profileSummary: buildProfileSummary(profile, calcType), recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
 }

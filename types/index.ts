@@ -80,6 +80,7 @@ export interface ProductRec {
 export interface CalculatorResult {
   currentScore:    number
   improvedScore:   number
+  profileSummary:  string
   recommendations: ProductRec[]
   personalTips:    string[]
   noUrgentNeed:    boolean

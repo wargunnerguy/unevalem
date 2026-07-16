@@ -64,42 +64,10 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
       </div>
     </div>
 
-    <!-- Primary recommendation -->
-    <div v-if="mainRec">
-      <h3 class="font-heading text-lg text-midnight mb-2">{{ heading }}</h3>
-      <div class="bg-dusk rounded-xl p-4 text-foam">
-        <div class="flex items-start justify-between gap-2 mb-1">
-          <span class="font-semibold text-base leading-snug">{{ mainRec.name }}</span>
-          <span class="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full"
-            :class="mainRec.urgency === 'must-have'
-              ? 'bg-gold text-midnight'
-              : 'border border-muted/40 text-muted'"
-          >
-            {{ mainRec.urgency === 'must-have'
-              ? calculator.result.mustHaveBadge
-              : calculator.result.niceToHaveBadge }}
-          </span>
-        </div>
-        <p class="text-sm text-foam/85 leading-relaxed mb-3">{{ mainRec.reason }}</p>
-        <div class="flex items-center justify-between">
-          <span v-if="mainRec.priceText" class="font-semibold text-gold text-base">{{ mainRec.priceText }}</span>
-          <a
-            v-if="mainRec.linkUrl && mainRec.linkUrl !== '#'"
-            :href="mainRec.linkUrl"
-            target="_blank"
-            rel="noopener"
-            class="text-xs font-medium text-gold hover:underline"
-          >
-            Vaata toodet →
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- No product yet (mattress placeholder) -->
-    <div v-else class="bg-dusk/40 rounded-xl p-4 border border-dashed border-lavender/30">
-      <h3 class="font-heading text-lg text-midnight mb-1">{{ heading }}</h3>
-      <p class="text-sm text-muted">Madratsid on varsti poes saadaval — senikaua vaata muid soovitusi.</p>
+    <!-- Sleep profile explanation — the advice comes before any product -->
+    <div v-if="result.profileSummary">
+      <h3 class="font-heading text-lg text-midnight mb-2">{{ calculator.result.profileHeading }}</h3>
+      <p class="text-sm text-midnight leading-relaxed">{{ result.profileSummary }}</p>
     </div>
 
     <!-- Personal tips -->
@@ -117,13 +85,50 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
       </ul>
     </div>
 
-    <!-- CTA to shop -->
-    <NuxtLink
-      to="/pood"
-      class="block w-full text-center bg-gold text-midnight font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-    >
-      {{ calculator.result.ctaButton }}
-    </NuxtLink>
+    <!-- Matching products — compact, last, no hard-sell -->
+    <div v-if="mainRec" class="border-t border-lavender/25 pt-5">
+      <h3 class="font-heading text-lg text-midnight mb-1">{{ calculator.result.productsHeading }}</h3>
+      <p class="text-xs text-muted mb-3">{{ calculator.result.productsIntro }}</p>
+      <div class="bg-foam border border-lavender/25 rounded-xl p-4">
+        <div class="flex items-start justify-between gap-2 mb-1">
+          <span class="font-semibold text-sm text-midnight leading-snug">{{ mainRec.name }}</span>
+          <span class="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full"
+            :class="mainRec.urgency === 'must-have'
+              ? 'bg-gold text-midnight'
+              : 'border border-muted/40 text-muted'"
+          >
+            {{ mainRec.urgency === 'must-have'
+              ? calculator.result.mustHaveBadge
+              : calculator.result.niceToHaveBadge }}
+          </span>
+        </div>
+        <p class="text-sm text-midnight/75 leading-relaxed mb-3">{{ mainRec.reason }}</p>
+        <div class="flex items-center justify-between">
+          <span v-if="mainRec.priceText" class="font-semibold text-midnight text-sm">{{ mainRec.priceText }}</span>
+          <a
+            v-if="mainRec.linkUrl && mainRec.linkUrl !== '#'"
+            :href="mainRec.linkUrl"
+            target="_blank"
+            rel="noopener"
+            class="text-xs font-medium text-midnight underline underline-offset-2 hover:text-dusk"
+          >
+            Vaata toodet →
+          </a>
+        </div>
+      </div>
+      <NuxtLink
+        to="/pood"
+        class="inline-block mt-3 text-sm font-medium text-midnight border-b border-midnight/30 hover:border-midnight pb-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+      >
+        {{ calculator.result.ctaButton }}
+      </NuxtLink>
+    </div>
+
+    <!-- No product for this category yet -->
+    <div v-else class="border-t border-lavender/25 pt-5">
+      <h3 class="font-heading text-lg text-midnight mb-1">{{ heading }}</h3>
+      <p class="text-sm text-muted">Madratsid on varsti poes saadaval — senikaua vaata muid soovitusi.</p>
+    </div>
 
     <!-- Research trust note -->
     <p class="text-center text-[11px] text-muted/60 flex items-center justify-center gap-1.5">
