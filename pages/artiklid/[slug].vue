@@ -142,6 +142,24 @@ const facebookShareUrl = computed(
           v-html="renderedContent"
         />
 
+        <!-- Dive deeper: the article's own sources. PostCard renders this too,
+             but on this page PostCard only covers the related posts below. -->
+        <div v-if="post.diveDeeper?.length" class="mt-10 pt-6 border-t border-lavender/20">
+          <p class="text-sm font-semibold text-midnight mb-3">{{ blogPage.diveDeeperHeading }}</p>
+          <ul class="space-y-1.5">
+            <li v-for="link in post.diveDeeper" :key="link.url">
+              <a
+                :href="link.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm text-midnight hover:text-gold underline underline-offset-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+              >
+                {{ link.title }} →
+              </a>
+            </li>
+          </ul>
+        </div>
+
         <!-- Share -->
         <div class="mt-10 pt-6 border-t border-lavender/20">
           <p class="text-sm font-semibold text-midnight mb-3">{{ blogPage.share.heading }}</p>

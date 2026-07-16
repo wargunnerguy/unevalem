@@ -332,6 +332,7 @@ export const blogPage = {
   metaTitle: 'Uneblog – unenõuanded ja teadus | Unevalem',
   metaDescription: 'Loe artikleid une teadusest, praktilisi nõuandeid ja tooteinfot. Kõik, mida pead teadma parema une jaoks.',
   relatedHeading: 'Seotud artiklid',
+  diveDeeperHeading: 'Sukeldu sügavamale',
   emptyCategory: 'Selles kategoorias pole veel artikleid.',
   notFound: 'Artiklit ei leitud.',
   share: {

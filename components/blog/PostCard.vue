@@ -74,7 +74,7 @@ function toggle() {
 
       <!-- Dive deeper links -->
       <div v-if="post.diveDeeper?.length" class="mt-6 pt-4 border-t border-gray-100">
-        <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-2">Sukelduge sügavamale</p>
+        <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-2">{{ blogPage.diveDeeperHeading }}</p>
         <ul class="space-y-1.5">
           <li v-for="link in post.diveDeeper" :key="link.url">
             <a
@@ -91,7 +91,7 @@ function toggle() {
 
       <!-- Related posts -->
       <div v-if="relatedPosts.length" class="mt-6 pt-4 border-t border-gray-100">
-        <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Seotud artiklid</p>
+        <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-3">{{ blogPage.relatedHeading }}</p>
         <ul class="space-y-2">
           <li v-for="p in relatedPosts" :key="p.id">
             <NuxtLink
