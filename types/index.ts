@@ -75,6 +75,7 @@ export interface ProductRec {
   linkUrl?:   string
   priceText?: string
   imageUrl?:  string
+  isExternal?: boolean
 }
 
 export interface CalculatorResult {

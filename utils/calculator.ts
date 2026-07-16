@@ -1,4 +1,5 @@
 import type { UserProfile, Product, CalculatorResult, ProductRec, CalcType } from '~/types'
+import { isExternalStore } from './products'
 
 function scoreProduct(product: Product, required: string[]): number {
   return required.filter(tag => product.tags.includes(tag)).length
@@ -166,9 +167,9 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
 
     const required = buildPillowTags(profile)
     const sorted = [...active.filter(p => p.category === 'pillow')].sort((a, b) => scoreProduct(b, required) - scoreProduct(a, required))
-    const best = sorted[0]
+    const best = sorted[0] && scoreProduct(sorted[0], required) > 0 ? sorted[0] : undefined
     const recs: ProductRec[] = best
-      ? [{ id: best.id, name: best.name, reason: pillowReason(profile, goodShape), urgency, category: 'pillow', linkUrl: best.storeUrl, priceText: best.priceText, imageUrl: best.imageUrl }]
+      ? [{ id: best.id, name: best.name, reason: pillowReason(profile, goodShape), urgency, category: 'pillow', linkUrl: best.storeUrl, priceText: best.priceText, imageUrl: best.imageUrl, isExternal: isExternalStore(best.storeUrl) }]
       : []
 
     const tips: string[] = []
@@ -202,9 +203,9 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
 
     const required = buildBlanketTags(profile)
     const sorted = [...active.filter(p => p.category === 'blanket')].sort((a, b) => scoreProduct(b, required) - scoreProduct(a, required))
-    const best = sorted[0]
+    const best = sorted[0] && scoreProduct(sorted[0], required) > 0 ? sorted[0] : undefined
     const recs: ProductRec[] = best
-      ? [{ id: best.id, name: best.name, reason: blanketReason(profile, goodShape), urgency, category: 'blanket', linkUrl: best.storeUrl, priceText: best.priceText, imageUrl: best.imageUrl }]
+      ? [{ id: best.id, name: best.name, reason: blanketReason(profile, goodShape), urgency, category: 'blanket', linkUrl: best.storeUrl, priceText: best.priceText, imageUrl: best.imageUrl, isExternal: isExternalStore(best.storeUrl) }]
       : []
 
     const tips: string[] = []
@@ -241,9 +242,9 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
 
   const required = buildMattressTags(profile)
   const sorted = [...active.filter(p => p.category === 'mattress')].sort((a, b) => scoreProduct(b, required) - scoreProduct(a, required))
-  const best = sorted[0]
+  const best = sorted[0] && scoreProduct(sorted[0], required) > 0 ? sorted[0] : undefined
   const recs: ProductRec[] = best
-    ? [{ id: best.id, name: best.name, reason: mattressReason(profile, goodShape), urgency, category: 'mattress', linkUrl: best.storeUrl, priceText: best.priceText, imageUrl: best.imageUrl }]
+    ? [{ id: best.id, name: best.name, reason: mattressReason(profile, goodShape), urgency, category: 'mattress', linkUrl: best.storeUrl, priceText: best.priceText, imageUrl: best.imageUrl, isExternal: isExternalStore(best.storeUrl) }]
     : []
 
   const tips: string[] = []

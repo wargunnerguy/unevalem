@@ -322,6 +322,14 @@ export const calculator = {
   },
 }
 
+// Transparency: shown at every surface that recommends products.
+export const disclosure = {
+  short: 'Aus märkus: osa soovitatud toodetest müüb Unevalem ise, osa viib välistesse poodidesse. Soovitused põhinevad sinu vastustel, mitte müügihuvil.',
+  linkLabel: 'Loe, kuidas Unevalem end rahastab →',
+  ownBadge: 'Unevalemi toode',
+  externalBadge: 'Väline pood',
+}
+
 export const blogCategories = {
   all: 'Kõik',
   teadus: 'Teadus',

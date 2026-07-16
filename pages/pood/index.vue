@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Product } from '~/types'
+import { disclosure } from '~/utils/copy'
 
 useHead({
   title: 'Pood — Bambuspadi, bambustekk ja rohkem | Unevalem',
@@ -39,6 +40,10 @@ const sections: CategorySection[] = [
         <p class="mt-2 text-lavender text-base">
           Bambusest voodimaterjalid, mis toetavad paremat und.
           Toodete valik kasvab — kontrolli regulaarselt.
+        </p>
+        <p class="mt-3 text-xs text-lavender/60 leading-snug max-w-2xl">
+          {{ disclosure.short }}
+          <NuxtLink to="/meist" class="underline underline-offset-2 hover:text-lavender">{{ disclosure.linkLabel }}</NuxtLink>
         </p>
       </div>
     </div>
@@ -87,6 +92,10 @@ const sections: CategorySection[] = [
                       Populaarne
                     </span>
                   </div>
+
+                  <span class="inline-block self-start text-[10px] font-medium px-1.5 py-0.5 rounded border border-lavender/40 text-muted mb-2">
+                    {{ isExternalStore(product.storeUrl) ? disclosure.externalBadge : disclosure.ownBadge }}
+                  </span>
 
                   <p class="text-sm text-muted leading-relaxed flex-1 mb-3">{{ product.description }}</p>
 

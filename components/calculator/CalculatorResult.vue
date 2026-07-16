@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CalculatorResult, CalcType } from '~/types'
-import { calculator } from '~/utils/copy'
+import { calculator, disclosure } from '~/utils/copy'
 
 const props = defineProps<{
   result: CalculatorResult
@@ -102,6 +102,9 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
               : calculator.result.niceToHaveBadge }}
           </span>
         </div>
+        <span class="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded border border-lavender/40 text-muted mb-2">
+          {{ mainRec.isExternal ? disclosure.externalBadge : disclosure.ownBadge }}
+        </span>
         <p class="text-sm text-midnight/75 leading-relaxed mb-3">{{ mainRec.reason }}</p>
         <div class="flex items-center justify-between">
           <span v-if="mainRec.priceText" class="font-semibold text-midnight text-sm">{{ mainRec.priceText }}</span>
@@ -122,6 +125,10 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
       >
         {{ calculator.result.ctaButton }}
       </NuxtLink>
+      <p class="mt-3 text-[11px] text-muted/80 leading-snug">
+        {{ disclosure.short }}
+        <NuxtLink to="/meist" class="underline underline-offset-2 hover:text-midnight">{{ disclosure.linkLabel }}</NuxtLink>
+      </p>
     </div>
 
     <!-- No product for this category yet -->
