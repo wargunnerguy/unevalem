@@ -351,14 +351,13 @@ export const homepage = {
   featuredPostsHeading: 'Populaarseimad artiklid',
   personalizedNote: 'Sinu vastuste põhjal',
 
-  // Stats strip: show these 3 keys in this order, with Estonian labels.
-  // Values come from Sheets; labels are defined here (override Sheets displayText).
-  featuredStatKeys: ['calculatorCompletions', 'monthlyVisitors', 'totalViews'] as const,
-  statLabels: {
-    calculatorCompletions: 'inimest leidnud oma unevalemi',
-    monthlyVisitors:       'külastajat kuus',
-    totalViews:            'lugemist kokku',
-  } as Record<string, string>,
+  // Value claims strip: three honest reasons to trust the site — replaces the
+  // old fabricated visitor/reader counters. Static copy, nothing from Sheets.
+  valueClaims: [
+    { title: 'Teaduspõhine', text: 'Soovitused põhinevad rahvusvahelistel uneuuringutel' },
+    { title: 'Eesti oma',    text: 'Eesti keeles ja Eesti magajatele loodud' },
+    { title: 'Tasuta',       text: 'Kõik testid ja nõuanded on täiesti tasuta' },
+  ],
 }
 
 export const quizPage = {

@@ -10,10 +10,6 @@ const calcVersion = computed(() => {
   return row?.value || calculator.version
 })
 
-const versionChangelog = computed(() => {
-  const row = (calcStatsData.value ?? []).find(s => s.key === 'announcement' && s.active)
-  return row?.displayText ?? null
-})
 
 const { step, answers, result, analyzing, selectOption, submitQuiz, restore, finishAnalysis, goBack, reset } = useCalculator()
 const { products } = useProducts()
@@ -394,16 +390,6 @@ function getProductName(type: CalcType): string {
       <!-- Version stamp -->
       <div class="flex justify-end items-center gap-1 px-3 pb-1.5 -mt-1">
         <span class="text-[9px] text-midnight/20 select-none tracking-wide">{{ calcVersion }}</span>
-        <div v-if="versionChangelog" class="relative group">
-          <button
-            type="button"
-            class="p-0 m-0 text-[9px] text-midnight/20 hover:text-midnight/50 transition-colors leading-none flex items-center focus:outline-none"
-            aria-label="Mis on uut selles versioonis"
-          >ℹ</button>
-          <div class="absolute bottom-full right-0 mb-1.5 w-56 bg-midnight text-foam text-[11px] leading-snug rounded-lg px-3 py-2 shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-150 z-10">
-            {{ versionChangelog }}
-          </div>
-        </div>
       </div>
     </div>
   </div>

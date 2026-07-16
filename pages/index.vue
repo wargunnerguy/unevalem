@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { calculator, homepage, common } from '~/utils/copy'
-import type { Stat, Tip } from '~/types'
+import type { Tip } from '~/types'
 
 const { incrementVisit } = useReadHistory()
 onMounted(() => incrementVisit())
@@ -24,17 +24,6 @@ const dailyTip = computed(() => {
   const tips = tipsData.value ?? []
   if (!tips.length) return ''
   return tips[dayOfYear % tips.length].text
-})
-
-const { data: statsData } = useFetch<Stat[]>('/api/stats', {
-  default: () => [] as Stat[],
-})
-
-const featuredStats = computed(() => {
-  const all = statsData.value ?? []
-  return homepage.featuredStatKeys
-    .map(key => all.find(s => s.key === key && s.active))
-    .filter(Boolean)
 })
 
 const featuredPosts = useFeaturedPosts(5)
@@ -129,19 +118,19 @@ const revisitSummary = computed(() => {
       <SleepCalculator />
     </section>
 
-    <!-- ─── STATS STRIP ─── -->
-    <section v-if="featuredStats.length" class="bg-dusk px-4 py-6">
+    <!-- ─── VALUE CLAIMS STRIP ─── -->
+    <section class="bg-dusk px-4 py-6">
       <div class="max-w-xl mx-auto flex justify-center gap-6 sm:gap-10">
         <div
-          v-for="stat in featuredStats"
-          :key="stat!.key"
+          v-for="claim in homepage.valueClaims"
+          :key="claim.title"
           class="text-center"
         >
-          <p class="font-heading text-gold text-2xl sm:text-3xl font-bold leading-none tabular-nums">
-            {{ stat!.value }}
+          <p class="font-heading text-gold text-lg sm:text-xl font-bold leading-none">
+            {{ claim.title }}
           </p>
-          <p class="text-lavender/70 text-xs mt-1.5 leading-snug max-w-[90px]">
-            {{ homepage.statLabels[stat!.key] ?? stat!.displayText }}
+          <p class="text-lavender/70 text-xs mt-1.5 leading-snug max-w-[140px]">
+            {{ claim.text }}
           </p>
         </div>
       </div>
