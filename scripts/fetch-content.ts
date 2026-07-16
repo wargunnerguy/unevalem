@@ -203,60 +203,64 @@ if (!BASE_URL) {
 }
 
 // ---------------------------------------------------------------------------
-// Fetch one sheet — returns null if the sheet doesn't exist or returns non-array
+// Fetch one sheet — retries transient failures; returns null only after all
+// attempts fail (sheet missing from the allowlist, tab absent, network down).
 // ---------------------------------------------------------------------------
+const FETCH_ATTEMPTS = 3
+const RETRY_DELAY_MS = 3_000
+
 async function tryFetchSheet(sheet: string): Promise<unknown[] | null> {
   const url = `${BASE_URL}?sheet=${sheet}`
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
-    if (!res.ok) return null
-    const body = (await res.json()) as unknown
-    return Array.isArray(body) ? body : null
-  } catch {
-    return null
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
+      if (res.ok) {
+        const body = (await res.json()) as unknown
+        // A JSON {error} object means the sheet genuinely isn't served —
+        // retrying won't change that.
+        if (Array.isArray(body)) return body
+        return null
+      }
+    } catch {
+      // transient network/timeout — fall through to retry
+    }
+    if (attempt < FETCH_ATTEMPTS) {
+      console.warn(`  … ${sheet}: attempt ${attempt} failed, retrying`)
+      await new Promise(r => setTimeout(r, RETRY_DELAY_MS))
+    }
   }
+  return null
 }
 
-// Fetch with per-sheet fallback to example file
-async function fetchSheet(sheet: string, outputName: string): Promise<unknown[]> {
+// Required sheet: with SHEETS_API_URL configured, a failure here must kill the
+// build. Example data exists only for the no-credentials dev path (which exits
+// before this runs) — it must NEVER ship to production. This happened once:
+// a single posts fetch timeout in CI silently deployed the 5 dummy example
+// articles to unevalem.ee (run 29510944443, 2026-07-16).
+async function fetchSheet(sheet: string): Promise<unknown[]> {
   const data = await tryFetchSheet(sheet)
-  if (data !== null) {
-    console.log(`  ✓ ${sheet} (${data.length} rows)`)
-    return data
+  if (data === null) {
+    throw new Error(`required sheet "${sheet}" unavailable after ${FETCH_ATTEMPTS} attempts — refusing to build without real content`)
   }
-  const examplePath = join(DATA_DIR, `${outputName}.example.json`)
-  if (existsSync(examplePath)) {
-    console.warn(`  ⚠ sheet "${sheet}" not available — using ${outputName}.example.json`)
-    return JSON.parse(readFileSync(examplePath, 'utf-8')) as unknown[]
-  }
-  console.warn(`  ⚠ sheet "${sheet}" not available and no example file — skipping`)
-  return []
+  console.log(`  ✓ ${sheet} (${data.length} rows)`)
+  return data
 }
 
 // Quizzes live across three tabs and are assembled into nested objects here.
-// Falls back to the (already assembled) quizzes.example.json if the tabs are absent.
+// All three are required — a partial quiz must not ship.
 async function fetchQuizzes(): Promise<unknown[]> {
   const [meta, questions, results] = await Promise.all([
-    tryFetchSheet('quizzes'),
-    tryFetchSheet('quiz_questions'),
-    tryFetchSheet('quiz_results'),
+    fetchSheet('quizzes'),
+    fetchSheet('quiz_questions'),
+    fetchSheet('quiz_results'),
   ])
-  if (meta && questions && results) {
-    const assembled = assembleQuizzes(
-      meta      as Record<string, unknown>[],
-      questions as Record<string, unknown>[],
-      results   as Record<string, unknown>[],
-    )
-    console.log(`  ✓ quizzes (${assembled.length} assembled from ${meta.length} meta rows)`)
-    return assembled
-  }
-  const examplePath = join(DATA_DIR, 'quizzes.example.json')
-  if (existsSync(examplePath)) {
-    console.warn('  ⚠ quiz tabs not available — using quizzes.example.json')
-    return JSON.parse(readFileSync(examplePath, 'utf-8')) as unknown[]
-  }
-  console.warn('  ⚠ quiz tabs not available and no example file — skipping')
-  return []
+  const assembled = assembleQuizzes(
+    meta      as Record<string, unknown>[],
+    questions as Record<string, unknown>[],
+    results   as Record<string, unknown>[],
+  )
+  console.log(`  ✓ quizzes (${assembled.length} assembled from ${meta.length} meta rows)`)
+  return assembled
 }
 
 // ---------------------------------------------------------------------------
@@ -289,14 +293,14 @@ async function main(): Promise<void> {
   mkdirSync(DATA_DIR, { recursive: true })
 
   const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats, sourcesRaw] = await Promise.all([
-    fetchSheet('posts',         'posts'),
-    fetchSheet('notifications', 'notifications'),
-    fetchSheet('stats',         'stats'),
-    fetchSheet('inventory',     'products'),
-    fetchSheet('tips',          'tips'),
+    fetchSheet('posts'),
+    fetchSheet('notifications'),
+    fetchSheet('stats'),
+    fetchSheet('inventory'),
+    fetchSheet('tips'),
     fetchQuizzes(),
-    tryFetchSheet('post_stats'),   // best-effort; absent until the sheet exists
-    tryFetchSheet('sources'),      // best-effort; posts fall back to column M
+    tryFetchSheet('post_stats'),   // optional; absent until the sheet exists
+    tryFetchSheet('sources'),      // optional; posts fall back to column M
   ])
 
   validateFields('posts',         posts,         REQUIRED.posts)
