@@ -17,7 +17,7 @@ const year = new Date().getFullYear()
 
         <!-- Links -->
         <nav aria-label="Jaluse navigatsioon">
-          <ul class="flex items-center gap-4 text-sm text-muted">
+          <ul class="flex flex-wrap items-center gap-4 text-sm text-muted">
             <li>
               <NuxtLink to="/artiklid" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
                 {{ nav.articles }}
@@ -29,6 +29,16 @@ const year = new Date().getFullYear()
               </NuxtLink>
             </li>
             <li>
+              <NuxtLink to="/meist" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+                {{ footer.links.about }}
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/muugitingimused" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+                {{ footer.links.terms }}
+              </NuxtLink>
+            </li>
+            <li>
               <NuxtLink to="/privaatsus" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
                 {{ footer.links.privacy }}
               </NuxtLink>
@@ -37,9 +47,10 @@ const year = new Date().getFullYear()
         </nav>
       </div>
 
-      <p class="text-xs text-muted/60 mt-6 border-t border-dusk pt-4">
-        {{ footer.copyright(year) }}
-      </p>
+      <div class="text-xs text-muted/60 mt-6 border-t border-dusk pt-4 space-y-1">
+        <p>{{ footer.legal }}</p>
+        <p>{{ footer.copyright(year) }}</p>
+      </div>
 
     </div>
   </footer>

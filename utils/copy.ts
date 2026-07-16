@@ -454,5 +454,42 @@ export const footer = {
   links: {
     privacy: 'Privaatsuspoliitika',
     contact: 'Kontakt',
+    about: 'Meist',
+    terms: 'Müügitingimused',
   },
+  // Legal identity line. {REGIKOOD}/{EMAIL} are placeholders the user fills in.
+  // Costlio OÜ is NOT VAT-registered: never render "sisaldab käibemaksu",
+  // "km-ga" or any VAT wording anywhere on the site — prices are final as-is.
+  legal: 'Unevalem — Costlio OÜ · registrikood {REGIKOOD} · e-post {EMAIL}',
+}
+
+export const aboutPage = {
+  metaTitle: 'Meist | Unevalem',
+  metaDescription: 'Kes teeb Unevalemit, miks see olemas on ja kuidas see end rahastab.',
+  heading: 'Meist',
+  // PLACEHOLDER STRUCTURE — the user writes the final copy. Keep headings.
+  sections: [
+    {
+      id: 'kes',
+      heading: 'Kes me oleme',
+      body: 'Unevalem on Eesti unehariduse leht, mida teeb Costlio OÜ. [Kasutaja kirjutab siia lõpliku teksti: kes lehte teeb ja miks just uni.]',
+    },
+    {
+      id: 'miks',
+      heading: 'Miks Unevalem on olemas',
+      body: 'Meie põhimõte on lihtne: kõigepealt harime, alles siis müüme. Kui õpid siit midagi kasulikku ja ostad padja hoopis mujalt — ka see on hea tulemus. [Kasutaja täiendab.]',
+    },
+    {
+      id: 'rahastus',
+      heading: 'Kuidas Unevalem end rahastab',
+      body: 'Unevalem müüb osa soovitatud toodetest ise — see on meie ainus tuluallikas. Kalkulaatori ja artiklite soovitused sünnivad sinu vastuste ja uneuuringute, mitte müügihuvi põhjal: iga soovituse juures on märgitud, kas tegu on meie enda või välise poe tootega, ja kui sul pole midagi vaja, ütleb kalkulaator sedagi. [Kasutaja täiendab: marginaalid, väliste linkide põhimõte.]',
+    },
+  ],
+}
+
+export const termsPage = {
+  metaTitle: 'Müügitingimused | Unevalem',
+  metaDescription: 'Unevalemi e-poe müügitingimused.',
+  heading: 'Müügitingimused',
+  placeholder: 'Müügitingimused on koostamisel ja avaldatakse enne esimese tellimuse vastuvõtmist. Küsimuste korral kirjuta {EMAIL}.',
 }
