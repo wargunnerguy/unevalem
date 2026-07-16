@@ -22,6 +22,7 @@ var SHEET_MAP = {
   quiz_questions: 'quiz_questions',
   quiz_results:   'quiz_results',
   post_stats:     'post_stats',
+  sources:        'sources',
 }
 
 function json(obj) {

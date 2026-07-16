@@ -47,9 +47,15 @@ function parseTags(v: unknown): string[] {
   return []
 }
 
-// Accepts "Title|URL;Title|URL" and, for rows that carry only a bare link,
-// "URL;URL" — falling back to the hostname as the label so a source without an
-// editorial title still renders instead of vanishing.
+// Label for a citation without an editorial title: the hostname, so a bare
+// research URL still renders as something readable instead of vanishing.
+function hostnameLabel(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, '') } catch { return url }
+}
+
+// LEGACY: the pipe-encoded posts column M ("Title|URL;URL;…"). Superseded by
+// the `sources` tab (one row per citation); kept as a per-article fallback so
+// migration can be gradual. Remove once column M is empty in the sheet.
 function parseDiveDeeper(v: unknown): { title: string; url: string }[] {
   if (!v || typeof v !== 'string' || !v.trim()) return []
   return v
@@ -61,11 +67,28 @@ function parseDiveDeeper(v: unknown): { title: string; url: string }[] {
       if (second) return { title: first ?? '', url: second }
       const url = first ?? ''
       if (!/^https?:\/\//i.test(url)) return { title: '', url: '' }
-      let title = url
-      try { title = new URL(url).hostname.replace(/^www\./, '') } catch {}
-      return { title, url }
+      return { title: hostnameLabel(url), url }
     })
     .filter(item => item.title && item.url)
+}
+
+// The `sources` tab: slug | title | url, one row per citation. Returns a
+// slug → citations map; rows with a missing slug or a non-http url are dropped.
+function sourcesBySlug(rows: Record<string, unknown>[]): Map<string, { title: string; url: string }[]> {
+  const map = new Map<string, { title: string; url: string }[]>()
+  for (const row of rows) {
+    const slug = String(row.slug ?? '').trim()
+    const url = String(row.url ?? '').trim()
+    if (!slug || !/^https?:\/\//i.test(url)) {
+      if (slug || url) console.warn(`  ⚠ sources row skipped (slug: "${slug}", url: "${url}")`)
+      continue
+    }
+    const title = String(row.title ?? '').trim() || hostnameLabel(url)
+    const list = map.get(slug) ?? []
+    list.push({ title, url })
+    map.set(slug, list)
+  }
+  return map
 }
 
 // Quiz option encoding: "Label A|3;Label B|2;Label C|1"  (";" separates options, "|" splits label/value)
@@ -265,7 +288,7 @@ async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
   mkdirSync(DATA_DIR, { recursive: true })
 
-  const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats] = await Promise.all([
+  const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats, sourcesRaw] = await Promise.all([
     fetchSheet('posts',         'posts'),
     fetchSheet('notifications', 'notifications'),
     fetchSheet('stats',         'stats'),
@@ -273,6 +296,7 @@ async function main(): Promise<void> {
     fetchSheet('tips',          'tips'),
     fetchQuizzes(),
     tryFetchSheet('post_stats'),   // best-effort; absent until the sheet exists
+    tryFetchSheet('sources'),      // best-effort; posts fall back to column M
   ])
 
   validateFields('posts',         posts,         REQUIRED.posts)
@@ -322,9 +346,16 @@ async function main(): Promise<void> {
     return true
   })
 
+  // Citations: the sources tab wins per-article; articles without rows there
+  // keep whatever the legacy pipe-encoded column M holds.
+  const citations = sourcesBySlug((sourcesRaw ?? []) as Record<string, unknown>[])
+
   const transformedPosts = publishedPosts.map(row => {
     const post = transformPost(row)
-    post.popularity = viewsBySlug.get(String(row.slug ?? '')) ?? 0
+    const slug = String(row.slug ?? '')
+    post.popularity = viewsBySlug.get(slug) ?? 0
+    const fromTab = citations.get(slug)
+    if (fromTab?.length) post.diveDeeper = fromTab
     return post
   })
   const transformedProducts = (inventory as Record<string, unknown>[]).map(transformProduct)

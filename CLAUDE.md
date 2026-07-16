@@ -377,12 +377,21 @@ The Google Sheet has 3 tabs. A pre-build Node script reads them and writes stati
 | M | diveDeeper | string | `Kofeiini uuring\|https://pubmed…;https://doi.org/…` |
 | N | proofread | boolean/string | `TRUE` / initials / date — see below |
 
-**`diveDeeper` needs its header cell.** The column holds source links rendered
-under "Sukelduge sügavamale" in `PostCard.vue`. Rows are `;`-separated; each is
-either `Title|URL` or a bare `URL` (the parser then labels it with the hostname).
-If the header cell in row 1 is blank, Apps Script keys the column as `""`, the
-parser never sees it, and every link silently disappears — this was the state
-until 2026-07-16.
+**Citations live in the `sources` tab** (one row per citation):
+| Col | Field | Example |
+|-----|-------|---------|
+| A | slug | `kohvi-ajastus-ja-uni` (must match a posts-tab slug) |
+| B | title | `Kofeiini mõju unele (Drake et al., 2013)` — blank → hostname is used |
+| C | url | `https://pubmed.ncbi.nlm.nih.gov/24235903/` |
+
+Rendered under "Uuri lähemalt" as "Allikas: <title> →" on the article page and
+in expanded PostCards. Multiple rows per slug = multiple citations, in row order.
+
+The posts tab's column M (`diveDeeper`, pipe-encoded `Title|URL;URL;…`) is the
+LEGACY encoding: it still works as a per-article fallback when the sources tab
+has no rows for that slug, but new citations belong in the sources tab. If M's
+header cell is ever blanked, Apps Script keys the column as `""` and its data
+silently disappears (this happened pre-2026-07-16).
 
 **`proofread` — human-review gate (column N).** Articles are AI-drafted; nothing
 goes live until a person has read and corrected it. A post is published only when
