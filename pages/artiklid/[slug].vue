@@ -154,7 +154,7 @@ const facebookShareUrl = computed(
                 rel="noopener noreferrer"
                 class="text-sm text-midnight hover:text-gold underline underline-offset-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
               >
-                {{ link.title }} →
+                {{ blogPage.sourceLabel }}: {{ link.title }} →
               </a>
             </li>
           </ul>

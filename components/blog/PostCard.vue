@@ -83,7 +83,7 @@ function toggle() {
               rel="noopener noreferrer"
               class="text-sm text-midnight hover:text-gold underline underline-offset-2 transition-colors"
             >
-              {{ link.title }} →
+              {{ blogPage.sourceLabel }}: {{ link.title }} →
             </a>
           </li>
         </ul>

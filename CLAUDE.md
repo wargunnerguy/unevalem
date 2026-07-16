@@ -375,6 +375,7 @@ The Google Sheet has 3 tabs. A pre-build Node script reads them and writes stati
 | K | isFeatured | boolean | `TRUE` / `FALSE` |
 | L | readingTimeMin | number | `4` |
 | M | diveDeeper | string | `Kofeiini uuring\|https://pubmed…;https://doi.org/…` |
+| N | proofread | boolean/string | `TRUE` / initials / date — see below |
 
 **`diveDeeper` needs its header cell.** The column holds source links rendered
 under "Sukelduge sügavamale" in `PostCard.vue`. Rows are `;`-separated; each is
@@ -382,6 +383,16 @@ either `Title|URL` or a bare `URL` (the parser then labels it with the hostname)
 If the header cell in row 1 is blank, Apps Script keys the column as `""`, the
 parser never sees it, and every link silently disappears — this was the state
 until 2026-07-16.
+
+**`proofread` — human-review gate (column N).** Articles are AI-drafted; nothing
+goes live until a person has read and corrected it. A post is published only when
+`status = published` AND `proofread` is non-empty and not `FALSE` (a checkbox,
+initials, or a date all count — initials/date double as a review record). The
+gate is enforced in `fetch-content.ts` and only arms once the column exists in
+the sheet: while the header is missing the build warns and publishes as before,
+so the code could ship ahead of the sheet change. Once the header exists, every
+unmarked row is held back — adding the header and ticking the reviewed rows must
+happen in the same sitting or the site empties on the next build.
 
 **Content convention — myth-busting posts:**
 Post titles prefixed with `MÜÜT: ` in the Sheet mark myth-busting content

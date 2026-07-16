@@ -288,14 +288,38 @@ async function main(): Promise<void> {
     if (slug) viewsBySlug.set(slug, Number(row.views ?? 0) || 0)
   }
 
+  // Human-review gate: AI-drafted articles must be read and corrected by a
+  // person before going live. The posts tab's `proofread` column marks that —
+  // any non-empty value except FALSE counts as approved, so a checkbox (TRUE),
+  // initials ("RV") or a date all work. The gate only arms once the column
+  // exists in the sheet; until then it warns, so deploying this code before
+  // the sheet has the column can't silently empty the whole site.
+  const postRows = posts as Record<string, unknown>[]
+  const hasProofreadColumn = postRows.some(r => 'proofread' in r)
+  if (!hasProofreadColumn && postRows.length) {
+    console.warn('  ⚠ posts sheet has no "proofread" column — human-review gate INACTIVE, all published posts go live')
+  }
+  const isProofread = (row: Record<string, unknown>): boolean => {
+    if (!hasProofreadColumn) return true
+    const v = String(row.proofread ?? '').trim()
+    return v !== '' && v.toUpperCase() !== 'FALSE'
+  }
+
   // Drop drafts here rather than trusting the Apps Script to do it: posts.json is
   // the single artifact the /api/posts route, sitemap.xml and the prerenderer all
   // read, so an unpublished row that survives this line becomes a public page.
-  const publishedPosts = (posts as Record<string, unknown>[]).filter(row => {
+  const publishedPosts = postRows.filter(row => {
+    const slug = String(row.slug ?? '?')
     const status = String(row.status ?? '').trim().toLowerCase()
-    if (status === 'published') return true
-    console.log(`  · skipping non-published post "${String(row.slug ?? '?')}" (status: ${status || 'empty'})`)
-    return false
+    if (status !== 'published') {
+      console.log(`  · skipping non-published post "${slug}" (status: ${status || 'empty'})`)
+      return false
+    }
+    if (!isProofread(row)) {
+      console.log(`  · skipping post "${slug}" — not proofread by a human yet`)
+      return false
+    }
+    return true
   })
 
   const transformedPosts = publishedPosts.map(row => {
