@@ -1,91 +1,88 @@
 <script setup lang="ts">
-// Slider-style dark mode toggle, after
-// e-dimensionz.com/devinsights/how-to-create-a-toggle-switch-for-dark-mode-with-css-and-javascript
-// (hidden checkbox + .slider span, 50×25 pill, 0.3s knob transition).
-// Persistence + html.dark toggling stay in useTheme.
-const { isDark, toggleTheme } = useTheme()
+// Slider-style dark mode toggle. The knob position is LOCAL state so the
+// slide animation can finish first — the theme flips only after the 300ms
+// transition ends. Dark = knob LEFT, and the knob itself carries the
+// current-mode glyph (moon when dark), so state reads unambiguously.
+const { isDark, setTheme } = useTheme()
+
+const knobDark = ref(isDark.value)
+watch(isDark, (v) => { knobDark.value = v })
+
+let pending: ReturnType<typeof setTimeout> | null = null
+function onToggle() {
+  knobDark.value = !knobDark.value
+  if (pending) clearTimeout(pending)
+  pending = setTimeout(() => { setTheme(knobDark.value) }, 300)
+}
+onUnmounted(() => { if (pending) clearTimeout(pending) })
 </script>
 
 <template>
-  <label
+  <button
+    type="button"
     class="toggle-switch ml-1 shrink-0"
-    :title="isDark ? 'Lülita heledaks' : 'Lülita tumedaks'"
+    role="switch"
+    :aria-checked="knobDark"
+    aria-label="Tume režiim"
+    :title="knobDark ? 'Lülita heledaks' : 'Lülita tumedaks'"
+    @click="onToggle"
   >
-    <input
-      type="checkbox"
-      :checked="isDark"
-      aria-label="Tume režiim"
-      @change="toggleTheme"
-    />
-    <span class="slider" aria-hidden="true">
-      <span class="icon sun">☀️</span>
-      <span class="icon moon">🌙</span>
+    <span class="slider" :class="{ 'is-dark': knobDark }" aria-hidden="true">
+      <span class="knob">{{ knobDark ? '🌙' : '☀️' }}</span>
     </span>
-  </label>
+  </button>
 </template>
 
 <style scoped>
 .toggle-switch {
-  position: relative;
   display: inline-block;
-  width: 50px;
-  height: 25px;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
-
-.slider {
-  position: absolute;
-  inset: 0;
+  padding: 0;
+  border: none;
+  background: none;
   cursor: pointer;
-  background-color: #ccc;
-  border-radius: 25px;
-  transition: background-color 0.3s;
 }
 
-/* The knob */
-.slider::before {
-  content: '';
-  position: absolute;
-  width: 19px;
-  height: 19px;
-  left: 3px;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: #ffffff;
-  border-radius: 50%;
-  transition: transform 0.3s;
-  z-index: 1;
+.toggle-switch:focus-visible {
+  outline: none;
 }
-
-input:checked + .slider {
-  background-color: var(--color-dusk);
-}
-
-input:checked + .slider::before {
-  transform: translate(25px, -50%);
-}
-
-input:focus-visible + .slider {
+.toggle-switch:focus-visible .slider {
   box-shadow: 0 0 0 2px var(--color-lavender);
 }
 
-/* Track glyphs: the knob covers the inactive side. Unchecked (light) — knob
-   left over the sun, moon visible on the side you'd slide to. Checked (dark)
-   — knob right over the moon, sun visible. */
-.icon {
+.slider {
+  display: block;
+  position: relative;
+  width: 50px;
+  height: 25px;
+  border-radius: 25px;
+  background-color: #ccc;
+  transition: background-color 0.3s;
+}
+
+.slider.is-dark {
+  background-color: var(--color-dusk);
+}
+
+/* Light mode: knob right (sun). Dark mode: knob slides LEFT (moon). */
+.knob {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  left: 3px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  transform: translate(25px, -50%);
+  transition: transform 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 11px;
   line-height: 1;
   user-select: none;
 }
-.sun { left: 5px; }
-.moon { right: 5px; }
+
+.is-dark .knob {
+  transform: translate(0, -50%);
+}
 </style>

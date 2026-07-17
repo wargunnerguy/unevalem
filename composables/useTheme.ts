@@ -11,12 +11,16 @@ export function useTheme() {
     document.documentElement.classList.toggle('dark', dark)
   }
 
-  function toggleTheme() {
+  function setTheme(dark: boolean) {
     if (!import.meta.client) return
-    isDark.value = !isDark.value
-    document.documentElement.classList.toggle('dark', isDark.value)
-    localStorage.setItem('unevalem-theme', isDark.value ? 'dark' : 'light')
+    isDark.value = dark
+    document.documentElement.classList.toggle('dark', dark)
+    localStorage.setItem('unevalem-theme', dark ? 'dark' : 'light')
   }
 
-  return { isDark, initTheme, toggleTheme }
+  function toggleTheme() {
+    setTheme(!isDark.value)
+  }
+
+  return { isDark, initTheme, setTheme, toggleTheme }
 }
