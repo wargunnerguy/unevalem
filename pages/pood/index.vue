@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Product } from '~/types'
+import type { Product, UserProfile } from '~/types'
 import { disclosure, shop } from '~/utils/copy'
 
 useHead({
@@ -16,6 +16,43 @@ const { add } = useCart()
 
 // Which product's waitlist form is expanded (one at a time keeps cards tidy)
 const waitlistOpen = ref<string | null>(null)
+
+// ── Profile fit ────────────────────────────────────────────────────────────
+// After the sleep test, products get a fit percentage (attribute overlap
+// with the user's answers — see productMatchPercent for why it's phrased as
+// fit, never as a sleep-improvement promise). Cookie-dependent, so it only
+// applies after mount to avoid hydration mismatches.
+const { siteProfile } = useCalcSession()
+const isMounted = useMounted()
+
+const answersByCalc = computed(() => ({
+  pillow:   siteProfile.value.pillow?.answers as Partial<UserProfile> | undefined,
+  blanket:  siteProfile.value.blanket?.answers as Partial<UserProfile> | undefined,
+  mattress: siteProfile.value.mattress?.answers as Partial<UserProfile> | undefined,
+}))
+
+const matchById = computed(() => {
+  const map = new Map<string, number>()
+  if (!isMounted.value) return map
+  for (const p of products.value ?? []) {
+    if (!p.active) continue
+    const pct = productMatchPercent(p, answersByCalc.value)
+    if (pct !== null) map.set(p.id, pct)
+  }
+  return map
+})
+
+// The single best fit across the whole shop (needs a meaningful score)
+const bestMatchId = computed(() => {
+  let best: string | null = null
+  let bestPct = 49 // floor: below half, "parim valik" would be misleading
+  for (const [id, pct] of matchById.value) {
+    if (pct > bestPct) { best = id; bestPct = pct }
+  }
+  return best
+})
+
+const hasAnyMatch = computed(() => matchById.value.size > 0)
 
 // Product structured data — deliberately NO aggregateRating (we have no
 // reviews; fabricating them would be a Google penalty and dishonest).
@@ -89,6 +126,10 @@ const sections: CategorySection[] = [
       </div>
 
       <div v-else class="space-y-14">
+        <!-- What the fit % means (liability-safe framing) -->
+        <p v-if="hasAnyMatch" class="!mt-0 text-xs text-muted leading-snug max-w-2xl">
+          {{ shop.match.note }}
+        </p>
         <section
           v-for="section in sections"
           :key="section.key"
@@ -105,7 +146,10 @@ const sections: CategorySection[] = [
               <article
                 v-for="product in getByCategory(section.key)"
                 :key="product.id"
-                class="bg-foam rounded-xl border border-gray-100 overflow-hidden hover:border-lavender/50 hover:shadow-sm transition-all duration-200 flex flex-col"
+                class="bg-foam rounded-xl overflow-hidden hover:shadow-sm transition-all duration-200 flex flex-col"
+                :class="product.id === bestMatchId
+                  ? 'border-2 border-success shadow-sm'
+                  : 'border border-gray-100 hover:border-lavender/50'"
               >
                 <!-- Image or placeholder -->
                 <div class="aspect-[4/3] bg-gradient-to-br from-midnight to-dusk flex items-center justify-center shrink-0 overflow-hidden">
@@ -126,9 +170,23 @@ const sections: CategorySection[] = [
                     </span>
                   </div>
 
-                  <span class="inline-block self-start text-[10px] font-medium px-1.5 py-0.5 rounded border border-lavender/40 text-muted mb-2">
-                    {{ isExternalStore(product.storeUrl) ? disclosure.externalBadge : disclosure.ownBadge }}
-                  </span>
+                  <div class="flex items-center gap-1.5 flex-wrap mb-2">
+                    <span class="inline-block text-[10px] font-medium px-1.5 py-0.5 rounded border border-lavender/40 text-muted">
+                      {{ isExternalStore(product.storeUrl) ? disclosure.externalBadge : disclosure.ownBadge }}
+                    </span>
+                    <span
+                      v-if="product.id === bestMatchId"
+                      class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-success text-foam"
+                    >
+                      ✓ {{ shop.match.bestBadge }}
+                    </span>
+                    <span
+                      v-else-if="(matchById.get(product.id) ?? 0) >= 60"
+                      class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border border-success/50 text-success"
+                    >
+                      {{ shop.match.goodBadge(matchById.get(product.id)!) }}
+                    </span>
+                  </div>
 
                   <p class="text-sm text-muted leading-relaxed flex-1 mb-3">{{ product.description }}</p>
 

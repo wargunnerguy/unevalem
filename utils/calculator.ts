@@ -145,6 +145,45 @@ function buildProfileSummary(profile: UserProfile, calcType: CalcType): string {
   return `Sina ${facts.join(', ')}. Sinu une jaoks on kõige olulisem ${need}.`
 }
 
+// Which calculator's answers can judge a product category. Categories without
+// a calculator (pillowcases etc.) get no match figure at all.
+const CATEGORY_CALC: Record<Product['category'], CalcType | null> = {
+  pillow: 'pillow',
+  blanket: 'blanket',
+  mattress: 'mattress',
+  pillowcase: null,
+  duvetcover: null,
+  sheet: null,
+}
+
+/**
+ * Profile-fit percentage for the shop: how many of the profile's required
+ * product attributes this product's tags cover. This is a statement about
+ * ATTRIBUTE OVERLAP with the user's answers — deliberately not a promise
+ * about sleep outcomes, which nobody can measure or guarantee.
+ * Returns null when the relevant calculator hasn't been completed.
+ */
+export function productMatchPercent(
+  product: Product,
+  answersByCalc: Partial<Record<CalcType, Partial<UserProfile>>>,
+): number | null {
+  const calc = CATEGORY_CALC[product.category]
+  if (!calc) return null
+  const answers = answersByCalc[calc]
+  if (!answers) return null
+
+  const p = answers as UserProfile
+  const required = calc === 'pillow'
+    ? buildPillowTags(p)
+    : calc === 'blanket'
+      ? buildBlanketTags(p)
+      : buildMattressTags(p)
+  if (!required.length || !product.tags?.length) return null
+
+  const hits = required.filter(tag => product.tags.includes(tag)).length
+  return Math.round((hits / required.length) * 100)
+}
+
 export function getRecommendations(profile: UserProfile, products: Product[], calcType: CalcType): CalculatorResult {
   const active = products.filter(p => p.active)
 

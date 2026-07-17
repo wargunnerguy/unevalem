@@ -323,6 +323,13 @@ export const calculator = {
 }
 
 export const shop = {
+  // Profile-fit badges (personalized after the sleep test)
+  match: {
+    bestBadge: 'Parim valik sulle',
+    goodBadge: (pct: number) => `Sobivus sinu profiiliga ${pct}%`,
+    note: 'Sobivus näitab, kui hästi toote omadused kattuvad sinu unetesti vastustega — see ei ole lubadus une kvaliteedi kohta.',
+  },
+
   addToCart: 'Lisa korvi',
   notifyMe: 'Anna teada, kui saadaval',
   notifyPlaceholder: 'sinu@email.ee',
