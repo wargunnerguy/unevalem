@@ -814,3 +814,16 @@ If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
   (only in .vue) — import it explicitly or every page 500s at prerender.
 - Backticks inside double-quoted `git commit -m` get command-substituted by
   bash — use single quotes.
+
+### 2026-07-17 — Staging environment (branching rules)
+
+- **`dev` branch → test.unevalem.ee** (staging, via deploy-staging.yml →
+  pushes built site to wargunnerguy/unevalem-test repo's gh-pages, whose
+  Pages serves the subdomain). Staging robots.txt disallows everything.
+- **`main` branch → unevalem.ee** (production, deploy.yml as before).
+- **Rule: feature work goes to `dev` first**; merge dev → main only when
+  verified on staging. Hotfixes may go straight to main when urgent.
+- Staging shares the PRODUCTION backend (same Apps Script, sheet, orders
+  tab, MK credentials). Harmless while MK_ENV=test; BEFORE switching MK to
+  live, revisit this — staging test purchases would otherwise create real
+  payment transactions.
