@@ -179,7 +179,7 @@ if (!BASE_URL) {
   console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
-  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes']) {
+  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes', 'terminals']) {
     const src = join(DATA_DIR, `${name}.example.json`)
     const dst = join(DATA_DIR, `${name}.json`)
     if (existsSync(src)) {
@@ -289,6 +289,40 @@ const REQUIRED: Record<string, readonly string[]> = {
 }
 
 // ---------------------------------------------------------------------------
+// Parcel terminals (checkout dropdown). Fetched at build time because the
+// static site can't call carrier APIs from the browser (CORS). Non-fatal:
+// if the carrier API is down we keep the previous terminals.json (or the
+// example file) rather than failing the whole build.
+// ---------------------------------------------------------------------------
+async function fetchTerminals(): Promise<void> {
+  const dst = join(DATA_DIR, 'terminals.json')
+  try {
+    const res = await fetch('https://www.omniva.ee/locations.json', { signal: AbortSignal.timeout(20000) })
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const all = await res.json() as Record<string, string>[]
+    // TYPE 0 = parcel terminal; A0_NAME = country code
+    const omniva = all
+      .filter(l => l.A0_NAME === 'EE' && l.TYPE === '0')
+      .map(l => ({ id: l.ZIP, name: l.NAME, carrier: 'omniva' }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'et'))
+    if (!omniva.length) throw new Error('0 Estonian terminals in response')
+    // SmartPosti has no public locations feed since the rebrand; if one
+    // reappears, append rows with carrier: 'smartpost' here and the checkout
+    // picks them up automatically.
+    writeFileSync(dst, JSON.stringify(omniva, null, 2), 'utf-8')
+    console.log(`  ✓ terminals (${omniva.length} Omniva)`)
+  } catch (err) {
+    if (existsSync(dst)) {
+      console.warn(`  ⚠ terminals fetch failed (${(err as Error).message}) — keeping existing terminals.json`)
+    } else {
+      const example = join(DATA_DIR, 'terminals.example.json')
+      if (existsSync(example)) copyFileSync(example, dst)
+      console.warn(`  ⚠ terminals fetch failed (${(err as Error).message}) — using example data`)
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 async function main(): Promise<void> {
@@ -304,6 +338,7 @@ async function main(): Promise<void> {
     fetchQuizzes(),
     tryFetchSheet('post_stats'),   // optional; absent until the sheet exists
     tryFetchSheet('sources'),      // optional; posts fall back to column M
+    fetchTerminals(),              // writes terminals.json itself; non-fatal
   ])
 
   validateFields('posts',         posts,         REQUIRED.posts)

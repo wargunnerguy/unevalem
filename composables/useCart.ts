@@ -1,3 +1,4 @@
+import { useStorage } from '@vueuse/core'
 import type { CartItem, Product } from '~/types'
 
 // Cart state, persisted in localStorage. Only ids + quantities are stored —

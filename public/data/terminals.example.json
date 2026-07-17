@@ -1,0 +1,9 @@
+[
+  { "id": "10101", "name": "Tallinna Kaubamaja pakiautomaat", "carrier": "omniva" },
+  { "id": "10102", "name": "Kristiine keskuse pakiautomaat", "carrier": "omniva" },
+  { "id": "10103", "name": "Ülemiste keskuse pakiautomaat", "carrier": "omniva" },
+  { "id": "50101", "name": "Tartu Lõunakeskuse pakiautomaat", "carrier": "omniva" },
+  { "id": "80101", "name": "Pärnu Keskuse pakiautomaat", "carrier": "omniva" },
+  { "id": "10201", "name": "Rocca al Mare SmartPosti automaat", "carrier": "smartpost" },
+  { "id": "50201", "name": "Tartu Kaubamaja SmartPosti automaat", "carrier": "smartpost" }
+]
