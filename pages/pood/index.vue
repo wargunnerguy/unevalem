@@ -5,7 +5,7 @@ import { disclosure, shop } from '~/utils/copy'
 useHead({
   title: 'Pood — padjad, tekid ja voodipesu | Unevalem',
   meta: [
-    { name: 'description', content: 'Unevalemi tootevalik: hoolikalt valitud padjad, tekid ja voodipesu eri materjalidest, mis toetavad paremat und.' },
+    { name: 'description', content: 'Unevalemi pood: tööriistad heaks uneks — padjad, tekid ja voodipesu, mis aitavad sul paremini magada.' },
     { property: 'og:title', content: 'Unevalem Pood' },
     { property: 'og:url', content: 'https://unevalem.ee/pood' },
   ],
@@ -112,8 +112,8 @@ const sections: CategorySection[] = [
       <div class="max-w-4xl mx-auto">
         <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight">Pood</h1>
         <p class="mt-2 text-lavender text-base">
-          Hoolikalt valitud voodikaubad, mis toetavad paremat und —
-          eri materjalidest ja igale magajale. Valik kasvab.
+          Tööriistad heaks uneks — padjad, tekid ja muu,
+          mis aitavad sul paremini magada. Valik kasvab.
         </p>
       </div>
     </div>
