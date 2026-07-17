@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useStorage } from '@vueuse/core'
 import type { ParcelTerminal, ShippingMethod } from '~/types'
 import { shop } from '~/utils/copy'
 
@@ -7,11 +8,30 @@ useHead({
   meta: [{ name: 'robots', content: 'noindex' }],
 })
 
-const { lines, count, subtotalText } = useCart()
+const { lines, count, subtotalText, setQty, remove } = useCart()
 
-// Maksekeskus cancel_url lands here with ?makse=katkes — cart is untouched.
+// Maksekeskus cancel_url lands here with ?makse=katkes. Shown once, then the
+// query is stripped so the notice doesn't reappear on refresh/return visits.
 const route = useRoute()
-const paymentCancelled = computed(() => route.query.makse === 'katkes')
+const router = useRouter()
+const paymentCancelled = ref(false)
+onMounted(() => {
+  // The static build's URL query can lag hydration by a moment (same trap as
+  // /aitah), so check a few times before concluding there was no cancel.
+  const check = () => {
+    const cancelled = route.query.makse === 'katkes'
+      || new URLSearchParams(window.location.search).get('makse') === 'katkes'
+    if (cancelled) {
+      paymentCancelled.value = true
+      router.replace({ query: {} })
+    }
+    return cancelled
+  }
+  if (!check()) {
+    setTimeout(check, 300)
+    setTimeout(() => { if (!paymentCancelled.value) check() }, 1500)
+  }
+})
 
 const { data: terminalsData } = useFetch<ParcelTerminal[]>('/api/terminals', {
   default: () => [] as ParcelTerminal[],
@@ -23,7 +43,9 @@ const carriers = computed<ShippingMethod[]>(() => {
   return (['omniva', 'smartpost'] as const).filter(c => present.has(c))
 })
 
-const form = reactive({
+// Persisted locally so navigating away (or a cancelled payment) never loses
+// what the buyer already typed. Lives only in their browser.
+const form = useStorage('uva-checkout', {
   name: '',
   email: '',
   phone: '',
@@ -33,23 +55,26 @@ const form = reactive({
 })
 
 watch(carriers, (c) => {
-  if (!form.carrier && c.length) form.carrier = c[0]
+  if (!form.value.carrier && c.length) form.value.carrier = c[0]
 }, { immediate: true })
-watch(() => form.carrier, () => { form.terminalId = '' })
+watch(() => form.value.carrier, (_, prev) => {
+  // Only reset the terminal on an actual carrier switch, not on page load
+  if (prev) form.value.terminalId = ''
+})
 
 const terminalOptions = computed(() =>
-  (terminalsData.value ?? []).filter(t => t.carrier === form.carrier),
+  (terminalsData.value ?? []).filter(t => t.carrier === form.value.carrier),
 )
 
 const state = ref<'idle' | 'submitting' | 'error'>('idle')
 const errorMsg = ref('')
 
 const valid = computed(() =>
-  form.name.trim().length > 1
-  && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email.trim())
-  && form.phone.trim().length >= 5
-  && !!form.carrier
-  && !!form.terminalId,
+  form.value.name.trim().length > 1
+  && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.value.email.trim())
+  && form.value.phone.trim().length >= 5
+  && !!form.value.carrier
+  && !!form.value.terminalId,
 )
 
 onMounted(() => {
@@ -66,7 +91,7 @@ async function submit() {
   state.value = 'submitting'
 
   const url = useRuntimeConfig().public.sheetsApiUrl as string
-  const terminal = terminalOptions.value.find(t => t.id === form.terminalId)
+  const terminal = terminalOptions.value.find(t => t.id === form.value.terminalId)
 
   // Only ids + quantities go up — the Apps Script looks prices up from the
   // inventory sheet itself, so a tampered client can't set its own prices.
@@ -74,16 +99,16 @@ async function submit() {
     action: 'create_order',
     items: lines.value.map(l => ({ id: l.id, qty: l.qty })),
     customer: {
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
+      name: form.value.name.trim(),
+      email: form.value.email.trim(),
+      phone: form.value.phone.trim(),
     },
     shipping: {
-      method: form.carrier,
-      terminalId: form.terminalId,
+      method: form.value.carrier,
+      terminalId: form.value.terminalId,
       terminalName: terminal?.name ?? '',
     },
-    note: form.note.trim(),
+    note: form.value.note.trim(),
   }
 
   try {
@@ -143,11 +168,32 @@ async function submit() {
           <section>
             <h2 class="font-heading text-xl text-midnight mb-3">{{ shop.checkout.itemsHeading }}</h2>
             <div class="bg-foam rounded-xl border border-lavender/25 divide-y divide-lavender/15">
-              <div v-for="line in lines" :key="line.id" class="flex items-center justify-between px-4 py-3">
-                <span class="text-sm text-midnight">{{ line.product.name }} × {{ line.qty }}</span>
-                <span class="text-sm font-semibold text-midnight tabular-nums">
+              <div v-for="line in lines" :key="line.id" class="flex items-center justify-between gap-3 px-4 py-3">
+                <span class="text-sm text-midnight flex-1 min-w-0 truncate">{{ line.product.name }}</span>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    class="w-6 h-6 rounded border border-lavender/40 text-midnight text-sm leading-none hover:bg-lavender/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                    :aria-label="`Vähenda kogust: ${line.product.name}`"
+                    @click="setQty(line.id, line.qty - 1)"
+                  >−</button>
+                  <span class="text-sm tabular-nums w-5 text-center">{{ line.qty }}</span>
+                  <button
+                    type="button"
+                    class="w-6 h-6 rounded border border-lavender/40 text-midnight text-sm leading-none hover:bg-lavender/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                    :aria-label="`Suurenda kogust: ${line.product.name}`"
+                    @click="setQty(line.id, line.qty + 1)"
+                  >+</button>
+                </div>
+                <span class="text-sm font-semibold text-midnight tabular-nums w-20 text-right shrink-0">
                   {{ (line.product.price * line.qty).toFixed(2).replace('.', ',') }} €
                 </span>
+                <button
+                  type="button"
+                  class="shrink-0 text-muted hover:text-midnight text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
+                  :aria-label="`${shop.cart.remove}: ${line.product.name}`"
+                  @click="remove(line.id)"
+                >✕</button>
               </div>
               <div class="flex items-center justify-between px-4 py-3 bg-moonlight/50">
                 <span class="text-sm font-semibold text-midnight">{{ shop.cart.subtotal }}</span>
