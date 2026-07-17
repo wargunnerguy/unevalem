@@ -14,10 +14,13 @@ export default defineEventHandler((event) => {
   }
 
   const staticRoutes = [
-    { loc: '/',         priority: '1.0', changefreq: 'daily' },
-    { loc: '/artiklid', priority: '0.9', changefreq: 'daily' },
-    { loc: '/unetest',  priority: '0.7', changefreq: 'monthly' },
-    { loc: '/pood',     priority: '0.8', changefreq: 'weekly' },
+    { loc: '/',                 priority: '1.0', changefreq: 'daily' },
+    { loc: '/artiklid',         priority: '0.9', changefreq: 'daily' },
+    { loc: '/unetest',          priority: '0.7', changefreq: 'monthly' },
+    { loc: '/pood',             priority: '0.8', changefreq: 'weekly' },
+    { loc: '/meist',            priority: '0.4', changefreq: 'monthly' },
+    { loc: '/muugitingimused',  priority: '0.3', changefreq: 'monthly' },
+    { loc: '/privaatsus',       priority: '0.3', changefreq: 'monthly' },
   ]
 
   const postRoutes = posts.map(p => ({

@@ -64,9 +64,36 @@ useHead(
           { name: 'description', content: post.value.excerpt },
           { property: 'og:title', content: post.value.title },
           { property: 'og:description', content: post.value.excerpt },
+          { property: 'og:type', content: 'article' },
           ...(post.value.coverImage
-            ? [{ property: 'og:image', content: post.value.coverImage }]
+            ? [
+                { key: 'og-image', property: 'og:image', content: post.value.coverImage },
+                { key: 'twitter-image', name: 'twitter:image', content: post.value.coverImage },
+              ]
             : []),
+        ]
+      : [],
+    script: post.value
+      ? [
+          {
+            type: 'application/ld+json',
+            innerHTML: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Article',
+              headline: post.value.title,
+              description: post.value.excerpt,
+              datePublished: post.value.publishDate,
+              inLanguage: 'et',
+              mainEntityOfPage: `https://unevalem.ee/artiklid/${post.value.slug}`,
+              ...(post.value.coverImage ? { image: post.value.coverImage } : {}),
+              author: { '@type': 'Organization', name: 'Unevalem', url: 'https://unevalem.ee' },
+              publisher: {
+                '@type': 'Organization',
+                name: 'Unevalem',
+                logo: { '@type': 'ImageObject', url: 'https://unevalem.ee/unevalem_logo.png' },
+              },
+            }),
+          },
         ]
       : [],
   })),

@@ -13,6 +13,27 @@ useHead({
     { property: 'og:description', content: homepage.metaDescription },
     { property: 'og:url', content: 'https://unevalem.ee/' },
   ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify([
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'Unevalem',
+          url: 'https://unevalem.ee',
+          logo: 'https://unevalem.ee/unevalem_logo.png',
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Unevalem',
+          url: 'https://unevalem.ee',
+          inLanguage: 'et',
+        },
+      ]),
+    },
+  ],
 })
 
 const dayOfYear = Math.floor(

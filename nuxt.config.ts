@@ -74,6 +74,9 @@ export default defineNuxtConfig({
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'et_EE' },
         { name: 'twitter:card', content: 'summary_large_image' },
+        // Site-wide fallback social image; article pages override via key.
+        { key: 'og-image', property: 'og:image', content: 'https://unevalem.ee/unevalem_logo.png' },
+        { key: 'twitter-image', name: 'twitter:image', content: 'https://unevalem.ee/unevalem_logo.png' },
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

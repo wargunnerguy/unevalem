@@ -11,7 +11,38 @@ useHead({
   ],
 })
 
-const { getByCategory, pending } = useProducts()
+const { products, getByCategory, pending } = useProducts()
+
+// Product structured data — deliberately NO aggregateRating (we have no
+// reviews; fabricating them would be a Google penalty and dishonest).
+useHead(computed(() => ({
+  script: (products.value ?? []).length
+    ? [{
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          itemListElement: (products.value ?? []).map((p, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'Product',
+              name: p.name,
+              description: p.description,
+              ...(p.imageUrl ? { image: p.imageUrl } : {}),
+              offers: {
+                '@type': 'Offer',
+                price: p.price,
+                priceCurrency: 'EUR',
+                availability: 'https://schema.org/PreOrder',
+                url: 'https://unevalem.ee/pood',
+              },
+            },
+          })),
+        }),
+      }]
+    : [],
+})))
 
 interface CategorySection {
   key: Product['category']
