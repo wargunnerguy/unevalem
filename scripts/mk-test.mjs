@@ -35,7 +35,7 @@ if (!shop.ok) {
 }
 console.log(`✓ credentials OK — shop: ${(await shop.json()).name}`)
 
-const reference = `mk-test-${Date.now()}`
+const reference = String(Date.now()).slice(-6) // short numeric, like real order numbers
 const res = await fetch(`${api}/v1/transactions`, {
   method: 'POST',
   headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/json' },

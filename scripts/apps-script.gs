@@ -326,7 +326,7 @@ function handleCreateOrder(ss, payload) {
   }
 
   try {
-    var paymentUrl = createPayment_(orderRef, total, email)
+    var paymentUrl = createPayment_(orderRef, orderNumber, total, email)
     return json({ ok: true, orderRef: orderRef, orderNumber: orderNumber, paymentUrl: paymentUrl })
   } catch (err) {
     setOrderStatus_(ss, orderRef, 'FAILED', '', '')
@@ -388,7 +388,7 @@ function mkConfig_() {
  * under payment_methods.other[name=redirect]).
  * Docs: developer.makecommerce.net → Custom API → Regular Payment Flow.
  */
-function createPayment_(orderRef, total, email) {
+function createPayment_(orderRef, orderNumber, total, email) {
   var cfg = mkConfig_()
   if (!cfg.shopId || !cfg.secret) throw new Error('MK credentials not set in Script Properties')
 
@@ -397,7 +397,10 @@ function createPayment_(orderRef, total, email) {
     transaction: {
       amount: total.toFixed(2),
       currency: 'EUR',
-      reference: orderRef,
+      // The reference is what the buyer sees on the payment page / bank
+      // statement (with the shop name) — keep it the short human number.
+      // The unguessable UUID rides along in merchant_data for lookups.
+      reference: String(orderNumber),
       merchant_data: orderRef,
       transaction_url: {
         // Success: /aitah verifies the order server-side before thanking.
@@ -464,10 +467,13 @@ function handlePaymentCallback(ss, jsonStr, mac) {
   }
 
   var msg = JSON.parse(jsonStr)
-  var orderRef = String(msg.reference || msg.merchant_data || '').trim()
+  // merchant_data carries the UUID; reference is the short human number.
+  // Older orders used the UUID as reference, so both are checked.
+  var orderRef = String(msg.merchant_data || msg.reference || '').trim()
+  var refNumber = parseInt(String(msg.reference || ''), 10) || 0
   var status = String(msg.status || '').toUpperCase()
   var txId = String(msg.transaction || '')
-  if (!orderRef) return json({ ok: false, error: 'no reference' })
+  if (!orderRef && !refNumber) return json({ ok: false, error: 'no reference' })
 
   var lock = LockService.getScriptLock()
   lock.waitLock(10000)
@@ -476,7 +482,9 @@ function handlePaymentCallback(ss, jsonStr, mac) {
     if (!orders) return json({ ok: false, error: 'no orders tab' })
     var data = orders.getDataRange().getValues()
     for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]) !== orderRef) continue
+      var uuidMatch = orderRef && String(data[i][0]) === orderRef
+      var numberMatch = refNumber && parseInt(String(data[i][14]), 10) === refNumber
+      if (!uuidMatch && !numberMatch) continue
 
       var current = String(data[i][2])
       if (status === 'COMPLETED') {
