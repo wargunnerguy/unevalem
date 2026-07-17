@@ -50,9 +50,31 @@ function eur(n: number): string {
 }
 
 // The cart survives the payment redirect (so a cancel loses nothing) and is
-// emptied only once the payment is confirmed by the server.
+// emptied only once the payment is confirmed by the server. The checkout
+// note is also cleared then — it belonged to this order; contact details
+// stay for the next purchase.
 const { clear } = useCart()
-watch(status, (s) => { if (s === 'paid') clear() })
+watch(status, (s) => {
+  if (s !== 'paid') return
+  clear()
+  try {
+    const saved = JSON.parse(localStorage.getItem('uva-checkout') ?? 'null')
+    if (saved && typeof saved === 'object') {
+      saved.note = ''
+      localStorage.setItem('uva-checkout', JSON.stringify(saved))
+    }
+  } catch { /* ignore malformed storage */ }
+})
+
+// Tab title mirrors the state so the buyer sees progress without focusing
+// the tab (a real navigation spinner can't be triggered from script).
+watchEffect(() => {
+  if (!import.meta.client) return
+  if (status.value === 'paid') document.title = shop.thanks.tabPaid
+  else if (status.value === 'loading' || status.value === 'pending' || status.value === 'unknown') {
+    document.title = shop.thanks.tabPending
+  }
+})
 
 async function fetchStatus() {
   // No ref yet: the static-host redirect + hydration can briefly leave the
@@ -62,7 +84,7 @@ async function fetchStatus() {
     const res = await fetch(`${sheetsApiUrl}?action=order_status&ref=${encodeURIComponent(orderRef.value)}`)
     const data = await res.json() as { status?: string; orderNumber?: number } & Partial<OrderSummary>
     const s = String(data.status ?? '').toUpperCase()
-    if (s === 'PAID') status.value = 'paid'
+    if (s === 'PAID' || s === 'SHIPPED') status.value = 'paid'
     else if (s === 'PENDING') status.value = 'pending'
     else if (s === 'CANCELLED' || s === 'EXPIRED' || s === 'FAILED') status.value = 'failed'
     else status.value = 'unknown'
@@ -125,13 +147,19 @@ onUnmounted(stopPolling)
 
     <div class="max-w-xl mx-auto px-4 py-10 text-center space-y-6">
 
-      <div v-if="status === 'loading'" class="text-sm text-muted py-4">…</div>
-
-      <div v-else-if="status === 'paid'" class="bg-success/10 border border-success/25 rounded-xl px-5 py-4">
-        <p class="text-sm text-midnight leading-relaxed">✓ {{ shop.thanks.paid }}</p>
+      <!-- Paid: unmissable green confirmation -->
+      <div v-if="status === 'paid'" class="bg-success/10 border border-success/25 rounded-xl px-5 py-6 space-y-3">
+        <div class="w-14 h-14 rounded-full bg-success flex items-center justify-center mx-auto">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+        <p class="text-sm text-midnight leading-relaxed font-medium">{{ shop.thanks.paid }}</p>
       </div>
 
-      <div v-else-if="status === 'pending' || status === 'unknown'" class="bg-foam border border-lavender/30 rounded-xl px-5 py-4">
+      <!-- Waiting (shown immediately, incl. the first check): spinner + honest copy -->
+      <div v-else-if="status === 'loading' || status === 'pending' || status === 'unknown'" class="bg-foam border border-lavender/30 rounded-xl px-5 py-5 space-y-3">
+        <span class="inline-block w-6 h-6 border-[3px] border-lavender border-t-transparent rounded-full animate-spin" aria-hidden="true" />
         <p class="text-sm text-midnight leading-relaxed">{{ shop.thanks.pending }}</p>
       </div>
 

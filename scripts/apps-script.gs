@@ -43,6 +43,8 @@ var DELIVERY_DAYS = '2–5'
 function doGet(e) {
   // Order status for the /aitah page: server-verified state only, no PII.
   if (e.parameter.action === 'order_status') return handleOrderStatus(e)
+  // Buyer self-service lookup (/tellimus): order number + matching email.
+  if (e.parameter.action === 'order_lookup') return handleOrderLookup(e)
 
   var sheet = e.parameter.sheet
   var ss = SpreadsheetApp.getActiveSpreadsheet()
@@ -364,6 +366,28 @@ function handleOrderStatus(e) {
       createdAt:    String(data[i][1]),
       paidAt:       String(data[i][13] || ''),
     })
+  }
+  return json({ error: 'not found' })
+}
+
+/**
+ * Buyer self-service status (/tellimus page). Requires BOTH the short order
+ * number and the exact buyer email — numbers alone are sequential and
+ * guessable, so they unlock nothing by themselves. Returns only the status.
+ * The shop owner marks fulfilment by changing a row's status to SHIPPED.
+ */
+function handleOrderLookup(e) {
+  var num = parseInt(String(e.parameter.number || '').replace(/\D/g, ''), 10)
+  var email = String(e.parameter.email || '').trim().toLowerCase()
+  if (!num || !email) return json({ error: 'missing' })
+  var orders = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('orders')
+  if (!orders) return json({ error: 'not found' })
+  var data = orders.getDataRange().getValues()
+  for (var i = 1; i < data.length; i++) {
+    if (parseInt(String(data[i][14]), 10) === num
+        && String(data[i][6]).trim().toLowerCase() === email) {
+      return json({ status: String(data[i][2]) })
+    }
   }
   return json({ error: 'not found' })
 }

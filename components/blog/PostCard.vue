@@ -51,14 +51,14 @@ function toggle() {
     <!-- Excerpt (always visible) -->
     <p class="text-sm text-midnight leading-relaxed">{{ post.excerpt }}</p>
 
-    <!-- Expand toggle -->
+    <!-- Expand toggle — pill button so the action is easy to spot -->
     <button
       v-if="!expanded"
       type="button"
-      class="mt-3 text-sm font-medium text-midnight hover:text-gold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded"
+      class="mt-3 inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-midnight text-gold text-sm font-semibold hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
       @click="toggle"
     >
-      Loe edasi →
+      {{ common.readMore }} →
     </button>
 
     <!-- Expanded section: max-height CSS transition -->

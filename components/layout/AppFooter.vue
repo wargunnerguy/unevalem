@@ -29,6 +29,11 @@ const year = new Date().getFullYear()
               </NuxtLink>
             </li>
             <li>
+              <NuxtLink to="/tellimus" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+                {{ footer.links.orderStatus }}
+              </NuxtLink>
+            </li>
+            <li>
               <NuxtLink to="/meist" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
                 {{ footer.links.about }}
               </NuxtLink>

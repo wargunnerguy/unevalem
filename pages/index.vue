@@ -173,7 +173,7 @@ const revisitSummary = computed(() => {
     </section>
 
     <!-- ─── FEATURED ARTICLES ─── -->
-    <section v-if="displayPosts.length" class="bg-moonlight px-4 pb-14 pt-2">
+    <section v-if="displayPosts.length" class="bg-moonlight sleep-pattern px-4 pb-14 pt-2">
       <div class="max-w-2xl mx-auto">
         <p v-if="showPersonalizedNote" class="text-xs font-semibold text-lavender uppercase tracking-wider mb-2">
           {{ homepage.personalizedNote }}

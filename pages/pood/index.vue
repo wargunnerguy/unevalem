@@ -3,9 +3,9 @@ import type { Product } from '~/types'
 import { disclosure, shop } from '~/utils/copy'
 
 useHead({
-  title: 'Pood — Bambuspadi, bambustekk ja rohkem | Unevalem',
+  title: 'Pood — padjad, tekid ja voodipesu | Unevalem',
   meta: [
-    { name: 'description', content: 'Unevalem tootevalik: bambuspadjad, bambustekid ja voodipesu, mis toetavad paremat und.' },
+    { name: 'description', content: 'Unevalemi tootevalik: hoolikalt valitud padjad, tekid ja voodipesu eri materjalidest, mis toetavad paremat und.' },
     { property: 'og:title', content: 'Unevalem Pood' },
     { property: 'og:url', content: 'https://unevalem.ee/pood' },
   ],
@@ -55,13 +55,15 @@ interface CategorySection {
   comingSoon?: boolean
 }
 
+// Material-neutral copy: the range spans bamboo, wool, silk, cotton,
+// synthetics and more — and it changes, so categories don't name materials.
 const sections: CategorySection[] = [
-  { key: 'pillow',     heading: 'Padjad',     description: 'Bambuspadjad erinevate magamisasendite ja kehaehituste jaoks.' },
-  { key: 'blanket',    heading: 'Tekid',      description: 'Bambustekid kõikidele — suvemudelitest talvetekideni.' },
-  { key: 'pillowcase', heading: 'Padjapüürid', description: 'Hingavad bambuspadjapüürid, mis on õrnad nahale.' },
-  { key: 'duvetcover', heading: 'Tekikotid',  description: 'Bambustekikotid, mis parandavad teki termoregulatsiooni.' },
-  { key: 'mattress',   heading: 'Madratsid',  description: 'Kvaliteetsed bambusmadratsid.', comingSoon: true },
-  { key: 'sheet',      heading: 'Voodilinad', description: 'Bambusest voodilinad.', comingSoon: true },
+  { key: 'pillow',     heading: 'Padjad',     description: 'Padjad erinevate magamisasendite ja kehaehituste jaoks.' },
+  { key: 'blanket',    heading: 'Tekid',      description: 'Tekid igale magajale — kergetest suvetekkidest soojade talvetekideni.' },
+  { key: 'pillowcase', heading: 'Padjapüürid', description: 'Hingavad padjapüürid, mis on õrnad nahale.' },
+  { key: 'duvetcover', heading: 'Tekikotid',  description: 'Tekikotid, mis toetavad teki termoregulatsiooni.' },
+  { key: 'mattress',   heading: 'Madratsid',  description: 'Kvaliteetsed madratsid.', comingSoon: true },
+  { key: 'sheet',      heading: 'Voodilinad', description: 'Voodilinad eri materjalidest.', comingSoon: true },
 ]
 </script>
 
@@ -73,12 +75,8 @@ const sections: CategorySection[] = [
       <div class="max-w-4xl mx-auto">
         <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight">Pood</h1>
         <p class="mt-2 text-lavender text-base">
-          Bambusest voodimaterjalid, mis toetavad paremat und.
-          Toodete valik kasvab — kontrolli regulaarselt.
-        </p>
-        <p class="mt-3 text-xs text-lavender/60 leading-snug max-w-2xl">
-          {{ disclosure.short }}
-          <NuxtLink to="/meist" class="underline underline-offset-2 hover:text-lavender">{{ disclosure.linkLabel }}</NuxtLink>
+          Hoolikalt valitud voodikaubad, mis toetavad paremat und —
+          eri materjalidest ja igale magajale. Valik kasvab.
         </p>
       </div>
     </div>
@@ -188,6 +186,12 @@ const sections: CategorySection[] = [
 
         </section>
       </div>
+
+      <!-- Transparency note — out of the way at the page's end -->
+      <p class="mt-12 text-[11px] text-muted/80 leading-snug max-w-2xl">
+        {{ disclosure.short }}
+        <NuxtLink to="/meist" class="underline underline-offset-2 hover:text-midnight">{{ disclosure.linkLabel }}</NuxtLink>
+      </p>
 
     </div>
   </div>
