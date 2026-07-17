@@ -33,7 +33,7 @@ function json(obj) {
 
 // ── Shop configuration ──────────────────────────────────────────────────────
 // Order alert recipient. Keep as a constant so it's visible at the top.
-var OWNER_EMAIL = 'reimovellemaa@gmail.com'
+var OWNER_EMAIL = 'unevalem@gmail.com'
 // Public site origin for payment return redirects.
 var SITE_URL = 'https://unevalem.ee'
 // Estimated delivery shown in the customer confirmation email. Must match the

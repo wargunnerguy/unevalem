@@ -497,7 +497,7 @@ export const privacyPage = {
     },
     {
       heading: 'Kontakt',
-      body: 'Privaatsusküsimustes kirjuta meile: info@unevalem.ee',
+      body: 'Privaatsusküsimustes kirjuta meile: unevalem@gmail.com',
     },
   ],
 }
@@ -514,9 +514,9 @@ export const footer = {
   // Legal identity line (registrikood from e-Äriregister, 2026-07-17).
   // Costlio OÜ is NOT VAT-registered: never render "sisaldab käibemaksu",
   // "km-ga" or any VAT wording anywhere on the site — prices are final as-is.
-  // info@unevalem.ee: domain has MX (Elkdata) — make sure the mailbox/forward
+  // unevalem@gmail.com: domain has MX (Elkdata) — make sure the mailbox/forward
   // actually exists before the first sale.
-  legal: 'Unevalem — Costlio OÜ · registrikood 14562345 · e-post info@unevalem.ee',
+  legal: 'Unevalem — Costlio OÜ · registrikood 14562345 · e-post unevalem@gmail.com',
 }
 
 export const aboutPage = {
@@ -551,7 +551,7 @@ export const termsPage = {
   sections: [
     {
       heading: '1. Üldsätted',
-      body: 'Veebipoe unevalem.ee (edaspidi: e-pood) omanik ja müüja on Costlio OÜ (registrikood 14562345, e-post info@unevalem.ee). Tingimused kehtivad kõigi e-poest ostetud kaupade kohta ning tellimuse vormistamisega kinnitab ostja, et on tingimustega tutvunud ja nendega nõus.',
+      body: 'Veebipoe unevalem.ee (edaspidi: e-pood) omanik ja müüja on Costlio OÜ (registrikood 14562345, e-post unevalem@gmail.com). Tingimused kehtivad kõigi e-poest ostetud kaupade kohta ning tellimuse vormistamisega kinnitab ostja, et on tingimustega tutvunud ja nendega nõus.',
     },
     {
       heading: '2. Hinnad',
@@ -567,15 +567,15 @@ export const termsPage = {
     },
     {
       heading: '5. Taganemisõigus',
-      body: 'Ostjal on õigus e-poest ostetud kaubast taganeda 14 päeva jooksul alates kauba kättesaamisest, saates avalduse aadressile info@unevalem.ee. Tagastatav kaup peab olema kasutamata, rikkumata ja originaalpakendis. Hügieenilistel põhjustel ei kuulu tagastamisele avatud pakendiga padjad, tekid ja voodipesu (VÕS § 53 lg 4). Tagastamise otsesed kulud kannab ostja. Makse tagastame hiljemalt 14 päeva jooksul pärast kauba tagasijõudmist.',
+      body: 'Ostjal on õigus e-poest ostetud kaubast taganeda 14 päeva jooksul alates kauba kättesaamisest, saates avalduse aadressile unevalem@gmail.com. Tagastatav kaup peab olema kasutamata, rikkumata ja originaalpakendis. Hügieenilistel põhjustel ei kuulu tagastamisele avatud pakendiga padjad, tekid ja voodipesu (VÕS § 53 lg 4). Tagastamise otsesed kulud kannab ostja. Makse tagastame hiljemalt 14 päeva jooksul pärast kauba tagasijõudmist.',
     },
     {
       heading: '6. Pretensioonid',
-      body: 'Ostjal on õigus esitada kauba puuduse korral pretensioon kahe aasta jooksul alates kauba kättesaamisest (VÕS § 218). Pretensioon tuleb saata aadressile info@unevalem.ee koos tellimuse numbri ja puuduse kirjeldusega. Puudusega kauba parandame, asendame või tagastame makse.',
+      body: 'Ostjal on õigus esitada kauba puuduse korral pretensioon kahe aasta jooksul alates kauba kättesaamisest (VÕS § 218). Pretensioon tuleb saata aadressile unevalem@gmail.com koos tellimuse numbri ja puuduse kirjeldusega. Puudusega kauba parandame, asendame või tagastame makse.',
     },
     {
       heading: '7. Vaidluste lahendamine',
-      body: 'Küsimused ja mured lahendame eelkõige läbirääkimiste teel — kirjuta info@unevalem.ee. Kui kokkulepet ei sünni, on ostjal õigus pöörduda Tarbijakaitse ja Tehnilise Järelevalve Ameti tarbijavaidluste komisjoni (ttja.ee) või Euroopa Liidu ODR-platvormi (ec.europa.eu/odr) poole.',
+      body: 'Küsimused ja mured lahendame eelkõige läbirääkimiste teel — kirjuta unevalem@gmail.com. Kui kokkulepet ei sünni, on ostjal õigus pöörduda Tarbijakaitse ja Tehnilise Järelevalve Ameti tarbijavaidluste komisjoni (ttja.ee) või Euroopa Liidu ODR-platvormi (ec.europa.eu/odr) poole.',
     },
     {
       heading: '8. Isikuandmed',
