@@ -378,8 +378,8 @@ export const shop = {
     delivery: 'Tarne: 2–5 tööpäeva jooksul pärast makse kinnitust.',
     orderRefLabel: 'Tellimuse number',
     backHome: 'Tagasi avalehele →',
-    tabPending: '⏳ Ootame maksekinnitust… | Unevalem',
-    tabPaid: '✓ Tellimus kinnitatud | Unevalem',
+    tabPending: 'Ootame maksekinnitust… | Unevalem',
+    tabPaid: 'Tellimus kinnitatud | Unevalem',
   },
 
   lookup: {

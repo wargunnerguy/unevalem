@@ -133,8 +133,8 @@ onUnmounted(stopPolling)
 </script>
 
 <template>
-  <div class="min-h-screen bg-moonlight">
-    <div class="bg-midnight px-4 py-12">
+  <div class="min-h-screen">
+    <div class="bg-midnight sleep-pattern px-4 py-12">
       <div class="max-w-xl mx-auto text-center">
         <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight">
           {{ shop.thanks.heading }}

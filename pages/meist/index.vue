@@ -12,8 +12,8 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-moonlight">
-    <div class="bg-midnight px-4 py-10">
+  <div class="min-h-screen">
+    <div class="bg-midnight sleep-pattern px-4 py-10">
       <div class="max-w-2xl mx-auto">
         <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight">{{ aboutPage.heading }}</h1>
       </div>

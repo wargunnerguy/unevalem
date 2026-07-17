@@ -14,7 +14,10 @@ useHead({
 <template>
   <div class="min-h-screen flex flex-col">
     <AppHeader />
-    <main class="flex-1">
+    <!-- Patterned base: pages leave their root transparent so the sleep-icon
+         texture shows everywhere; colored hero sections carry the class
+         themselves. Header and footer stay pattern-free by design. -->
+    <main class="flex-1 bg-moonlight sleep-pattern">
       <NuxtPage />
     </main>
     <AppFooter />

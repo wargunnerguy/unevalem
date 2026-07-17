@@ -88,7 +88,7 @@ const revisitSummary = computed(() => {
   <div>
 
     <!-- ─── HERO ─── -->
-    <section class="bg-midnight px-4 pt-8 pb-10">
+    <section class="bg-midnight sleep-pattern px-4 pt-8 pb-10">
 
       <!-- Revisit banner — shown only on client after hydration -->
       <ClientOnly>
@@ -140,7 +140,7 @@ const revisitSummary = computed(() => {
     </section>
 
     <!-- ─── VALUE CLAIMS STRIP ─── -->
-    <section class="bg-dusk px-4 py-6">
+    <section class="bg-dusk sleep-pattern px-4 py-6">
       <div class="max-w-xl mx-auto flex justify-center gap-6 sm:gap-10">
         <div
           v-for="claim in homepage.valueClaims"
@@ -158,7 +158,7 @@ const revisitSummary = computed(() => {
     </section>
 
     <!-- ─── DAILY TIP ─── -->
-    <section class="bg-moonlight px-4 py-8">
+    <section class="px-4 py-8">
       <div class="max-w-xl mx-auto">
         <div class="flex gap-3 items-start p-4 rounded-xl border border-lavender/25 bg-foam shadow-sm">
           <span class="text-xl shrink-0 mt-0.5" aria-hidden="true">🌙</span>
@@ -173,7 +173,7 @@ const revisitSummary = computed(() => {
     </section>
 
     <!-- ─── FEATURED ARTICLES ─── -->
-    <section v-if="displayPosts.length" class="bg-moonlight sleep-pattern px-4 pb-14 pt-2">
+    <section v-if="displayPosts.length" class="px-4 pb-14 pt-2">
       <div class="max-w-2xl mx-auto">
         <p v-if="showPersonalizedNote" class="text-xs font-semibold text-lavender uppercase tracking-wider mb-2">
           {{ homepage.personalizedNote }}

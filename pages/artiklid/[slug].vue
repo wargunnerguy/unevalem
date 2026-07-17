@@ -131,7 +131,7 @@ const facebookShareUrl = computed(
 </script>
 
 <template>
-  <div class="min-h-screen bg-moonlight">
+  <div class="min-h-screen">
 
     <!-- Loading -->
     <div v-if="pending" class="flex justify-center items-center min-h-64">
