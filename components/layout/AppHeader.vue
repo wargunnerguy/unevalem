@@ -4,7 +4,6 @@ import { nav, shop } from '~/utils/copy'
 const route = useRoute()
 const isActive = (path: string) => route.path === path
 
-const { isDark, toggleTheme } = useTheme()
 const { count, open } = useCart()
 </script>
 
@@ -63,53 +62,8 @@ const { count, open } = useCart()
           </button>
         </ClientOnly>
 
-        <!-- Theme toggle: sun shown in dark mode (click → light), moon in light mode (click → dark) -->
-        <button
-          type="button"
-          class="ml-1 p-2 rounded-lg text-muted hover:text-midnight hover:bg-moonlight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
-          :aria-label="isDark ? 'Lülita heledaks' : 'Lülita tumedaks'"
-          :title="isDark ? 'Lülita heledaks' : 'Lülita tumedaks'"
-          @click="toggleTheme"
-        >
-          <!-- Sun = dark mode active, click to go light -->
-          <svg
-            v-if="isDark"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <circle cx="12" cy="12" r="4" />
-            <line x1="12" y1="1" x2="12" y2="4" />
-            <line x1="12" y1="20" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
-            <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="4" y2="12" />
-            <line x1="20" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
-            <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
-          </svg>
-          <!-- Moon = light mode active, click to go dark -->
-          <svg
-            v-else
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        </button>
+        <!-- Theme toggle: slider switch (sun ↔ moon) -->
+        <ThemeSwitch />
       </div>
 
     </div>
