@@ -322,6 +322,60 @@ export const calculator = {
   },
 }
 
+export const shop = {
+  addToCart: 'Lisa korvi',
+  notifyMe: 'Anna teada, kui saadaval',
+  notifyPlaceholder: 'sinu@email.ee',
+  notifySubmit: 'Anna teada',
+  notifyConfirm: 'Kirjas! Anname teada, kui toode on saadaval.',
+  notifyError: 'Midagi läks valesti — proovi hetke pärast uuesti.',
+  // GDPR: waitlist stores only the address + product, nothing else.
+  notifyGdpr: 'Kasutame sinu e-posti ainult selle toote saadavusteate saatmiseks.',
+  notifyGdprLink: 'Privaatsuspoliitika',
+
+  cart: {
+    heading: 'Ostukorv',
+    empty: 'Sinu ostukorv on tühi.',
+    emptyCta: 'Vaata tooteid →',
+    subtotal: 'Kokku',
+    checkout: 'Vormista tellimus',
+    remove: 'Eemalda',
+    close: 'Sulge',
+    ariaOpen: 'Ava ostukorv',
+  },
+
+  checkout: {
+    metaTitle: 'Tellimuse vormistamine | Unevalem',
+    heading: 'Vormista tellimus',
+    itemsHeading: 'Sinu tellimus',
+    name: 'Nimi',
+    email: 'E-post',
+    phone: 'Telefon',
+    shippingHeading: 'Tarneviis',
+    carriers: { omniva: 'Omniva pakiautomaat', smartpost: 'SmartPost pakiautomaat' } as Record<string, string>,
+    terminalLabel: 'Vali pakiautomaat',
+    terminalLoading: 'Laen pakiautomaate…',
+    note: 'Märkus (valikuline)',
+    gdpr: 'Kasutame sinu andmeid ainult selle tellimuse täitmiseks ja tarneks.',
+    submit: 'Jätka maksma →',
+    submitting: 'Saadan tellimust…',
+    error: 'Tellimuse loomine ebaõnnestus — proovi uuesti või kirjuta meile.',
+    emptyCart: 'Sinu ostukorv on tühi — vali kõigepealt tooted.',
+    required: 'Täida kõik kohustuslikud väljad.',
+  },
+
+  thanks: {
+    metaTitle: 'Aitäh! | Unevalem',
+    heading: 'Aitäh! Sinu tellimus on kirjas.',
+    paid: 'Makse on kinnitatud. Saadame sulle e-postiga tellimuse kinnituse.',
+    pending: 'Ootame maksekinnitust — see võib võtta mõne minuti. Värskenda lehte või kontrolli hiljem e-posti.',
+    failed: 'Makse ei õnnestunud või katkestati. Kui see on eksitus, proovi uuesti või kirjuta meile.',
+    delivery: 'Tarne: {X} tööpäeva jooksul pärast makse kinnitust.',
+    orderRefLabel: 'Tellimuse number',
+    backHome: 'Tagasi avalehele →',
+  },
+}
+
 // Transparency: shown at every surface that recommends products.
 export const disclosure = {
   short: 'Aus märkus: osa soovitatud toodetest müüb Unevalem ise, osa viib välistesse poodidesse. Soovitused põhinevad sinu vastustel, mitte müügihuvil.',

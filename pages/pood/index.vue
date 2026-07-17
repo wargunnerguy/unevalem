@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Product } from '~/types'
-import { disclosure } from '~/utils/copy'
+import { disclosure, shop } from '~/utils/copy'
 
 useHead({
   title: 'Pood — Bambuspadi, bambustekk ja rohkem | Unevalem',
@@ -12,6 +12,10 @@ useHead({
 })
 
 const { products, getByCategory, pending } = useProducts()
+const { add } = useCart()
+
+// Which product's waitlist form is expanded (one at a time keeps cards tidy)
+const waitlistOpen = ref<string | null>(null)
 
 // Product structured data — deliberately NO aggregateRating (we have no
 // reviews; fabricating them would be a Google penalty and dishonest).
@@ -130,18 +134,44 @@ const sections: CategorySection[] = [
 
                   <p class="text-sm text-muted leading-relaxed flex-1 mb-3">{{ product.description }}</p>
 
-                  <div class="flex items-center justify-between mt-auto">
-                    <span class="font-semibold text-midnight text-lg">{{ product.priceText }}</span>
-                    <a
-                      :href="product.storeUrl !== '#' ? product.storeUrl : undefined"
-                      :aria-disabled="product.storeUrl === '#' || undefined"
-                      class="px-4 py-2 rounded-lg text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                      :class="product.storeUrl !== '#'
-                        ? 'bg-gold text-midnight hover:opacity-90'
-                        : 'bg-gray-100 text-muted cursor-default'"
-                    >
-                      {{ product.storeUrl !== '#' ? 'Vaata toodet →' : 'Tulemas' }}
-                    </a>
+                  <div class="mt-auto space-y-2.5">
+                    <div class="flex items-center justify-between">
+                      <span class="font-semibold text-midnight text-lg">{{ product.priceText }}</span>
+
+                      <!-- External product: link out -->
+                      <a
+                        v-if="isExternalStore(product.storeUrl)"
+                        :href="product.storeUrl"
+                        target="_blank"
+                        rel="noopener"
+                        class="px-4 py-2 rounded-lg text-sm font-medium bg-gold text-midnight hover:opacity-90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                      >
+                        Vaata toodet →
+                      </a>
+
+                      <!-- Own product in stock: add to cart -->
+                      <button
+                        v-else-if="product.available"
+                        type="button"
+                        class="px-4 py-2 rounded-lg text-sm font-medium bg-gold text-midnight hover:opacity-90 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                        @click="add(product.id)"
+                      >
+                        {{ shop.addToCart }}
+                      </button>
+
+                      <!-- Out of stock: waitlist toggle -->
+                      <button
+                        v-else
+                        type="button"
+                        class="px-4 py-2 rounded-lg text-sm font-medium border border-midnight/25 text-midnight hover:bg-midnight/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                        :aria-expanded="waitlistOpen === product.id"
+                        @click="waitlistOpen = waitlistOpen === product.id ? null : product.id"
+                      >
+                        {{ shop.notifyMe }}
+                      </button>
+                    </div>
+
+                    <WaitlistForm v-if="waitlistOpen === product.id && !product.available" :product-id="product.id" />
                   </div>
                 </div>
               </article>

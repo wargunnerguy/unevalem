@@ -5,13 +5,22 @@
     "category": "pillow",
     "subcategory": "classic",
     "description": "Kõrge bambuspadi, mis hoiab kaela ja lülisamba sirges joones kogu öö.",
-    "price": 49.90,
+    "price": 49.9,
     "priceText": "49,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["side-sleeper", "high-loft", "bamboo", "adjustable-loft", "hypoallergenic", "standard-shoulders", "cooling"],
+    "tags": [
+      "side-sleeper",
+      "high-loft",
+      "bamboo",
+      "adjustable-loft",
+      "hypoallergenic",
+      "standard-shoulders",
+      "cooling"
+    ],
     "active": true,
-    "isFeatured": true
+    "isFeatured": true,
+    "available": true
   },
   {
     "id": "bambuspadi-kyljeli-pro",
@@ -19,13 +28,22 @@
     "category": "pillow",
     "subcategory": "premium",
     "description": "Laiema õlgadega magajale loodud kõrgema tuge pakkuv bambuspadi.",
-    "price": 64.90,
+    "price": 64.9,
     "priceText": "64,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["side-sleeper", "high-loft", "bamboo", "adjustable-loft", "hypoallergenic", "broad-shoulders", "cooling"],
+    "tags": [
+      "side-sleeper",
+      "high-loft",
+      "bamboo",
+      "adjustable-loft",
+      "hypoallergenic",
+      "broad-shoulders",
+      "cooling"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": true
   },
   {
     "id": "bambuspadi-selili",
@@ -33,13 +51,21 @@
     "category": "pillow",
     "subcategory": "classic",
     "description": "Keskmise kõrgusega bambuspadi, mis toetab kaelaosa loomulikus neutraalses asendis.",
-    "price": 44.90,
+    "price": 44.9,
     "priceText": "44,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["back-sleeper", "medium-loft", "bamboo", "adjustable-loft", "hypoallergenic", "cooling"],
+    "tags": [
+      "back-sleeper",
+      "medium-loft",
+      "bamboo",
+      "adjustable-loft",
+      "hypoallergenic",
+      "cooling"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": false
   },
   {
     "id": "bambuspadi-ohuke",
@@ -47,13 +73,21 @@
     "category": "pillow",
     "subcategory": "flat",
     "description": "Madala profiilriga bambuspadi, mis hoiab kaela ülevenimise ära.",
-    "price": 34.90,
+    "price": 34.9,
     "priceText": "34,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["stomach-sleeper", "low-loft", "bamboo", "hypoallergenic", "cooling", "lightweight"],
+    "tags": [
+      "stomach-sleeper",
+      "low-loft",
+      "bamboo",
+      "hypoallergenic",
+      "cooling",
+      "lightweight"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": false
   },
   {
     "id": "bambuspadi-universaal",
@@ -61,13 +95,21 @@
     "category": "pillow",
     "subcategory": "adjustable",
     "description": "Reguleeritava täidisega bambuspadi, mis sobib kõikidele magamisasenditele.",
-    "price": 54.90,
+    "price": 54.9,
     "priceText": "54,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["all-positions", "medium-loft", "bamboo", "adjustable-loft", "hypoallergenic", "cooling"],
+    "tags": [
+      "all-positions",
+      "medium-loft",
+      "bamboo",
+      "adjustable-loft",
+      "hypoallergenic",
+      "cooling"
+    ],
     "active": true,
-    "isFeatured": true
+    "isFeatured": true,
+    "available": false
   },
   {
     "id": "bambustekk-suvi",
@@ -75,13 +117,20 @@
     "category": "blanket",
     "subcategory": "summer",
     "description": "Õhuke ja hingav bambustekk soojalembelistele ja higistajatele.",
-    "price": 79.90,
+    "price": 79.9,
     "priceText": "79,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["cooling", "lightweight", "bamboo", "hypoallergenic", "dust-mite-resistant"],
+    "tags": [
+      "cooling",
+      "lightweight",
+      "bamboo",
+      "hypoallergenic",
+      "dust-mite-resistant"
+    ],
     "active": true,
-    "isFeatured": true
+    "isFeatured": true,
+    "available": false
   },
   {
     "id": "bambustekk-aasta",
@@ -89,13 +138,21 @@
     "category": "blanket",
     "subcategory": "all-season",
     "description": "Universaalne bambustekk, mis reguleerib temperatuuri aastaringselt.",
-    "price": 94.90,
+    "price": 94.9,
     "priceText": "94,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["all-season", "medium-weight", "bamboo", "hypoallergenic", "dust-mite-resistant", "cooling"],
+    "tags": [
+      "all-season",
+      "medium-weight",
+      "bamboo",
+      "hypoallergenic",
+      "dust-mite-resistant",
+      "cooling"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": false
   },
   {
     "id": "bambustekk-talv",
@@ -103,13 +160,20 @@
     "category": "blanket",
     "subcategory": "winter",
     "description": "Soojapidav bambustekk, mis hoiab vajaliku soojuse ka külmades tingimustes.",
-    "price": 109.90,
+    "price": 109.9,
     "priceText": "109,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["warming", "heavy", "medium-weight", "bamboo", "hypoallergenic"],
+    "tags": [
+      "warming",
+      "heavy",
+      "medium-weight",
+      "bamboo",
+      "hypoallergenic"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": false
   },
   {
     "id": "tekikott-bambus",
@@ -117,13 +181,19 @@
     "category": "duvetcover",
     "subcategory": "classic",
     "description": "Hingav bambusest tekikott, mis parandab teki termoregulatsiooni.",
-    "price": 39.90,
+    "price": 39.9,
     "priceText": "39,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["bamboo", "cooling", "hypoallergenic", "dust-mite-resistant"],
+    "tags": [
+      "bamboo",
+      "cooling",
+      "hypoallergenic",
+      "dust-mite-resistant"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": false
   },
   {
     "id": "padjapyyr-bambus",
@@ -131,12 +201,19 @@
     "category": "pillowcase",
     "subcategory": "classic",
     "description": "Siidpehme bambuspadjapüür, mis on hingav ja nahka hellitav.",
-    "price": 24.90,
+    "price": 24.9,
     "priceText": "24,90 €",
     "imageUrl": "",
     "storeUrl": "#",
-    "tags": ["bamboo", "cooling", "hypoallergenic", "dust-mite-resistant", "lightweight"],
+    "tags": [
+      "bamboo",
+      "cooling",
+      "hypoallergenic",
+      "dust-mite-resistant",
+      "lightweight"
+    ],
     "active": true,
-    "isFeatured": false
+    "isFeatured": false,
+    "available": false
   }
 ]

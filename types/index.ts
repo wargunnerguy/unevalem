@@ -64,6 +64,20 @@ export interface Product {
   tags:        string[]
   active:      boolean
   isFeatured:  boolean
+  available:   boolean
+}
+
+export interface CartItem {
+  id:  string
+  qty: number
+}
+
+export type ShippingMethod = 'omniva' | 'smartpost'
+
+export interface ParcelTerminal {
+  id:      string
+  name:    string
+  carrier: ShippingMethod
 }
 
 export interface ProductRec {

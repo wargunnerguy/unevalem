@@ -166,6 +166,9 @@ function transformProduct(row: Record<string, unknown>): Record<string, unknown>
     tags:       parseTags(row.tags),
     active:     parseBool(row.active),
     isFeatured: parseBool(row.isFeatured),
+    // Stock gate: only an explicit TRUE is purchasable; a missing column or
+    // blank cell means waitlist mode ("Anna teada, kui saadaval").
+    available:  parseBool(row.available),
   }
 }
 

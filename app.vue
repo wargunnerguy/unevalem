@@ -20,6 +20,7 @@ useHead({
     <AppFooter />
     <ClientOnly>
       <SocialProofToast />
+      <CartDrawer />
     </ClientOnly>
     <CookieConsent />
   </div>
