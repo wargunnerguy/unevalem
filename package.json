@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "fetch-content": "tsx scripts/fetch-content.ts",
     "build:full": "npm run fetch-content && npm run generate",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "mk:test": "node scripts/mk-test.mjs"
   },
   "devDependencies": {
     "@nuxt/icon": "^1.10.0",
