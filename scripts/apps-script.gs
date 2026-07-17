@@ -352,8 +352,12 @@ function createPayment_(orderRef, total, email) {
       reference: orderRef,
       merchant_data: orderRef,
       transaction_url: {
+        // Success: /aitah verifies the order server-side before thanking.
         return_url:        { url: SITE_URL + '/aitah?ref=' + orderRef, method: 'GET' },
-        cancel_url:        { url: SITE_URL + '/aitah?ref=' + orderRef, method: 'GET' },
+        // Cancel: back to checkout with a notice — the cart is still intact.
+        cancel_url:        { url: SITE_URL + '/kassa?makse=katkes', method: 'GET' },
+        // Authoritative server-to-server result, independent of the user's
+        // journey — must hit this web app (the only backend we have).
         notifications_url: { url: selfUrl, method: 'POST' },
       },
     },

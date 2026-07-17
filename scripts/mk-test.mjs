@@ -47,7 +47,7 @@ const res = await fetch(`${api}/v1/transactions`, {
       merchant_data: reference,
       transaction_url: {
         return_url: { url: `https://unevalem.ee/aitah?ref=${reference}`, method: 'GET' },
-        cancel_url: { url: `https://unevalem.ee/aitah?ref=${reference}`, method: 'GET' },
+        cancel_url: { url: 'https://unevalem.ee/kassa?makse=katkes', method: 'GET' },
         notifications_url: { url: 'https://unevalem.ee/aitah', method: 'POST' },
       },
     },

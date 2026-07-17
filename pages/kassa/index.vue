@@ -7,7 +7,11 @@ useHead({
   meta: [{ name: 'robots', content: 'noindex' }],
 })
 
-const { lines, count, subtotalText, clear } = useCart()
+const { lines, count, subtotalText } = useCart()
+
+// Maksekeskus cancel_url lands here with ?makse=katkes — cart is untouched.
+const route = useRoute()
+const paymentCancelled = computed(() => route.query.makse === 'katkes')
 
 const { data: terminalsData } = useFetch<ParcelTerminal[]>('/api/terminals', {
   default: () => [] as ParcelTerminal[],
@@ -94,8 +98,10 @@ async function submit() {
     const data = await res.json() as { ok?: boolean; orderRef?: string; paymentUrl?: string; error?: string }
     if (!data.ok || !data.paymentUrl) throw new Error(data.error || 'no payment url')
 
+    // Cart is intentionally NOT cleared here: if the payment is cancelled the
+    // user returns with their cart intact. /aitah clears it once payment is
+    // confirmed.
     gaEvent('purchase_redirect', { order_ref: data.orderRef ?? '' })
-    clear()
     window.location.href = data.paymentUrl
   } catch {
     state.value = 'error'
@@ -124,6 +130,14 @@ async function submit() {
         </div>
 
         <form v-else class="space-y-8" @submit.prevent="submit">
+
+          <!-- Cancelled payment notice -->
+          <div
+            v-if="paymentCancelled"
+            class="bg-foam border border-red-200 rounded-xl px-4 py-3 text-sm text-midnight leading-snug"
+          >
+            {{ shop.checkout.cancelledNotice }}
+          </div>
 
           <!-- Order lines -->
           <section>

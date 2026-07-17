@@ -362,6 +362,7 @@ export const shop = {
     error: 'Tellimuse loomine ebaõnnestus — proovi uuesti või kirjuta meile.',
     emptyCart: 'Sinu ostukorv on tühi — vali kõigepealt tooted.',
     required: 'Täida kõik kohustuslikud väljad.',
+    cancelledNotice: 'Makse katkestati või ebaõnnestus. Sinu ostukorv on alles — saad proovida uuesti.',
   },
 
   thanks: {

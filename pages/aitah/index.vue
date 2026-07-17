@@ -14,6 +14,11 @@ const orderRef = computed(() => String(route.query.ref ?? '').trim())
 type Status = 'loading' | 'paid' | 'pending' | 'failed' | 'unknown'
 const status = ref<Status>('loading')
 
+// The cart survives the payment redirect (so a cancel loses nothing) and is
+// emptied only once the payment is confirmed by the server.
+const { clear } = useCart()
+watch(status, (s) => { if (s === 'paid') clear() })
+
 async function fetchStatus() {
   if (!orderRef.value) { status.value = 'unknown'; return }
   const url = useRuntimeConfig().public.sheetsApiUrl as string
