@@ -284,23 +284,50 @@ function handleCreateOrder(ss, payload) {
   }
   total = Math.round(total * 100) / 100
 
+  // The UUID stays the unguessable access token (URLs, status endpoint);
+  // orderNumber is the short numeric id humans quote (emails, support).
   var orderRef = Utilities.getUuid()
-  var orders = ss.getSheetByName('orders')
-  if (!orders) orders = ss.insertSheet('orders')
-  if (orders.getLastRow() === 0) {
-    orders.appendRow(['orderRef', 'createdAt', 'status', 'itemsJson', 'total',
-      'name', 'email', 'phone', 'shipMethod', 'terminalId', 'terminalName',
-      'note', 'transactionId', 'paidAt'])
+  var orderNumber
+
+  // Lock: sequential numbers must not collide under concurrent checkouts.
+  var lock = LockService.getScriptLock()
+  try {
+    lock.waitLock(10000)
+  } catch (err) {
+    return json({ ok: false, error: 'busy, try again' })
   }
-  orders.appendRow([
-    orderRef, new Date().toISOString(), 'PENDING', JSON.stringify(lines), total,
-    name, email, phone, shipMethod, terminalId, terminalName,
-    String(payload.note || '').slice(0, 500), '', ''
-  ])
+  try {
+    var orders = ss.getSheetByName('orders')
+    if (!orders) orders = ss.insertSheet('orders')
+    if (orders.getLastRow() === 0) {
+      orders.appendRow(['orderRef', 'createdAt', 'status', 'itemsJson', 'total',
+        'name', 'email', 'phone', 'shipMethod', 'terminalId', 'terminalName',
+        'note', 'transactionId', 'paidAt', 'orderNumber'])
+    } else if (orders.getRange(1, 15).getValue() !== 'orderNumber') {
+      orders.getRange(1, 15).setValue('orderNumber') // migrate pre-existing tab
+    }
+
+    // Next number = max existing + 1, starting from 1001
+    var maxN = 1000
+    var vals = orders.getDataRange().getValues()
+    for (var r = 1; r < vals.length; r++) {
+      var n = parseInt(String(vals[r][14]), 10)
+      if (n > maxN) maxN = n
+    }
+    orderNumber = maxN + 1
+
+    orders.appendRow([
+      orderRef, new Date().toISOString(), 'PENDING', JSON.stringify(lines), total,
+      name, email, phone, shipMethod, terminalId, terminalName,
+      String(payload.note || '').slice(0, 500), '', '', orderNumber
+    ])
+  } finally {
+    lock.releaseLock()
+  }
 
   try {
     var paymentUrl = createPayment_(orderRef, total, email)
-    return json({ ok: true, orderRef: orderRef, paymentUrl: paymentUrl })
+    return json({ ok: true, orderRef: orderRef, orderNumber: orderNumber, paymentUrl: paymentUrl })
   } catch (err) {
     setOrderStatus_(ss, orderRef, 'FAILED', '', '')
     return json({ ok: false, error: 'payment init failed: ' + err.message })
@@ -329,6 +356,7 @@ function handleOrderStatus(e) {
     } catch (err) { /* leave empty on malformed itemsJson */ }
     return json({
       status:       String(data[i][2]),
+      orderNumber:  parseInt(String(data[i][14]), 10) || null,
       items:        items,
       total:        Number(data[i][4]) || 0,
       shipMethod:   String(data[i][8]),
@@ -378,7 +406,7 @@ function createPayment_(orderRef, total, email) {
         cancel_url:        { url: SITE_URL + '/kassa?makse=katkes', method: 'GET' },
         // Authoritative server-to-server result, independent of the user's
         // journey — must hit this web app (the only backend we have).
-        notifications_url: { url: selfUrl, method: 'POST' },
+        notification_url: { url: selfUrl, method: 'POST' },
       },
     },
     customer: {
@@ -420,7 +448,7 @@ function createPayment_(orderRef, total, email) {
 
 /**
  * Maksekeskus callback (both customer return POSTs and the async
- * notifications_url hit this). MAC is verified BEFORE anything else; a bad
+ * notification_url hit this). MAC is verified BEFORE anything else; a bad
  * MAC is rejected. Idempotent: a repeated COMPLETED for an already-PAID
  * order does nothing (MK explicitly warns duplicates happen).
  */
@@ -491,6 +519,8 @@ function sendOrderEmails_(orderRow, orderRef) {
   var phone = String(orderRow[7])
   var shipMethod = String(orderRow[8])
   var terminalName = String(orderRow[10])
+  // Human-facing id; old rows without one fall back to the short ref.
+  var orderNo = parseInt(String(orderRow[14]), 10) || orderRef.slice(0, 8)
 
   var lines = []
   try {
@@ -501,24 +531,24 @@ function sendOrderEmails_(orderRow, orderRef) {
 
   try {
     MailApp.sendEmail(OWNER_EMAIL,
-      '💰 Uus tellimus — ' + total + ' € (' + orderRef.slice(0, 8) + ')',
+      '💰 Uus tellimus nr ' + orderNo + ' — ' + total + ' €',
       'Uus makstud tellimus:\n\n' + lines.join('\n') +
       '\n\nKokku: ' + total + ' €' +
       '\n\nKlient: ' + name + '\nE-post: ' + email + '\nTelefon: ' + phone +
       '\nTarne: ' + shipMethod + ' — ' + terminalName +
-      '\n\nTellimuse nr: ' + orderRef)
+      '\n\nTellimuse nr: ' + orderNo + '\nSisemine viide: ' + orderRef)
   } catch (err) { /* owner alert must not block the callback ack */ }
 
   try {
     MailApp.sendEmail(email,
-      'Sinu tellimus on kinnitatud — Unevalem',
+      'Sinu tellimus nr ' + orderNo + ' on kinnitatud — Unevalem',
       'Tere, ' + name + '!\n\n' +
       'Aitäh tellimuse eest — makse on kinnitatud.\n\n' +
       'Sinu tellimus:\n' + lines.join('\n') +
       '\nKokku: ' + total + ' €\n\n' +
       'Tarne: ' + terminalName + ' (' + shipMethod + ')\n' +
       'Saadame paki teele ' + DELIVERY_DAYS + ' tööpäeva jooksul — pakiautomaadi koodi saad SMS-iga.\n\n' +
-      'Tellimuse number: ' + orderRef + '\n\n' +
+      'Tellimuse number: ' + orderNo + '\n\n' +
       'Küsimuste korral vasta sellele kirjale.\n\n' +
       'Head und!\nUnevalem — Costlio OÜ')
   } catch (err) { /* ditto */ }
@@ -592,8 +622,11 @@ function setupShop() {
     orders = ss.insertSheet('orders')
     orders.appendRow(['orderRef', 'createdAt', 'status', 'itemsJson', 'total',
       'name', 'email', 'phone', 'shipMethod', 'terminalId', 'terminalName',
-      'note', 'transactionId', 'paidAt'])
+      'note', 'transactionId', 'paidAt', 'orderNumber'])
     Logger.log('created orders tab')
+  } else if (orders.getRange(1, 15).getValue() !== 'orderNumber') {
+    orders.getRange(1, 15).setValue('orderNumber')
+    Logger.log('orders: added orderNumber column')
   }
 
   var props = PropertiesService.getScriptProperties()

@@ -373,7 +373,7 @@ export const shop = {
     deliveryLabel: 'Tarne',
     emailNote: 'Saatsime tellimuse kinnituse ka sinu e-postile.',
     paid: 'Makse on kinnitatud. Saadame sulle e-postiga tellimuse kinnituse.',
-    pending: 'Ootame maksekinnitust — see võib võtta mõne minuti. Värskenda lehte või kontrolli hiljem e-posti.',
+    pending: 'Ootame maksekinnitust — see võtab tavaliselt vaid hetke. Leht uueneb automaatselt.',
     failed: 'Makse ei õnnestunud või katkestati. Kui see on eksitus, proovi uuesti või kirjuta meile.',
     delivery: 'Tarne: 2–5 tööpäeva jooksul pärast makse kinnitust.',
     orderRefLabel: 'Tellimuse number',

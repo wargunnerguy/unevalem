@@ -21,6 +21,11 @@ interface OrderSummary {
   terminalName: string
 }
 const order = ref<OrderSummary | null>(null)
+const orderNumber = ref<number | null>(null)
+
+// Human-facing id: the short numeric order number when the backend provides
+// it, otherwise the raw ref (old orders).
+const displayOrderId = computed(() => orderNumber.value ?? orderRef.value)
 
 const carrierNames: Record<string, string> = {
   omniva: 'Omniva pakiautomaat',
@@ -41,12 +46,13 @@ async function fetchStatus() {
   const url = useRuntimeConfig().public.sheetsApiUrl as string
   try {
     const res = await fetch(`${url}?action=order_status&ref=${encodeURIComponent(orderRef.value)}`)
-    const data = await res.json() as { status?: string } & Partial<OrderSummary>
+    const data = await res.json() as { status?: string; orderNumber?: number } & Partial<OrderSummary>
     const s = String(data.status ?? '').toUpperCase()
     if (s === 'PAID') status.value = 'paid'
     else if (s === 'PENDING') status.value = 'pending'
     else if (s === 'CANCELLED' || s === 'EXPIRED' || s === 'FAILED') status.value = 'failed'
     else status.value = 'unknown'
+    if (data.orderNumber) orderNumber.value = Number(data.orderNumber)
     // Older script versions return only {status} — the summary is optional.
     if (Array.isArray(data.items) && data.items.length) {
       order.value = {
@@ -61,7 +67,24 @@ async function fetchStatus() {
   }
 }
 
-onMounted(fetchStatus)
+// The payment notification is asynchronous, so the order is often still
+// PENDING when the buyer lands here. Poll until it resolves (or ~2 min).
+let pollTimer: ReturnType<typeof setInterval> | null = null
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null }
+}
+onMounted(async () => {
+  await fetchStatus()
+  if (status.value === 'paid' || status.value === 'failed' || !orderRef.value) return
+  const startedAt = Date.now()
+  pollTimer = setInterval(async () => {
+    await fetchStatus()
+    if (status.value === 'paid' || status.value === 'failed' || Date.now() - startedAt > 120_000) {
+      stopPolling()
+    }
+  }, 5000)
+})
+onUnmounted(stopPolling)
 </script>
 
 <template>
@@ -72,7 +95,7 @@ onMounted(fetchStatus)
           {{ shop.thanks.heading }}
         </h1>
         <p v-if="orderRef" class="mt-3 text-sm text-lavender/70">
-          {{ shop.thanks.orderRefLabel }}: <span class="font-mono text-lavender">{{ orderRef }}</span>
+          {{ shop.thanks.orderRefLabel }}: <span class="font-mono text-lavender">{{ displayOrderId }}</span>
         </p>
       </div>
     </div>
