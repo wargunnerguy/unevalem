@@ -64,7 +64,10 @@ export default defineNuxtConfig({
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
     head: {
-      htmlAttrs: { lang: 'et' },
+      // Dark is the default theme: rendered into the static HTML so first
+      // paint is dark with no flash; the inline script below strips it only
+      // for visitors who explicitly chose light.
+      htmlAttrs: { lang: 'et', class: 'dark' },
       // Default browser-tab title; every page overrides it via useHead. Guards
       // against an untitled route ever showing a stale/blank tab name.
       title: 'Unevalem',
@@ -85,6 +88,10 @@ export default defineNuxtConfig({
         // page claim the homepage as canonical and suppress article indexing).
       ],
       script: [
+        // Runs before paint: honour a stored explicit "light" choice.
+        {
+          innerHTML: ';(function(){try{if(localStorage.getItem("unevalem-theme")==="light")document.documentElement.classList.remove("dark")}catch(e){}})()',
+        },
         {
           defer: true,
           'data-domain': 'unevalem.ee',

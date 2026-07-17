@@ -1,16 +1,12 @@
 export function useTheme() {
-  const isDark = useState<boolean>('theme-dark', () => false)
-
-  function shouldAutoDark(): boolean {
-    const hour = new Date().getHours()
-    return hour >= 21 || hour < 7
-  }
+  // Dark is the site default; a stored manual choice is the only thing that
+  // overrides it. (Was time-based auto-dark — replaced 2026-07-17.)
+  const isDark = useState<boolean>('theme-dark', () => true)
 
   function initTheme() {
     if (!import.meta.client) return
     const stored = localStorage.getItem('unevalem-theme')
-    // Manual preference wins; if none stored, use time-based default (dark 21:00–06:59)
-    const dark = stored !== null ? stored === 'dark' : shouldAutoDark()
+    const dark = stored !== null ? stored === 'dark' : true
     isDark.value = dark
     document.documentElement.classList.toggle('dark', dark)
   }
