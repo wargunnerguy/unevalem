@@ -1,0 +1,55 @@
+name: Deploy staging (test.unevalem.ee)
+
+# Every push to dev rebuilds the staging site. Production (unevalem.ee)
+# only changes when dev is merged into main — deploy.yml handles that.
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Fetch content from Google Sheets (Apps Script proxy)
+        run: npm run fetch-content
+        env:
+          SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
+
+      - name: Keep staging out of search engines
+        run: |
+          printf 'User-agent: *\nDisallow: /\n' > public/robots.txt
+
+      - name: Generate static site
+        run: npm run generate
+        env:
+          NUXT_APP_BASE_URL: /
+          NUXT_PUBLIC_SITE_URL: https://test.unevalem.ee
+
+      - name: Add staging CNAME
+        run: echo 'test.unevalem.ee' > .output/public/CNAME
+
+      - name: Publish to unevalem-test
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          deploy_key: ${{ secrets.STAGING_DEPLOY_KEY }}
+          external_repository: wargunnerguy/unevalem-test
+          publish_branch: gh-pages
+          publish_dir: .output/public
