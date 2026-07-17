@@ -134,3 +134,19 @@ h1, h2, h3, h4, h5, h6 {
   --tw-prose-th-borders: rgba(91, 163, 176, 0.3);
   --tw-prose-td-borders: rgba(91, 163, 176, 0.2);
 }
+
+/* Eased theme change: this class is stamped on <html> by useTheme.setTheme()
+   for the duration of the switch only — a permanent global transition would
+   make normal hover/focus color changes feel laggy. */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    fill 0.45s ease,
+    stroke 0.45s ease,
+    box-shadow 0.45s ease !important;
+}

@@ -11,10 +11,20 @@ export function useTheme() {
     document.documentElement.classList.toggle('dark', dark)
   }
 
+  let transitionTimer: ReturnType<typeof setTimeout> | null = null
+
   function setTheme(dark: boolean) {
     if (!import.meta.client) return
+    const root = document.documentElement
+    // Ease every themed color for the duration of the switch (CSS in
+    // main.css scoped to html.theme-transition), then drop the class so
+    // normal interactions stay snappy.
+    root.classList.add('theme-transition')
+    if (transitionTimer) clearTimeout(transitionTimer)
+    transitionTimer = setTimeout(() => root.classList.remove('theme-transition'), 500)
+
     isDark.value = dark
-    document.documentElement.classList.toggle('dark', dark)
+    root.classList.toggle('dark', dark)
     localStorage.setItem('unevalem-theme', dark ? 'dark' : 'light')
   }
 
