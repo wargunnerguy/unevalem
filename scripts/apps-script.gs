@@ -307,7 +307,12 @@ function handleCreateOrder(ss, payload) {
   }
 }
 
-/** /aitah polls this: returns only the status string for a given order ref. */
+/**
+ * /aitah polls this: order status + a safe summary (items, total, delivery).
+ * The ref is an unguessable UUID and acts as the access token. Name, email
+ * and phone are deliberately NOT returned — those live only in the
+ * confirmation email.
+ */
 function handleOrderStatus(e) {
   var ref = String(e.parameter.ref || '').trim()
   if (!ref) return json({ error: 'missing ref' })
@@ -315,7 +320,22 @@ function handleOrderStatus(e) {
   if (!orders) return json({ error: 'not found' })
   var data = orders.getDataRange().getValues()
   for (var i = 1; i < data.length; i++) {
-    if (String(data[i][0]) === ref) return json({ status: String(data[i][2]) })
+    if (String(data[i][0]) !== ref) continue
+    var items = []
+    try {
+      items = JSON.parse(String(data[i][3])).map(function (l) {
+        return { name: l.name, qty: l.qty, price: l.price }
+      })
+    } catch (err) { /* leave empty on malformed itemsJson */ }
+    return json({
+      status:       String(data[i][2]),
+      items:        items,
+      total:        Number(data[i][4]) || 0,
+      shipMethod:   String(data[i][8]),
+      terminalName: String(data[i][10]),
+      createdAt:    String(data[i][1]),
+      paidAt:       String(data[i][13] || ''),
+    })
   }
   return json({ error: 'not found' })
 }

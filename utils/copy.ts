@@ -368,6 +368,10 @@ export const shop = {
   thanks: {
     metaTitle: 'Aitäh! | Unevalem',
     heading: 'Aitäh! Sinu tellimus on kirjas.',
+    summaryHeading: 'Sinu tellimus',
+    totalLabel: 'Kokku',
+    deliveryLabel: 'Tarne',
+    emailNote: 'Saatsime tellimuse kinnituse ka sinu e-postile.',
     paid: 'Makse on kinnitatud. Saadame sulle e-postiga tellimuse kinnituse.',
     pending: 'Ootame maksekinnitust — see võib võtta mõne minuti. Värskenda lehte või kontrolli hiljem e-posti.',
     failed: 'Makse ei õnnestunud või katkestati. Kui see on eksitus, proovi uuesti või kirjuta meile.',
