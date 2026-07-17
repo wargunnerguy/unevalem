@@ -7,7 +7,20 @@ useHead({
 })
 
 const route = useRoute()
-const orderRef = computed(() => String(route.query.ref ?? '').trim())
+// On the prerendered static build route.query can still be empty when the
+// component mounts (it fills in just after hydration) — window.location is
+// the ground truth, so fall back to it on the client.
+const orderRef = computed(() => {
+  const fromRoute = String(route.query.ref ?? '').trim()
+  if (fromRoute) return fromRoute
+  if (import.meta.client) {
+    return String(new URLSearchParams(window.location.search).get('ref') ?? '').trim()
+  }
+  return ''
+})
+
+// Captured at setup: composables are not callable from timer callbacks.
+const sheetsApiUrl = useRuntimeConfig().public.sheetsApiUrl as string
 
 // Server-verified status only: the page never claims "paid" based on the
 // return redirect alone — the Apps Script checks its own MAC-verified state.
@@ -42,10 +55,11 @@ const { clear } = useCart()
 watch(status, (s) => { if (s === 'paid') clear() })
 
 async function fetchStatus() {
-  if (!orderRef.value) { status.value = 'unknown'; return }
-  const url = useRuntimeConfig().public.sheetsApiUrl as string
+  // No ref yet: the static-host redirect + hydration can briefly leave the
+  // URL without its query string — stay in 'loading' and let the poll retry.
+  if (!orderRef.value) return
   try {
-    const res = await fetch(`${url}?action=order_status&ref=${encodeURIComponent(orderRef.value)}`)
+    const res = await fetch(`${sheetsApiUrl}?action=order_status&ref=${encodeURIComponent(orderRef.value)}`)
     const data = await res.json() as { status?: string; orderNumber?: number } & Partial<OrderSummary>
     const s = String(data.status ?? '').toUpperCase()
     if (s === 'PAID') status.value = 'paid'
@@ -69,20 +83,29 @@ async function fetchStatus() {
 
 // The payment notification is asynchronous, so the order is often still
 // PENDING when the buyer lands here. Poll until it resolves (or ~2 min).
+// The poll starts unconditionally: at mount the query string may not have
+// settled yet (see fetchStatus), so a single up-front check can't be trusted.
 let pollTimer: ReturnType<typeof setInterval> | null = null
 function stopPolling() {
   if (pollTimer) { clearInterval(pollTimer); pollTimer = null }
 }
-onMounted(async () => {
-  await fetchStatus()
-  if (status.value === 'paid' || status.value === 'failed' || !orderRef.value) return
+onMounted(() => {
+  fetchStatus()
+  // React the moment the router surfaces the ref (usually within a tick).
+  watch(orderRef, (ref) => { if (ref) fetchStatus() })
   const startedAt = Date.now()
   pollTimer = setInterval(async () => {
+    // Genuinely ref-less visit: give the URL 5s to settle, then stop guessing.
+    if (!orderRef.value && Date.now() - startedAt > 5000) {
+      status.value = 'unknown'
+      stopPolling()
+      return
+    }
     await fetchStatus()
     if (status.value === 'paid' || status.value === 'failed' || Date.now() - startedAt > 120_000) {
       stopPolling()
     }
-  }, 5000)
+  }, 3000)
 })
 onUnmounted(stopPolling)
 </script>
