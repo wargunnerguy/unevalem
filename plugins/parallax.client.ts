@@ -11,9 +11,10 @@ export default defineNuxtPlugin(() => {
   function update() {
     ticking = false
     const y = window.scrollY
-    root.style.setProperty('--sleep-y1', `${-y * 0.10}px`) // far, slowest
-    root.style.setProperty('--sleep-y2', `${-y * 0.25}px`) // mid
-    root.style.setProperty('--sleep-y3', `${-y * 0.45}px`) // near, fastest
+    root.style.setProperty('--sleep-y1', `${-y * 0.10}px`) // far icons, slowest
+    root.style.setProperty('--sleep-y2', `${-y * 0.25}px`) // mid icons
+    root.style.setProperty('--sleep-y4', `${-y * 0.32}px`) // fog drift
+    root.style.setProperty('--sleep-y3', `${-y * 0.45}px`) // near icons, fastest
   }
 
   window.addEventListener('scroll', () => {
