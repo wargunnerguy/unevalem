@@ -25,6 +25,23 @@ watch(post, (p) => {
   }
 }, { immediate: true })
 
+// GA4 scroll depth: fire once per threshold per article view.
+const scrollFired = new Set<number>()
+function onScrollDepth() {
+  const doc = document.documentElement
+  const scrollable = doc.scrollHeight - window.innerHeight
+  if (scrollable <= 0) return
+  const pct = Math.round((window.scrollY / scrollable) * 100)
+  for (const threshold of [25, 50, 75, 90]) {
+    if (pct >= threshold && !scrollFired.has(threshold)) {
+      scrollFired.add(threshold)
+      gaEvent('article_scroll', { slug, depth: threshold })
+    }
+  }
+}
+onMounted(() => window.addEventListener('scroll', onScrollDepth, { passive: true }))
+onUnmounted(() => window.removeEventListener('scroll', onScrollDepth))
+
 const relatedPosts = computed<Post[]>(() => {
   if (!post.value) return []
   return posts.value

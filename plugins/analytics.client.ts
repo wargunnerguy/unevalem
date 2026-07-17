@@ -23,8 +23,10 @@ export default defineNuxtPlugin(() => {
     analytics_storage: consent.value === 'denied' ? 'denied' : 'granted',
   })
 
+  // send_page_view off: the router hook below fires on the initial route too,
+  // so letting config also send one would double-count every landing.
   window.gtag('js', new Date())
-  window.gtag('config', gaId, { anonymize_ip: true })
+  window.gtag('config', gaId, { anonymize_ip: true, send_page_view: false })
 
   const script = document.createElement('script')
   script.async = true

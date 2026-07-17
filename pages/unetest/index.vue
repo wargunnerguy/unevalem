@@ -40,7 +40,10 @@ const { saveQuizResult } = useQuizHistory()
 watch(
   () => (phase.value === 'result' ? result.value : null),
   (r) => {
-    if (r && quiz.value) saveQuizResult(quiz.value.id, r.key)
+    if (r && quiz.value) {
+      saveQuizResult(quiz.value.id, r.key)
+      gaEvent('quiz_completed', { quiz_id: quiz.value.id, result_key: r.key, score: totalScore.value })
+    }
   },
 )
 

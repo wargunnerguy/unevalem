@@ -1,5 +1,13 @@
 import type { UserProfile, CalculatorResult, CalcType } from '~/types'
 
+// GA4 custom event, no-op when gtag is absent (GA disabled or blocked).
+// Consent Mode v2 handles the cookie side: when analytics_storage is denied
+// the hit goes out cookieless, so no extra gating is needed here.
+export function gaEvent(name: string, params: Record<string, string | number> = {}) {
+  if (!import.meta.client || typeof window.gtag !== 'function') return
+  window.gtag('event', name, params)
+}
+
 export function useAnalytics() {
   const { variant, sessionId } = useABTest()
   const config = useRuntimeConfig()

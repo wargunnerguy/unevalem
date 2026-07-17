@@ -15,6 +15,7 @@ const { step, answers, result, analyzing, selectOption, submitQuiz, restore, fin
 const { products } = useProducts()
 const { variant } = useABTest()
 const { submitCalcResult, resetSubmitted } = useAnalytics()
+// gaEvent is auto-imported from composables/useAnalytics
 const {
   siteProfile, activeCalcType, completedCount, allDone,
   syncActiveCalcType, getNextAfter, storeCompletion, getPrefilledAnswers,
@@ -89,6 +90,11 @@ watch(step, (val, prev) => {
     const productName = result.value.recommendations[0]?.name ?? ''
     storeCompletion(activeCalcType.value, answers.value, productName)
     submitCalcResult(answers.value, result.value, activeCalcType.value)
+    gaEvent('calc_result_shown', {
+      calc_type: activeCalcType.value,
+      score: result.value.currentScore,
+      recommended: result.value.recommendations[0]?.id ?? 'none',
+    })
   }
   if (val === 1 && prev && prev > 1) resetSubmitted()
 })
@@ -101,6 +107,8 @@ const transitionName = computed(() => goingForward.value ? 'slide-left' : 'slide
 function handleSelect(value: string) {
   const key = stepKeys.value[step.value - 1]
   const isLastStep = step.value === totalSteps.value
+  if (step.value === 1) gaEvent('calc_started', { calc_type: activeCalcType.value })
+  gaEvent('calc_step_completed', { calc_type: activeCalcType.value, step: step.value })
   selectOption(key as keyof typeof answers.value, value, totalSteps.value)
   if (isLastStep) {
     setTimeout(() => submitQuiz(products.value ?? [], activeCalcType.value), 350)

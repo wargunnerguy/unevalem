@@ -114,6 +114,7 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
             target="_blank"
             rel="noopener"
             class="text-xs font-medium text-midnight underline underline-offset-2 hover:text-dusk"
+            @click="gaEvent('recommendation_clicked', { product_id: mainRec.id, calc_type: calcType })"
           >
             Vaata toodet →
           </a>
