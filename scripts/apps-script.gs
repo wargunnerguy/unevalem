@@ -36,9 +36,9 @@ function json(obj) {
 var OWNER_EMAIL = 'reimovellemaa@gmail.com'
 // Public site origin for payment return redirects.
 var SITE_URL = 'https://unevalem.ee'
-// Estimated delivery shown in the customer confirmation email. Placeholder —
-// set a real number before going live.
-var DELIVERY_DAYS = '{X}'
+// Estimated delivery shown in the customer confirmation email. Must match the
+// promise in müügitingimused (§4) and on /aitah.
+var DELIVERY_DAYS = '2–5'
 
 function doGet(e) {
   // Order status for the /aitah page: server-verified state only, no PII.
@@ -505,4 +505,76 @@ function bytesToHex_(bytes) {
     var v = (b < 0 ? b + 256 : b).toString(16)
     return v.length === 1 ? '0' + v : v
   }).join('')
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ONE-TIME ADMIN HELPERS — run manually from the Apps Script editor
+// (select the function in the toolbar dropdown → Run). Not reachable over
+// the web app; they exist so sheet setup doesn't require hand-pasting.
+// ═══════════════════════════════════════════════════════════════════════════
+
+var REPO_RAW = 'https://raw.githubusercontent.com/wargunnerguy/unevalem/main'
+
+/**
+ * Imports scripts/sources-import.tsv from the repo into the `sources` tab
+ * (slug | title | url). Replaces the tab's contents — safe to re-run.
+ */
+function importSources() {
+  var tsv = UrlFetchApp.fetch(REPO_RAW + '/scripts/sources-import.tsv').getContentText()
+  var rows = tsv.trim().split('\n').map(function (line) {
+    var parts = line.split('\t')
+    return [parts[0] || '', parts[1] || '', parts[2] || '']
+  })
+  var ss = SpreadsheetApp.getActiveSpreadsheet()
+  var tab = ss.getSheetByName('sources')
+  if (!tab) tab = ss.insertSheet('sources')
+  tab.clearContents()
+  tab.getRange(1, 1, 1, 3).setValues([['slug', 'title', 'url']])
+  tab.getRange(2, 1, rows.length, 3).setValues(rows)
+  Logger.log('Imported ' + rows.length + ' source rows into the sources tab')
+}
+
+/**
+ * Prepares the shop side of the spreadsheet:
+ *  - adds an `available` column to inventory if missing (blank = waitlist mode)
+ *  - creates waitlist + orders tabs with headers (kept out of the GET allowlist)
+ * Safe to re-run; never overwrites existing data.
+ */
+function setupShop() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet()
+
+  var inv = ss.getSheetByName('inventory')
+  if (inv) {
+    var headers = inv.getRange(1, 1, 1, inv.getLastColumn()).getValues()[0]
+    if (headers.indexOf('available') === -1) {
+      inv.getRange(1, inv.getLastColumn() + 1).setValue('available')
+      Logger.log('inventory: added "available" column — tick TRUE per product to enable purchase')
+    } else {
+      Logger.log('inventory: "available" column already present')
+    }
+  } else {
+    Logger.log('WARNING: no inventory tab found')
+  }
+
+  var waitlist = ss.getSheetByName('waitlist')
+  if (!waitlist) {
+    waitlist = ss.insertSheet('waitlist')
+    waitlist.appendRow(['createdAt', 'email', 'productId'])
+    Logger.log('created waitlist tab')
+  }
+
+  var orders = ss.getSheetByName('orders')
+  if (!orders) {
+    orders = ss.insertSheet('orders')
+    orders.appendRow(['orderRef', 'createdAt', 'status', 'itemsJson', 'total',
+      'name', 'email', 'phone', 'shipMethod', 'terminalId', 'terminalName',
+      'note', 'transactionId', 'paidAt'])
+    Logger.log('created orders tab')
+  }
+
+  var props = PropertiesService.getScriptProperties()
+  if (!props.getProperty('MK_SHOP_ID')) {
+    Logger.log('REMINDER: set Script Properties MK_SHOP_ID, MK_SECRET_KEY, MK_ENV=test ' +
+      '(Project Settings → Script properties) before testing checkout')
+  }
 }

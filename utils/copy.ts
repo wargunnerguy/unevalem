@@ -370,7 +370,7 @@ export const shop = {
     paid: 'Makse on kinnitatud. Saadame sulle e-postiga tellimuse kinnituse.',
     pending: 'Ootame maksekinnitust — see võib võtta mõne minuti. Värskenda lehte või kontrolli hiljem e-posti.',
     failed: 'Makse ei õnnestunud või katkestati. Kui see on eksitus, proovi uuesti või kirjuta meile.',
-    delivery: 'Tarne: {X} tööpäeva jooksul pärast makse kinnitust.',
+    delivery: 'Tarne: 2–5 tööpäeva jooksul pärast makse kinnitust.',
     orderRefLabel: 'Tellimuse number',
     backHome: 'Tagasi avalehele →',
   },
@@ -511,39 +511,75 @@ export const footer = {
     about: 'Meist',
     terms: 'Müügitingimused',
   },
-  // Legal identity line. {REGIKOOD}/{EMAIL} are placeholders the user fills in.
+  // Legal identity line (registrikood from e-Äriregister, 2026-07-17).
   // Costlio OÜ is NOT VAT-registered: never render "sisaldab käibemaksu",
   // "km-ga" or any VAT wording anywhere on the site — prices are final as-is.
-  legal: 'Unevalem — Costlio OÜ · registrikood {REGIKOOD} · e-post {EMAIL}',
+  // info@unevalem.ee: domain has MX (Elkdata) — make sure the mailbox/forward
+  // actually exists before the first sale.
+  legal: 'Unevalem — Costlio OÜ · registrikood 14562345 · e-post info@unevalem.ee',
 }
 
 export const aboutPage = {
   metaTitle: 'Meist | Unevalem',
   metaDescription: 'Kes teeb Unevalemit, miks see olemas on ja kuidas see end rahastab.',
   heading: 'Meist',
-  // PLACEHOLDER STRUCTURE — the user writes the final copy. Keep headings.
   sections: [
     {
       id: 'kes',
       heading: 'Kes me oleme',
-      body: 'Unevalem on Eesti unehariduse leht, mida teeb Costlio OÜ. [Kasutaja kirjutab siia lõpliku teksti: kes lehte teeb ja miks just uni.]',
+      body: 'Unevalem on Eesti unehariduse leht, mida teeb väike Eesti ettevõte Costlio OÜ. Meid ajendas lihtne tähelepanek: eestikeelset, teaduspõhist ja ausalt kirjutatud uneinfot on veebis üllatavalt vähe — küll aga leidub palju müügijuttu, mis esitleb end nõuandena. Tahtsime teha lehe, mida ise oleksime uneprobleemide korral lugeda tahtnud.',
     },
     {
       id: 'miks',
       heading: 'Miks Unevalem on olemas',
-      body: 'Meie põhimõte on lihtne: kõigepealt harime, alles siis müüme. Kui õpid siit midagi kasulikku ja ostad padja hoopis mujalt — ka see on hea tulemus. [Kasutaja täiendab.]',
+      body: 'Meie põhimõte on lihtne: kõigepealt harime, alles siis müüme. Iga artikkel toetub avaldatud uneuuringutele ja iga artikli lõpus on viide algallikale, et saaksid ise järele kontrollida. Kui õpid siit midagi kasulikku ja ostad padja hoopis mujalt — ka see on meie jaoks hea tulemus. Usaldus on ainus asi, mida unenõuannete leht päriselt omab.',
     },
     {
       id: 'rahastus',
       heading: 'Kuidas Unevalem end rahastab',
-      body: 'Unevalem müüb osa soovitatud toodetest ise — see on meie ainus tuluallikas. Kalkulaatori ja artiklite soovitused sünnivad sinu vastuste ja uneuuringute, mitte müügihuvi põhjal: iga soovituse juures on märgitud, kas tegu on meie enda või välise poe tootega, ja kui sul pole midagi vaja, ütleb kalkulaator sedagi. [Kasutaja täiendab: marginaalid, väliste linkide põhimõte.]',
+      body: 'Unevalem müüb osa soovitatud toodetest ise — see on meie ainus tuluallikas. Reklaame me ei näita ja andmeid me ei müü.\n\nEt see ei muudaks meie soovitusi kallutatuks, kehtivad kolm reeglit. Esiteks: kalkulaatori ja artiklite soovitused sünnivad sinu vastuste ja uneuuringute, mitte müügihuvi põhjal. Teiseks: iga soovituse juures on selgelt märgitud, kas tegu on meie enda tootega („Unevalemi toode") või välise poe omaga („Väline pood"). Kolmandaks: kui sinu vastustest selgub, et sul pole midagi vaja osta, ütleb kalkulaator sedagi — otse ja ilma „aga äkki siiski" müüginurgata.',
     },
   ],
 }
 
 export const termsPage = {
   metaTitle: 'Müügitingimused | Unevalem',
-  metaDescription: 'Unevalemi e-poe müügitingimused.',
+  metaDescription: 'Unevalemi e-poe müügitingimused: tellimine, maksmine, tarne, taganemisõigus ja pretensioonid.',
   heading: 'Müügitingimused',
-  placeholder: 'Müügitingimused on koostamisel ja avaldatakse enne esimese tellimuse vastuvõtmist. Küsimuste korral kirjuta {EMAIL}.',
+  // Standard VÕS-based e-shop terms. Not lawyer-reviewed — worth a once-over
+  // by a professional before serious volume. No VAT wording (not registered).
+  sections: [
+    {
+      heading: '1. Üldsätted',
+      body: 'Veebipoe unevalem.ee (edaspidi: e-pood) omanik ja müüja on Costlio OÜ (registrikood 14562345, e-post info@unevalem.ee). Tingimused kehtivad kõigi e-poest ostetud kaupade kohta ning tellimuse vormistamisega kinnitab ostja, et on tingimustega tutvunud ja nendega nõus.',
+    },
+    {
+      heading: '2. Hinnad',
+      body: 'Kõik hinnad on eurodes ja lõplikud. Tarne pakiautomaati sisaldub hinnas, kui tellimuse vormistamisel ei ole märgitud teisiti. Müüjal on õigus hindu muuta; tellimusele kehtib hind, mis kehtis tellimuse vormistamise hetkel.',
+    },
+    {
+      heading: '3. Tellimine ja maksmine',
+      body: 'Tellimus vormistatakse e-poe ostukorvi kaudu. Maksmine toimub turvaliselt Maksekeskus AS-i vahendusel (pangalingid ja pangakaardid). Leping loetakse sõlmituks, kui tellimuse summa on laekunud müüja arvelduskontole. Kui tellitud kaupa ei ole võimalik tarnida, teavitab müüja ostjat esimesel võimalusel ja tagastab makse hiljemalt 14 päeva jooksul.',
+    },
+    {
+      heading: '4. Tarne',
+      body: 'Kaubad saadetakse ostja valitud pakiautomaati 2–5 tööpäeva jooksul pärast makse kinnitust. Pakiautomaadi saabumiskoodi saad SMS-iga. Kui tellimus hilineb, anname sellest e-posti teel teada.',
+    },
+    {
+      heading: '5. Taganemisõigus',
+      body: 'Ostjal on õigus e-poest ostetud kaubast taganeda 14 päeva jooksul alates kauba kättesaamisest, saates avalduse aadressile info@unevalem.ee. Tagastatav kaup peab olema kasutamata, rikkumata ja originaalpakendis. Hügieenilistel põhjustel ei kuulu tagastamisele avatud pakendiga padjad, tekid ja voodipesu (VÕS § 53 lg 4). Tagastamise otsesed kulud kannab ostja. Makse tagastame hiljemalt 14 päeva jooksul pärast kauba tagasijõudmist.',
+    },
+    {
+      heading: '6. Pretensioonid',
+      body: 'Ostjal on õigus esitada kauba puuduse korral pretensioon kahe aasta jooksul alates kauba kättesaamisest (VÕS § 218). Pretensioon tuleb saata aadressile info@unevalem.ee koos tellimuse numbri ja puuduse kirjeldusega. Puudusega kauba parandame, asendame või tagastame makse.',
+    },
+    {
+      heading: '7. Vaidluste lahendamine',
+      body: 'Küsimused ja mured lahendame eelkõige läbirääkimiste teel — kirjuta info@unevalem.ee. Kui kokkulepet ei sünni, on ostjal õigus pöörduda Tarbijakaitse ja Tehnilise Järelevalve Ameti tarbijavaidluste komisjoni (ttja.ee) või Euroopa Liidu ODR-platvormi (ec.europa.eu/odr) poole.',
+    },
+    {
+      heading: '8. Isikuandmed',
+      body: 'Tellimuse täitmiseks kasutame ostja nime, e-posti, telefoninumbrit ja valitud pakiautomaati. Andmete töötlemisest loe lähemalt privaatsuspoliitikast.',
+    },
+  ],
 }

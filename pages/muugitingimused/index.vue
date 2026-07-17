@@ -19,8 +19,11 @@ useHead({
       </div>
     </div>
 
-    <div class="max-w-2xl mx-auto px-4 py-10">
-      <p class="text-sm text-midnight leading-relaxed">{{ termsPage.placeholder }}</p>
+    <div class="max-w-2xl mx-auto px-4 py-10 space-y-8">
+      <section v-for="section in termsPage.sections" :key="section.heading">
+        <h2 class="font-heading text-xl text-midnight mb-2">{{ section.heading }}</h2>
+        <p class="text-sm text-midnight leading-relaxed whitespace-pre-line">{{ section.body }}</p>
+      </section>
     </div>
   </div>
 </template>
