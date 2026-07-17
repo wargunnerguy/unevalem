@@ -750,3 +750,67 @@ SHEETS_API_URL=https://script.google.com/macros/s/LONG_ID/exec
 ### dev without credentials
 If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
 `public/data/*.json` and exit cleanly so `npm run dev` still works.
+
+### 2026-07-17 — Honesty overhaul + full shop (overrides anything above)
+
+**Corrections to stale sections above:**
+- Quiz page path is `pages/unetest/index.vue` (not /viktoriin); nav label "Unetest".
+- The calculator is THREE sequential 8-step calculators (pillow → blanket →
+  mattress funnel via `useCalcSession`), not the single 5-step flow described
+  above. Result screen leads with score + `profileSummary` (advice), tips next,
+  products LAST in a compact section — never restore product-first layout.
+- Fonts: Plus Jakarta Sans (headings) + Inter (body), not DM Serif Display.
+- NO fabricated social proof: the homepage stats strip was replaced by three
+  static value claims (Teaduspõhine / Eesti oma / Tasuta) in `homepage.valueClaims`.
+  Never reintroduce fake counters or ratings. Purchase-toast notifications stay
+  sheet-gated (`active` flag).
+- Analytics: Plausible + GA4 (`G-D921C30JEQ`, Consent Mode v2, opt-out).
+  `gaEvent()` in composables/useAnalytics.ts; funnel + shop + scroll + quiz
+  events are instrumented. `send_page_view:false` — the router hook emits
+  page_views; don't re-enable both (double-counting).
+
+**Legal identity (facts, do not change):**
+- Owner: Costlio OÜ, registrikood 14562345. Contact: **unevalem@gmail.com**
+  (also Apps Script OWNER_EMAIL for order alerts).
+- NOT VAT-registered — never render "sisaldab käibemaksu"/"km-ga"; prices are
+  final. Delivery promise everywhere: 2–5 tööpäeva.
+- Pages: /meist (who/why/funding — disclosure links to #rahastus), /muugitingimused
+  (VÕS-based terms), /privaatsus. Footer carries the legal line + links.
+
+**Transparency rules (product surfaces):**
+- Every recommendation surface shows `disclosure.short` + badge
+  "Unevalemi toode" / "Väline pood" (derived from storeUrl host via
+  `utils/products.ts isExternalStore` — external = any non-unevalem.ee host).
+- Recommendation engine only suggests products matching ≥1 profile tag; a
+  zero-product result is a valid, intended outcome.
+
+**Shop (static frontend + Apps Script backend):**
+- Flow: /pood → useCart (localStorage `uva-cart`, ids+qty ONLY — prices are
+  never trusted from the client) → CartDrawer → /kassa (name/email/phone +
+  Omniva terminal dropdown + note) → Apps Script `create_order` (server-side
+  price lookup from inventory sheet, rejects unknown/inactive/unavailable)
+  → Maksekeskus gateway redirect → /aitah?ref=<uuid> polls `order_status`
+  and shows ONLY the server-verified status.
+- Inventory sheet has an `available` column: only explicit TRUE is purchasable;
+  blank/missing = waitlist mode ("Anna teada, kui saadaval" → waitlist tab).
+- Parcel terminals are fetched at BUILD time (fetch-content → 
+  public/data/terminals.json, ~408 Omniva rows) because browser CORS blocks
+  carrier APIs. SmartPosti has no public feed since the rebrand — the checkout
+  shows a carrier only if terminals.json contains rows for it.
+- Payment: Maksekeskus/MakeCommerce behind a swappable adapter in
+  scripts/apps-script.gs (`createPayment_`, `handlePaymentCallback`). Creds in
+  Script Properties (MK_SHOP_ID / MK_SECRET_KEY / MK_ENV=test|live), never in
+  code. Callbacks: MAC = UPPER(HEX(SHA512(json+secret))) verified BEFORE any
+  state change; idempotent on duplicate COMPLETED; only COMPLETED ⇒ PAID ⇒
+  MailApp emails owner + customer.
+- `orders` and `waitlist` tabs hold PII and are deliberately NOT in the Apps
+  Script GET allowlist. Never add them to SHEET_MAP.
+- Admin helpers in apps-script.gs (run manually in the editor): `importSources()`
+  pulls scripts/sources-import.tsv from the repo into the sources tab;
+  `setupShop()` adds the available column + waitlist/orders tabs.
+
+**Gotchas:**
+- @vueuse `useStorage` is NOT auto-imported in `composables/*.ts` during SSR
+  (only in .vue) — import it explicitly or every page 500s at prerender.
+- Backticks inside double-quoted `git commit -m` get command-substituted by
+  bash — use single quotes.
