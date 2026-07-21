@@ -57,6 +57,10 @@ export interface Product {
   category:    'pillow' | 'blanket' | 'mattress' | 'pillowcase' | 'duvetcover' | 'sheet'
   subcategory: string
   description: string
+  // Key facts a buyer needs before ordering (dimensions, weight, material).
+  // Filled from the inventory sheet's `specs` column; free text, e.g.
+  // "Mõõdud: 50×70 cm · Kaal: 800 g · Materjal: 100% bambuskiudtäidis".
+  specs?:      string
   price:       number
   priceText:   string
   imageUrl?:   string

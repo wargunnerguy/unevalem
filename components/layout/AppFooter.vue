@@ -1,7 +1,20 @@
 ﻿<script setup lang="ts">
-import { footer, nav } from '~/utils/copy'
+import { contact, footer, nav } from '~/utils/copy'
 
 const year = new Date().getFullYear()
+
+// Phone is decoded only in the browser so it's absent from the prerendered
+// HTML (scraper defence). raw "+37253447499" → display "+372 5344 7499".
+const phone = ref<{ display: string; href: string } | null>(null)
+onMounted(() => {
+  if (!contact.phoneEncoded) return
+  const raw = atob(contact.phoneEncoded)
+  const nat = raw.replace(/^\+372/, '')
+  const display = nat.length === 8
+    ? `+372 ${nat.slice(0, 4)} ${nat.slice(4)}`
+    : raw
+  phone.value = { display, href: `tel:${raw}` }
+})
 </script>
 
 <template>
@@ -54,6 +67,12 @@ const year = new Date().getFullYear()
 
       <div class="text-xs text-muted/60 mt-6 border-t border-dusk pt-4 space-y-1">
         <p>{{ footer.legal }}</p>
+        <ClientOnly>
+          <p v-if="phone">
+            {{ contact.phoneLabel }}:
+            <a :href="phone.href" class="hover:text-foam transition-colors">{{ phone.display }}</a>
+          </p>
+        </ClientOnly>
         <p>{{ footer.copyright(year) }}</p>
       </div>
 

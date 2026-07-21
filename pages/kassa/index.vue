@@ -69,7 +69,12 @@ const terminalOptions = computed(() =>
 const state = ref<'idle' | 'submitting' | 'error'>('idle')
 const errorMsg = ref('')
 
-const valid = computed(() =>
+// Terms consent — deliberately NOT persisted (kept out of the useStorage form)
+// so the buyer actively ticks it each time. Maksekeskus requires an explicit
+// opt-in before payment.
+const agreeTerms = ref(false)
+
+const contactValid = computed(() =>
   form.value.name.trim().length > 1
   && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.value.email.trim())
   && form.value.phone.trim().length >= 5
@@ -83,8 +88,12 @@ onMounted(() => {
 
 async function submit() {
   if (!count.value) return
-  if (!valid.value) {
+  if (!contactValid.value) {
     errorMsg.value = shop.checkout.required
+    return
+  }
+  if (!agreeTerms.value) {
+    errorMsg.value = shop.checkout.termsRequired
     return
   }
   errorMsg.value = ''
@@ -265,6 +274,20 @@ async function submit() {
 
           <!-- Submit -->
           <section class="space-y-3">
+            <!-- Mandatory terms consent (Maksekeskus requirement) -->
+            <label class="flex items-start gap-2.5 text-sm text-midnight cursor-pointer">
+              <input
+                v-model="agreeTerms"
+                type="checkbox"
+                required
+                class="mt-0.5 h-4 w-4 shrink-0 rounded border-lavender/50 text-gold focus:ring-lavender"
+              />
+              <span>
+                {{ shop.checkout.termsBefore }}
+                <NuxtLink to="/muugitingimused" target="_blank" class="underline underline-offset-2 hover:text-gold">{{ shop.checkout.termsLink }}</NuxtLink>{{ shop.checkout.termsAfter }}
+              </span>
+            </label>
+
             <p v-if="errorMsg" class="text-sm text-red-600">{{ errorMsg }}</p>
             <button
               type="submit"

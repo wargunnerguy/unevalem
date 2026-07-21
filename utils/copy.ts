@@ -27,6 +27,18 @@ export const common = {
   daysAgo:      'päeva tagasi',
 }
 
+export const contact = {
+  // Personal phone — kept OUT of the static HTML on purpose (light scraper
+  // defence). Stored base64-encoded; the footer assembles it only in the
+  // browser (onMounted), so plain-HTML scrapes, curl and the sitemap never
+  // contain it, while real visitors and reviewers see it normally.
+  // Decodes to +372 5344 7499. Set to '' to hide the phone everywhere.
+  phoneEncoded: 'KzM3MjUzNDQ3NDk5',
+  phoneLabel: 'Telefon',
+  emailLabel: 'E-post',
+  email: 'unevalem@gmail.com',
+}
+
 export const calculator = {
   version: 'v2.5',
   heroLabel: 'Leia oma ideaalne padi, tekk ja madrats — 3 lühikest testi',
@@ -364,6 +376,11 @@ export const shop = {
     terminalLoading: 'Laen pakiautomaate…',
     note: 'Märkus (valikuline)',
     gdpr: 'Kasutame sinu andmeid ainult selle tellimuse täitmiseks ja tarneks.',
+    // Mandatory terms consent before payment (Maksekeskus requirement).
+    termsBefore: 'Olen tutvunud ja nõustun ',
+    termsLink: 'müügitingimustega',
+    termsAfter: '.',
+    termsRequired: 'Palun nõustu müügitingimustega, et jätkata.',
     submit: 'Jätka maksmisega →',
     submitting: 'Saadan tellimust…',
     error: 'Tellimuse loomine ebaõnnestus — proovi uuesti või kirjuta meile.',
@@ -493,17 +510,31 @@ export const privacyPage = {
   metaTitle: 'Privaatsuspoliitika | Unevalem',
   metaDescription: 'Kuidas Unevalem kogub ja kasutab andmeid ning milliseid küpsiseid kasutame.',
   heading: 'Privaatsuspoliitika',
-  lastUpdated: 'Viimati uuendatud: 13. juuli 2026',
+  lastUpdated: 'Viimati uuendatud: 21. juuli 2026',
   intro:
-    'Sinu privaatsus on meile oluline. Siin selgitame lihtsalt ja ausalt, milliseid andmeid Unevalem kogub, miks ja kuidas saad seda ise kontrollida.',
+    'Sinu privaatsus on meile oluline. Siin selgitame lihtsalt ja ausalt, milliseid andmeid Unevalem kogub, miks ja kuidas saad seda ise kontrollida. Isikuandmete vastutav töötleja on Costlio OÜ (registrikood 14562345, e-post unevalem@gmail.com).',
   sections: [
     {
       heading: 'Milliseid andmeid kogume',
-      body: 'Unevalem ei küsi ega salvesta sinu nime, e-posti ega muid isikut tuvastavaid andmeid. Kogume ainult anonüümset statistikat lehe kasutuse kohta ning sinu unekalkulaatori vastuseid, et anda personaalseid soovitusi.',
+      body: 'Lehe hariduslik osa — artiklid, kalkulaator ja testid — ei nõua sisselogimist ega isikuandmeid. Isikuandmeid vajame ainult siis, kui vormistad e-poes tellimuse (vt „Ostud, maksed ja tarne"). Muul juhul kogume vaid anonüümset kasutusstatistikat ja sinu kalkulaatori vastuseid.',
       items: [
         'Kalkulaatori vastused (nt magamisasend, temperatuurieelistus) — hoitakse sinu seadmes küpsistes ja saadetakse meile üksnes anonüümselt koondstatistikana.',
         'Anonüümne külastusstatistika — milliseid lehti vaadatakse ja kust külastajad tulevad.',
       ],
+    },
+    {
+      heading: 'Ostud, maksed ja tarne',
+      body: 'Kui vormistad e-poes tellimuse, kogub ja töötleb Costlio OÜ tellimuse täitmiseks järgmisi andmeid:',
+      items: [
+        'Nimi, e-posti aadress ja telefoninumber — tellimuse kinnitamiseks ja sinuga ühenduse võtmiseks.',
+        'Valitud pakiautomaat ja võimalik tellimuse märkus — kauba kohaletoimetamiseks.',
+        'Makse teostab Maksekeskus AS (registrikood 12268475), kes on makseandmete iseseisev vastutav töötleja. Sinu kaardi- ja pangaandmeid me ise ei näe ega salvesta — need liiguvad üksnes Maksekeskuse turvalises maksekeskkonnas.',
+        'Kohaletoimetamiseks edastame nime ja pakiautomaadi valiku tarneteenuse pakkujale Omniva.',
+      ],
+    },
+    {
+      heading: 'Kui kaua andmeid säilitame',
+      body: 'Tellimustega seotud andmeid säilitame raamatupidamise ja seadusest tulenevate kohustuste täitmiseks (raamatupidamise seaduse kohaselt kuni 7 aastat). Toote saadavuse ooteloendisse jäetud e-posti kustutame kohe, kui oleme saadavusteate saatnud või kui palud selle eemaldada.',
     },
     {
       heading: 'Küpsised',
@@ -527,7 +558,7 @@ export const privacyPage = {
     },
     {
       heading: 'Sinu õigused',
-      body: 'Kuna me ei salvesta sinu isikuandmeid, ei ole meil sinuga seotud profiili. Sul on siiski õigus keelduda analüütikast (vali „Ainult vajalikud\") ja kustutada kõik küpsised oma brauseri seadetest. Küsimuste korral võta meiega ühendust.',
+      body: 'Lehe hariduslikus osas me sinu isikuandmeid ei salvesta. Kui oled esitanud tellimuse, on sul õigus tutvuda enda andmetega, lasta neid parandada või kustutada (arvestades seadusest tulenevaid säilitustähtaegu) ning keelduda analüütikast. Samuti saad kustutada kõik küpsised oma brauseri seadetest. Küsimuste või taotluste korral kirjuta unevalem@gmail.com.',
     },
     {
       heading: 'Kontakt',
@@ -598,7 +629,7 @@ export const termsPage = {
     },
     {
       heading: '4. Tarne',
-      body: 'Kaubad saadetakse ostja valitud pakiautomaati 2–5 tööpäeva jooksul pärast makse kinnitust. Pakiautomaadi saabumiskoodi saad SMS-iga. Kui tellimus hilineb, anname sellest e-posti teel teada.',
+      body: 'Kaubad saadetakse ostja valitud pakiautomaati 2–5 tööpäeva jooksul pärast makse kinnitust. Kättetoimetamist vahendab tarneteenuse pakkuja Omniva (Omniva pakiautomaadid üle Eesti). Pakiautomaadi saabumiskoodi saad SMS-iga. Kui tellimus hilineb, anname sellest e-posti teel teada.',
     },
     {
       heading: '5. Taganemisõigus',

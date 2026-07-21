@@ -190,6 +190,13 @@ const sections: CategorySection[] = [
 
                   <p class="text-sm text-muted leading-relaxed flex-1 mb-3">{{ product.description }}</p>
 
+                  <!-- Key specs (dimensions / weight / material) — shown when the
+                       inventory sheet's specs column is filled -->
+                  <p
+                    v-if="product.specs"
+                    class="text-xs text-midnight/70 leading-relaxed mb-3 whitespace-pre-line border-t border-lavender/20 pt-2.5"
+                  >{{ product.specs }}</p>
+
                   <div class="mt-auto space-y-2.5">
                     <div class="flex items-center justify-between">
                       <span class="font-semibold text-midnight text-lg">{{ product.priceText }}</span>
