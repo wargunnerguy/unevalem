@@ -763,7 +763,13 @@ If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
 - NO fabricated social proof: the homepage stats strip was replaced by three
   static value claims (Teaduspõhine / Eesti oma / Tasuta) in `homepage.valueClaims`.
   Never reintroduce fake counters or ratings. Purchase-toast notifications stay
-  sheet-gated (`active` flag).
+  sheet-gated (`active` flag). (2026-07-21: the value-claims strip was removed
+  from the landing page entirely during a declutter pass — copy stays in
+  `homepage.valueClaims` for possible reuse elsewhere, e.g. /meist.)
+- Calculator questions: every step must visibly influence the result (score,
+  summary, tips or product tags) — dead questions were wired in 2026-07-21
+  (roomTemp/problemSeason → blanket warmth class; complaint/pillowCount →
+  pillow; currentMattress → mattress tips). Don't add steps the engine ignores.
 - Analytics: Plausible + GA4 (`G-D921C30JEQ`, Consent Mode v2, opt-out).
   `gaEvent()` in composables/useAnalytics.ts; funnel + shop + scroll + quiz
   events are instrumented. `send_page_view:false` — the router hook emits

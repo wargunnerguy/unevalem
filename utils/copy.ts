@@ -107,7 +107,7 @@ export const calculator = {
           ],
         },
         {
-          question: 'Mis häirib sind une osas kõige rohkem?',
+          question: 'Mis häirib sinu und kõige rohkem?',
           options: [
             { label: 'Raske uinuda', value: 'cant-sleep' },
             { label: 'Ärkan öösel üles', value: 'wake-at-night' },
@@ -148,7 +148,7 @@ export const calculator = {
       stepKeys: ['sweating', 'temp', 'age', 'blanketWeight', 'partner', 'roomTemp', 'allergies', 'problemSeason'] as const,
       steps: [
         {
-          question: 'Kas higistab öösel või ärkad kuumalt?',
+          question: 'Kas higistad öösel või ärkad kuumalt?',
           options: [
             { label: 'Jah, sageli', value: 'often' },
             { label: 'Mõnikord', value: 'sometimes' },
@@ -156,11 +156,11 @@ export const calculator = {
           ],
         },
         {
-          question: 'Milline temperatuur sobib sulle magamiseks?',
+          question: 'Kas oled pigem külm või soe magaja?',
           options: [
-            { label: 'Jahe tuba (16–18 °C)', value: 'cold' },
-            { label: 'Mugav (18–20 °C)', value: 'normal' },
-            { label: 'Soe tuba (20 °C+)', value: 'hot' },
+            { label: 'Mul on öösiti tihti külm', value: 'cold' },
+            { label: 'Enamasti parasjagu', value: 'normal' },
+            { label: 'Mul on öösiti tihti palav', value: 'hot' },
           ],
         },
         {
@@ -189,11 +189,11 @@ export const calculator = {
           ],
         },
         {
-          question: 'Milline on sinu magamistoa tavatemperatuur?',
+          question: 'Kui soe on sinu magamistuba tavaliselt?',
           options: [
-            { label: 'Pigem jahe', value: 'cool' },
-            { label: 'Keskmiselt soe', value: 'moderate' },
-            { label: 'Pigem soe', value: 'warm' },
+            { label: 'Jahe (alla 18 °C)', value: 'cool' },
+            { label: 'Keskmine (18–21 °C)', value: 'moderate' },
+            { label: 'Soe (üle 21 °C)', value: 'warm' },
           ],
         },
         {

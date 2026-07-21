@@ -47,7 +47,7 @@ const dailyTip = computed(() => {
   return tips[dayOfYear % tips.length].text
 })
 
-const featuredPosts = useFeaturedPosts(5)
+const featuredPosts = useFeaturedPosts(3)
 
 // The personalized order depends on cookies, so it must only apply on the client
 // after mount. Until then we render a cookie/date-independent base order (still
@@ -57,7 +57,7 @@ const { posts: allPosts } = usePosts()
 const basePosts = computed(() =>
   [...allPosts.value]
     .sort((a, b) => Number(b.isFeatured) - Number(a.isFeatured))
-    .slice(0, 5),
+    .slice(0, 3),
 )
 const isMounted = useMounted()
 const displayPosts = computed(() => (isMounted.value ? featuredPosts.value : basePosts.value))
@@ -125,9 +125,6 @@ const revisitSummary = computed(() => {
               </h1>
             </div>
           </Transition>
-          <p class="mt-2 text-lavender/40 text-xs flex items-center justify-center gap-1.5">
-            <span aria-hidden="true">🔬</span>{{ calculator.researchBadge }}
-          </p>
           <template #fallback>
             <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight mb-2">
               {{ calculator.heroTitle.pillow }}
@@ -137,24 +134,6 @@ const revisitSummary = computed(() => {
       </div>
 
       <SleepCalculator />
-    </section>
-
-    <!-- ─── VALUE CLAIMS STRIP ─── -->
-    <section class="bg-dusk sleep-pattern px-4 py-6">
-      <div class="max-w-xl mx-auto flex justify-center gap-6 sm:gap-10">
-        <div
-          v-for="claim in homepage.valueClaims"
-          :key="claim.title"
-          class="text-center"
-        >
-          <p class="font-heading text-gold text-lg sm:text-xl font-bold leading-none">
-            {{ claim.title }}
-          </p>
-          <p class="text-lavender/70 text-xs mt-1.5 leading-snug max-w-[140px]">
-            {{ claim.text }}
-          </p>
-        </div>
-      </div>
     </section>
 
     <!-- ─── DAILY TIP ─── -->
@@ -188,15 +167,6 @@ const revisitSummary = computed(() => {
             :key="post.id"
             class="py-5 first:pt-0"
           >
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs font-medium px-2 py-0.5 rounded-full border border-lavender/30 bg-foam text-midnight">
-                {{ post.category }}
-              </span>
-              <span v-if="post.isFeatured" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold text-midnight">
-                {{ common.popularBadge }}
-              </span>
-            </div>
-
             <h3 class="font-heading text-xl text-midnight leading-snug mb-2 hover:text-dusk transition-colors">
               <NuxtLink :to="`/artiklid/${post.slug}`" class="focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
                 {{ post.title }}

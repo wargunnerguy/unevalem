@@ -142,6 +142,9 @@ function buildStages(a: Partial<typeof answers.value>, type: CalcType): Stage[] 
     if (a.neckPain === 'often' || a.neckPain === 'sometimes') {
       stages.push({ text: 'Kontrollin kaelavalude seost patjatüübiga...', delay: rnd(1100, 1600) })
     }
+    if (a.complaint && a.complaint !== 'none') {
+      stages.push({ text: 'Seon sinu unemured magamisasendi ja toega...', delay: rnd(800, 1200) })
+    }
     if (a.allergies && a.allergies !== 'none') {
       stages.push({ text: 'Kontrollin allergeenivabaduse nõudeid...', delay: rnd(900, 1300) })
     }
@@ -159,6 +162,12 @@ function buildStages(a: Partial<typeof answers.value>, type: CalcType): Stage[] 
     if (a.allergies && a.allergies !== 'none') {
       stages.push({ text: 'Kontrollin allergeenivabaduse nõudeid...', delay: rnd(900, 1300) })
     }
+    if (a.problemSeason === 'summer' || a.problemSeason === 'winter') {
+      stages.push({ text: 'Arvestan hooajalisi temperatuurikõikumisi...', delay: rnd(800, 1200) })
+    }
+    if (a.roomTemp === 'warm' || a.roomTemp === 'cool') {
+      stages.push({ text: 'Kohandan soovitust sinu magamistoa temperatuuriga...', delay: rnd(700, 1100) })
+    }
     if (a.partner === 'shared') {
       stages.push({ text: 'Arvestan jagatud teki eripärasid...', delay: rnd(800, 1100) })
     }
@@ -174,6 +183,9 @@ function buildStages(a: Partial<typeof answers.value>, type: CalcType): Stage[] 
     stages.push({ text: posMsg[a.position ?? ''] ?? 'Analüüsin magamisasendit...', delay: rnd(900, 1400) })
     if (a.backPain === 'often' || a.backPain === 'sometimes') {
       stages.push({ text: 'Hindan seljavalu seost madratsitüübiga...', delay: rnd(1100, 1600) })
+    }
+    if (a.currentMattress && a.currentMattress !== 'unknown') {
+      stages.push({ text: 'Võrdlen sinu praeguse madratsitüübi omadusi...', delay: rnd(800, 1200) })
     }
     stages.push({ text: 'Otsin sobivaimaid madratseid andmebaasist...', delay: rnd(1600, 2400) })
     if ((a.mattressAge as string) === '5y+' || (a.mattressAge as string) === '3-5y') {
@@ -222,8 +234,10 @@ function getProductName(type: CalcType): string {
   <div class="w-full max-w-xl mx-auto">
     <div class="bg-foam rounded-2xl shadow-lg overflow-hidden">
 
-      <!-- Calc journey breadcrumb — each type is clickable to switch -->
-      <div v-if="step <= totalSteps && !analyzing" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
+      <!-- Calc journey breadcrumb — each type is clickable to switch.
+           Hidden until at least one calc is done: first-time visitors get a
+           clean card, the breadcrumb appears once it has meaning. -->
+      <div v-if="step <= totalSteps && !analyzing && completedCount > 0" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
         <template v-for="(type, idx) in (['pillow', 'blanket', 'mattress'] as const)" :key="type">
           <!-- Active type: plain label, not clickable -->
           <span
@@ -251,7 +265,8 @@ function getProductName(type: CalcType): string {
       <!-- Progress header (steps 1–5 only) -->
       <div
         v-if="step <= totalSteps && !analyzing"
-        class="flex items-center gap-3 px-5 pt-2 pb-0"
+        class="flex items-center gap-3 px-5 pb-0"
+        :class="completedCount > 0 ? 'pt-2' : 'pt-5'"
       >
         <button
           v-if="step > 1"
