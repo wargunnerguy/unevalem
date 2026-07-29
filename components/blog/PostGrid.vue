@@ -14,6 +14,7 @@ const sentinel = ref<HTMLElement | null>(null)
 
 const categories = [
   { key: 'all',      label: blogCategories.all },
+  { key: 'myths',    label: blogCategories.myths },
   { key: 'teadus',   label: blogCategories.teadus },
   { key: 'nõuanded', label: blogCategories.nõuanded },
   { key: 'tooted',   label: blogCategories.tooted },
@@ -24,6 +25,9 @@ watch(selectedCategory, () => { visibleCount.value = PAGE_SIZE })
 
 const filteredPosts = computed(() => {
   if (selectedCategory.value === 'all') return props.posts
+  // "myths" cuts across the real categories: it selects on the isMyth flag
+  // usePosts derives from the "MÜÜT: " title prefix, not on a category value.
+  if (selectedCategory.value === 'myths') return props.posts.filter(p => p.isMyth)
   return props.posts.filter(p => p.category === selectedCategory.value)
 })
 

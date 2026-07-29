@@ -442,6 +442,11 @@ export const disclosure = {
 
 export const blogCategories = {
   all: 'Kõik',
+  // Not a real category column value — a cross-cutting filter over posts whose
+  // title carried the "MÜÜT: " prefix. Myth-busting is the most shareable
+  // format the site has, and this gives ads and social posts one browsable
+  // cluster to point at.
+  myths: 'Müüdid',
   teadus: 'Teadus',
   nõuanded: 'Nõuanded',
   tooted: 'Tooted',

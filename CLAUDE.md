@@ -821,6 +821,71 @@ If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
 - Backticks inside double-quoted `git commit -m` get command-substituted by
   bash — use single quotes.
 
+### 2026-07-29 — Paid-traffic readiness (overrides anything above)
+
+**Social proof toast is UNMOUNTED.** `app.vue` no longer renders
+`<SocialProofToast />`. Every notification row was fabricated (purchases that
+never happened), which contradicts the 2026-07-17 honesty overhaul and is a
+per-se unfair commercial practice under Omnibus-amended EU Directive
+2005/29/EC Annex I once ads drive traffic. The component, composable and
+`notifications` tab all stay. Remount ONLY when real orders can feed it —
+never with hand-written rows. `notifications.example.json` is now `[]` because
+it is the production fallback when `SHEETS_API_URL` is unset.
+
+**Campaign landing pages: `pages/probleem/[slug].vue`**, driven by a new
+`pains` sheet tab (slug, eyebrow, headline, subhead, bodyMd, ctaType, ctaLabel,
+prefill, relatedSlugs, ogImage, metaTitle, metaDescription, active, noindex).
+Optional fetch — the build works before the tab exists. Routes are added to
+`nitro.prerender.routes` by `painRoutes()`; without that every ad click 404s,
+since nothing on the site links to them. The headline must mirror the ad's
+wording verbatim and is rendered server-side (never inside `ClientOnly`).
+`SleepCalculator` takes optional `calcType` / `prefill` / `prefilledFrom` props
+so the calculator embeds inline rather than being linked.
+
+**⚠️ Page keys must NOT be `route.fullPath`.** Any query string then produces a
+different key, which discards the prerendered payload and makes `useFetch` call
+`/api/*` — routes that do not exist on a static host. The fetch 404s and the
+not-found redirect fires. This was live: Facebook appends `fbclid` to shared
+links, so every Facebook click on an article landed on `/artiklid`. Both
+`[slug].vue` pages now key on the slug param, and their redirects fire only
+when the list actually loaded without the slug — never on a failed fetch.
+
+**Attribution.** `useAttribution` writes first-touch utm_*/fbclid/gclid/ttclid
+to a 90d `uva-attr` cookie (last-touch in sessionStorage);
+`plugins/attribution.client.ts` captures on any landing route.
+`attrPayload()` flows into `submit_calc` and `create_order`. The sheet, not the
+pixel, is the reliable record — don't reconcile the two.
+
+**`handleCalcSubmit` is header-mapped, not positional.** It was dropping seven
+answers the client already sent. Adding a payload field now needs no script
+change. Don't reintroduce a fixed-array `appendRow`.
+
+**A/B testing removed.** `useABTest` now returns only `sessionId`. The variant
+was written to every row, rendered nowhere, and could never reach significance.
+
+**Newsletter.** `components/lead/LeadForm.vue` at four placements (calc result,
+footer, quiz result, article end). NO popup, NO interstitial, NO gate — the ads
+promise "e-posti ei küsi" and that must stay literally true. Explicit unticked
+consent checkbox required (Estonian ESS §103¹); the exact wording is stored
+with a version. Writes to a `subscribers` tab which — like `orders` and
+`waitlist` — must NEVER be added to `SHEET_MAP`. No ESP until ~300 subscribers.
+
+**Consent v2.** `uva-consent-v2` holds `{ analytics, ads }`. Renamed, not
+migrated, so an old `'granted'` (analytics-only) can't be read as ad consent.
+Advertising storage is opt-IN, denied by default; analytics stays opt-out.
+Three-button banner, reject as easy as accept. `plugins/meta-pixel.client.ts`
+no-ops unless ads are granted AND `NUXT_PUBLIC_META_PIXEL_ID` is set; it
+mirrors GA events via a `unevalem:ga-event` window event. **Optimise Meta
+toward `Lead`, not `Purchase`, while nothing is purchasable.**
+
+**Staging no longer pollutes production analytics.** Plausible domain, og:image
+and the sitemap host all derive from env; the staging generate step now gets
+`SHEETS_API_URL` (without it every sheet POST silently no-op'd), an empty GA id
+and its own Plausible domain.
+
+**Campaign playbook: `docs/kampaaniad.md`.** Ad angles, the weekly posting
+rhythm, and the rule that every number in an ad traces to a `sources` row.
+
 ### 2026-07-17 — Staging environment (branching rules)
 
 - **`dev` branch → test.unevalem.ee** (staging, via deploy-staging.yml →
