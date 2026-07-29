@@ -142,6 +142,30 @@ export interface Stat {
   active:      boolean
 }
 
+// A campaign landing page, one row per ad angle in the `pains` sheet tab.
+// The headline must mirror the ad's wording verbatim — message match is the
+// whole point of the page existing. Everything editorial comes from the sheet
+// so a new angle needs no developer; only chrome lives in copy.ts.
+export interface PainPage {
+  slug:             string
+  eyebrow:          string
+  headline:         string
+  subhead:          string
+  bodyMd:           string
+  // `calc:pillow|calc:blanket|calc:mattress` embeds that calculator inline,
+  // `quiz:<id>` links to the quiz, `lead` shows only the email form.
+  ctaType:          string
+  ctaLabel:         string
+  // "key:value;key:value" — answers pre-filled into the embedded calculator.
+  prefill:          string
+  relatedSlugs:     string[]
+  ogImage:          string
+  metaTitle:        string
+  metaDescription:  string
+  active:           boolean
+  noindex:          boolean
+}
+
 // Campaign tags captured from the landing URL. Every field is optional: a direct
 // visitor has none, and a Google Ads click has gclid but no utm_* unless the
 // campaign was tagged manually. `landedAt` is set only on the first-touch record.

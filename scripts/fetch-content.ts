@@ -160,6 +160,17 @@ function transformPost(row: Record<string, unknown>): Record<string, unknown> {
   }
 }
 
+// Campaign landing pages. Booleans and the related-slug list arrive as raw
+// Sheets strings; `prefill` stays a string and is parsed client-side.
+function transformPain(row: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...row,
+    relatedSlugs: parseTags(row.relatedSlugs),
+    active:       parseBool(row.active),
+    noindex:      parseBool(row.noindex),
+  }
+}
+
 function transformProduct(row: Record<string, unknown>): Record<string, unknown> {
   return {
     ...row,
@@ -179,7 +190,7 @@ if (!BASE_URL) {
   console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
-  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes', 'terminals']) {
+  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes', 'terminals', 'pains']) {
     const src = join(DATA_DIR, `${name}.example.json`)
     const dst = join(DATA_DIR, `${name}.json`)
     if (existsSync(src)) {
@@ -201,7 +212,7 @@ if (!BASE_URL) {
   } else {
     console.warn('  missing notifications.example.json — skipping')
   }
-  console.log(`[fetch-content] done (${ok}/6 example files processed)`)
+  console.log(`[fetch-content] done (${ok}/8 example files processed)`)
   process.exit(0)
 }
 
@@ -329,7 +340,7 @@ async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
   mkdirSync(DATA_DIR, { recursive: true })
 
-  const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats, sourcesRaw] = await Promise.all([
+  const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats, sourcesRaw, painsRaw] = await Promise.all([
     fetchSheet('posts'),
     fetchSheet('notifications'),
     fetchSheet('stats'),
@@ -338,6 +349,7 @@ async function main(): Promise<void> {
     fetchQuizzes(),
     tryFetchSheet('post_stats'),   // optional; absent until the sheet exists
     tryFetchSheet('sources'),      // optional; posts fall back to column M
+    tryFetchSheet('pains'),        // optional; campaign landing pages
     fetchTerminals(),              // writes terminals.json itself; non-fatal
   ])
 
@@ -403,18 +415,31 @@ async function main(): Promise<void> {
   const transformedProducts = (inventory as Record<string, unknown>[]).map(transformProduct)
   const tips = (tipsRaw as Record<string, unknown>[]).filter(r => parseBool(r.active))
 
+  // Only rows with a slug are usable — a blank slug would prerender to a route
+  // that ads then link to and that 404s. Drop them loudly rather than silently.
+  const pains = ((painsRaw ?? []) as Record<string, unknown>[])
+    .filter((row) => {
+      if (String(row.slug ?? '').trim()) return true
+      console.warn('  ⚠ pains row skipped — no slug')
+      return false
+    })
+    .map(transformPain)
+
   writeFileSync(join(DATA_DIR, 'posts.json'),         JSON.stringify(transformedPosts, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'notifications.json'), JSON.stringify(notifications, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'stats.json'),         JSON.stringify(stats, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'products.json'),      JSON.stringify(transformedProducts, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'tips.json'),          JSON.stringify(tips, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'quizzes.json'),       JSON.stringify(quizzes, null, 2), 'utf-8')
+  // Always written, even as [] — nuxt.config reads this file to build the
+  // prerender route list and warns when it is missing.
+  writeFileSync(join(DATA_DIR, 'pains.json'),         JSON.stringify(pains, null, 2), 'utf-8')
 
   console.log(
     `[fetch-content] done — ${transformedPosts.length} posts · ` +
     `${notifications.length} notifications · ${stats.length} stats · ` +
     `${transformedProducts.length} products · ${tips.length} tips · ` +
-    `${quizzes.length} quizzes`,
+    `${quizzes.length} quizzes · ${pains.length} pains`,
   )
 }
 

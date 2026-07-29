@@ -496,6 +496,19 @@ export const quizPage = {
   empty: 'Unetest pole hetkel saadaval.',
 }
 
+// Campaign landing page CHROME ONLY. Every editorial string on /probleem/*
+// (eyebrow, headline, body, CTA label) comes from the `pains` sheet tab so the
+// owner can add an ad angle without a developer — same split as quizPage.*.
+export const painPage = {
+  loading: 'Laen...',
+  notFound: 'Sellist lehte ei ole.',
+  backHome: '← Unevalemi avalehele',
+  relatedHeading: 'Loe edasi',
+  // Sits directly above the embedded calculator.
+  calcIntro: 'Vasta 8 küsimusele — vastus on kohe siin, e-posti me ei küsi.',
+  freeNote: 'Tasuta. E-posti ei küsi.',
+}
+
 export const socialProof = {
   // Keyed by the notifications tab's `type` column. The sheet has held both the
   // documented purchase/view/quiz values and generic success/info ones, and an

@@ -23,6 +23,7 @@ var SHEET_MAP = {
   quiz_results:   'quiz_results',
   post_stats:     'post_stats',
   sources:        'sources',
+  pains:          'pains',
 }
 
 function json(obj) {

@@ -2,6 +2,21 @@
 import type { CalcType, Stat, UserProfile } from '~/types'
 import { calculator, common } from '~/utils/copy'
 
+// Embedded on a campaign landing page, the calculator must open on the flow the
+// ad promised with the answer the ad already established pre-filled — not on
+// whatever the visitor's session would otherwise resume. Unset on the homepage,
+// where the session decides.
+const props = withDefaults(defineProps<{
+  calcType?: CalcType | null
+  prefill?: Partial<UserProfile>
+  /** Pain page slug, recorded with the submission so prefilled sessions stay filterable. */
+  prefilledFrom?: string
+}>(), {
+  calcType: null,
+  prefill: () => ({}),
+  prefilledFrom: '',
+})
+
 // Single source of truth for the version: the `calculatorVersion` stats row.
 // Falls back to the copy.ts constant when the sheet has no such row (e.g. dev).
 const { data: calcStatsData } = useFetch<Stat[]>('/api/stats', { default: () => [] as Stat[] })
@@ -41,6 +56,16 @@ const latestCompletion = computed(() => {
 function initFromProfile() {
   if (didInit) return
   const latest = latestCompletion.value
+
+  // Campaign entry wins over session resume, and over a stored result: someone
+  // arriving from a "higistad öösel?" ad must land on the blanket flow with
+  // sweating already answered, not on the pillow result they saw last week.
+  if (props.calcType) {
+    activeCalcType.value = props.calcType
+    reset({ ...getPrefilledAnswers(props.calcType), ...props.prefill })
+    didInit = true
+    return
+  }
 
   if (!latest) {
     const prevType = activeCalcType.value
@@ -88,7 +113,7 @@ watch(step, (val, prev) => {
   if (val === totalSteps.value + 1 && result.value) {
     const productName = result.value.recommendations[0]?.name ?? ''
     storeCompletion(activeCalcType.value, answers.value, productName)
-    submitCalcResult(answers.value, result.value, activeCalcType.value)
+    submitCalcResult(answers.value, result.value, activeCalcType.value, props.prefilledFrom)
     gaEvent('calc_result_shown', {
       calc_type: activeCalcType.value,
       score: result.value.currentScore,

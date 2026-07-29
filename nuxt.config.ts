@@ -23,6 +23,28 @@ function articleRoutes(): string[] {
   }
 }
 
+// Campaign landing pages are linked from ads, not from the site, so the link
+// crawler can never discover them. Every active pain must be listed here or a
+// paid click lands on a 404 — the most expensive possible failure mode.
+function painRoutes(): string[] {
+  const path = resolve(__dirname, 'public/data/pains.json')
+  if (!existsSync(path)) {
+    console.warn('[nuxt.config] public/data/pains.json missing — no campaign pages will be prerendered')
+    return []
+  }
+  try {
+    const pains = JSON.parse(readFileSync(path, 'utf-8')) as { slug?: string; active?: boolean }[]
+    return pains
+      .filter(p => p.active !== false)
+      .map(p => p.slug)
+      .filter((s): s is string => !!s)
+      .map(s => `/probleem/${s}`)
+  } catch (err) {
+    console.warn('[nuxt.config] could not parse pains.json:', (err as Error).message)
+    return []
+  }
+}
+
 // Resolved once here so the head defaults, the runtimeConfig and the sitemap
 // all agree. Staging sets NUXT_PUBLIC_SITE_URL=https://test.unevalem.ee, which
 // must not leak production URLs into og:image or JSON-LD.
@@ -62,7 +84,7 @@ export default defineNuxtConfig({
     preset: 'static',
     prerender: {
       crawlLinks: true,
-      routes: ['/sitemap.xml', ...articleRoutes()],
+      routes: ['/sitemap.xml', ...articleRoutes(), ...painRoutes()],
     },
   },
 

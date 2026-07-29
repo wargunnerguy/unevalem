@@ -4,7 +4,13 @@ import type { Post } from '~/types'
 import { blogPage, blogCategories, common } from '~/utils/copy'
 
 definePageMeta({
-  key: (route) => route.fullPath,
+  // Keyed on the slug, NOT route.fullPath. With fullPath, any query string
+  // (fbclid from a Facebook share, utm_* from an ad) produced a different key,
+  // which discarded the prerendered payload and made useFetch hit /api/posts —
+  // a route that does not exist on a static host. The fetch 404'd, `post`
+  // resolved null, and the visitor was redirected to /artiklid. Every ad click
+  // and every Facebook share landed on the listing instead of the article.
+  key: route => route.params.slug as string,
 })
 
 const route = useRoute()
@@ -54,9 +60,12 @@ const relatedPosts = computed<Post[]>(() => {
     .slice(0, 3)
 })
 
-// Redirect to listing if post not found after data loads
+// Redirect to the listing only when the data genuinely loaded and this slug is
+// not in it. `posts.length > 0` is the guard that matters: an empty list means
+// the fetch failed, and bouncing the visitor on a transient failure loses a
+// reader who was on the right URL all along.
 watchEffect(() => {
-  if (!pending.value && !post.value) {
+  if (!pending.value && posts.value.length > 0 && !post.value) {
     navigateTo('/artiklid')
   }
 })

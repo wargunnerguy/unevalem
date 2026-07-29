@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import type { Post } from '~/types'
+import type { Post, PainPage } from '~/types'
 
 // Baked in at prerender time from the same env var nuxt.config reads, so the
 // staging build publishes a sitemap of staging URLs rather than advertising
@@ -33,7 +33,22 @@ export default defineEventHandler((event) => {
     lastmod: p.publishDate,
   }))
 
-  const allRoutes = [...staticRoutes, ...postRoutes]
+  // Campaign pages. A page flagged noindex is still prerendered (the ad has to
+  // land somewhere) but must not be advertised to search engines.
+  const painsPath = join(process.cwd(), 'public/data/pains.json')
+  let pains: PainPage[] = []
+  if (existsSync(painsPath)) {
+    try { pains = JSON.parse(readFileSync(painsPath, 'utf-8')) as PainPage[] } catch {}
+  }
+  const painRoutes = pains
+    .filter(p => p.active && !p.noindex && p.slug)
+    .map(p => ({
+      loc: `/probleem/${p.slug}`,
+      priority: '0.7',
+      changefreq: 'monthly',
+    }))
+
+  const allRoutes = [...staticRoutes, ...postRoutes, ...painRoutes]
 
   const urls = allRoutes.map(r => `
   <url>

@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "kaelavalu-hommikul",
+    "eyebrow": "Hommikune kaela- ja õlavalu",
+    "headline": "Ärkad hommikul kaela- või õlavaluga?",
+    "subhead": "Enamik inimesi süüdistab magamisasendit. Sagedasem põhjus on paar sentimeetrit padja kõrguses.",
+    "bodyMd": "Külili magades peab padi täitma õla ja kõrva vahe. Kui padi on liiga madal, kaldub pea allapoole ja kaelalihased hoiavad pead terve öö üleval. Kui padi on liiga kõrge, surutakse pea ülespoole. Kumbki asend ei lase kaelal öösel lõdvestuda — ja hommikul tunned seda.\n\nÕige kõrgus ei ole kõigil sama. See sõltub sellest, kui laiad on sinu õlad ja kuidas sa magad. Sellepärast ei saa öelda \"osta see padi\" — saab öelda ainult, milline kõrgus sinu kehale vastab.\n\nAus vastus: võib-olla ei ole sul uut patja üldse vaja. Kui su praegune padi on õigele kõrgusele volditav, on see sama hea lahendus.",
+    "ctaType": "calc:pillow",
+    "ctaLabel": "Vaata oma unevalemit",
+    "prefill": "neckPain:often",
+    "relatedSlugs": [],
+    "ogImage": "",
+    "metaTitle": "Kaelavalu hommikul — miks see tuleb padja kõrgusest | Unevalem",
+    "metaDescription": "Hommikune kaela- ja õlavalu tuleb sagedamini padja kõrgusest kui magamisasendist. 8 küsimust ütlevad, milline kõrgus sinu õlgade laiusele vastab.",
+    "active": true,
+    "noindex": false
+  },
+  {
+    "slug": "arkan-kolm-oosel",
+    "eyebrow": "Öine ärkamine",
+    "headline": "Uinud kiiresti. Ärkad kell 3. Uni ei tule tagasi.",
+    "subhead": "Kui õhtul oli klaas veini, pole see juhus.",
+    "bodyMd": "Alkohol kiirendab uinumist ja süvendab öö esimest poolt — see osa on tõsi ja seda tunnevad kõik. Aga kui keha alkoholi lagundab, pöördub mõju ümber: REM-uni väheneb ja ärkamised sagenevad. Just siis, kui öö teine pool peaks olema kõige taastavam.\n\nSee ei ole ainuke põhjus kella kolme ärkamiseks. Magamistoa temperatuur ja hiline kofeiin teevad sama asja. Aga alkohol on neist kõige sagedamini kahe silma vahele jääv.",
+    "ctaType": "lead",
+    "ctaLabel": "Loe, mis öö teises pooles päriselt juhtub",
+    "prefill": "complaint:wake-at-night",
+    "relatedSlugs": ["alkohol-ja-uni"],
+    "ogImage": "",
+    "metaTitle": "Miks ärkan kell 3 öösel? | Unevalem",
+    "metaDescription": "Kella kolme ärkamine ei ole juhus. Alkohol, toa temperatuur ja hiline kofeiin muudavad öö teist poolt — loe, mis täpselt juhtub.",
+    "active": true,
+    "noindex": false
+  },
+  {
+    "slug": "higistan-oosel",
+    "eyebrow": "Öine higistamine",
+    "headline": "Higistad öösel ja arvad, et oled lihtsalt soe inimene?",
+    "subhead": "Sagedamini on tegu teki soojusregulatsiooniga, mitte sinu kehaga.",
+    "bodyMd": "Keha temperatuur langeb loomulikult õhtul — see langus on üks tugevamaid uinumissignaale. Tekk, mis soojust kinni hoiab, töötab selle vastu: keha üritab jahtuda, tekk ei lase, ja tulemuseks on higistamine ja katkendlik uni.\n\nSiin ei ole tähtis mitte teki paksus, vaid see, kui hästi ta niiskust ja soojust läbi laseb. Kaks ühesuguse paksusega tekki võivad käituda täiesti erinevalt.",
+    "ctaType": "calc:blanket",
+    "ctaLabel": "Vaata, milline tekk sulle sobib",
+    "prefill": "sweating:often;temp:hot",
+    "relatedSlugs": [],
+    "ogImage": "",
+    "metaTitle": "Öine higistamine — tekk või sina? | Unevalem",
+    "metaDescription": "Öine higistamine tuleb sagedamini teki soojusregulatsioonist kui kehast. Vasta 8 küsimusele ja vaata, milline tekk sinu magamisviisile sobib.",
+    "active": true,
+    "noindex": false
+  }
+]
