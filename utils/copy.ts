@@ -41,7 +41,6 @@ export const contact = {
 
 export const calculator = {
   version: 'v2.5',
-  heroLabel: 'Leia oma ideaalne padi, tekk ja madrats — 3 lühikest testi',
 
   heroTitle: {
     pillow:   'Leia endale parim padi',
@@ -49,14 +48,12 @@ export const calculator = {
     mattress: 'Leia endale parim madrats',
   } as Record<string, string>,
 
-  researchBadge: 'Soovitustest põhineb 60+ rahvusvahelisel uneuuringul',
+  // No counted claim here ("60+ uuringut" and similar): the number was never
+  // traceable to the sources tab, and an invented statistic is exactly what the
+  // honesty positioning cannot afford. Keep claims qualitative unless a row in
+  // the `sources` tab backs the figure.
   researchResultNote: 'Soovitus on koostatud teadusuuringute põhjal.',
 
-  variantLabels: {
-    pillow:  'Leia oma ideaalne padi — alusta siit',
-    blanket: 'Leia oma ideaalne tekk — alusta siit',
-    sleep:   'Ehita oma täielik une profiil — 3 testi',
-  } as Record<string, string>,
   progressLabel: (step: number, total: number) => `Samm ${step} / ${total}`,
   timeLeft: (step: number, total: number): string => {
     const sek = (total + 1 - step) * 20
@@ -273,10 +270,10 @@ export const calculator = {
         {
           question: 'Kui vana on sinu praegune madrats?',
           options: [
-            { label: 'Uus (alla 2 aasta)', value: 'new' },
-            { label: '2–5 aastat', value: '1-3y' },
-            { label: '5–8 aastat', value: '3-5y' },
-            { label: 'Üle 8 aasta', value: '5y+' },
+            { label: 'Uus (alla aasta)', value: 'new' },
+            { label: '1–3 aastat', value: '1-3y' },
+            { label: '3–5 aastat', value: '3-5y' },
+            { label: 'Üle 5 aasta', value: '5y+' },
           ],
         },
         {
@@ -302,9 +299,9 @@ export const calculator = {
       mattress: 'Järgmisena: leia oma ideaalne padi',
     } as Record<string, string>,
     nextCalcBtn: {
-      pillow:   'Alusta tekikülkulaatoriga →',
-      blanket:  'Alusta madratsikülkulaatoriga →',
-      mattress: 'Alusta padjakülkulaatoriga →',
+      pillow:   'Alusta tekikalkulaatoriga →',
+      blanket:  'Alusta madratsikalkulaatoriga →',
+      mattress: 'Alusta padjakalkulaatoriga →',
     } as Record<string, string>,
     doneLabel: {
       pillow:   'Padi',
@@ -330,6 +327,14 @@ export const calculator = {
     ctaButton: 'Vaata kõiki tooteid →',
     mustHaveBadge: 'Oluline',
     niceToHaveBadge: 'Kasulik',
+    // Shown when the engine matched no product for this calc type — a valid
+    // outcome, not an error. Per-type because the old hardcoded string spoke
+    // only of mattresses and was shown on the pillow and blanket flows too.
+    noProductsYet: {
+      pillow:   'Sinu profiiliga sobivat patja meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue padjata — ja kui otsustad osta, tead nüüd, mida otsida.',
+      blanket:  'Sinu profiiliga sobivat tekki meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue tekita — ja kui otsustad osta, tead nüüd, mida otsida.',
+      mattress: 'Sinu profiiliga sobivat madratsit meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue madratsita — ja kui otsustad osta, tead nüüd, mida otsida.',
+    } as Record<string, string>,
     noUrgentNeedMessage: 'Sul pole praegu kiireloomulist vajadust — aga saad alati edasi täiustada.',
   },
 }
@@ -492,11 +497,18 @@ export const quizPage = {
 }
 
 export const socialProof = {
+  // Keyed by the notifications tab's `type` column. The sheet has held both the
+  // documented purchase/view/quiz values and generic success/info ones, and an
+  // unknown key rendered `undefined` in the toast — hence the total lookup at
+  // the call site (`typeIcons[type] ?? ''`). The component is unmounted in
+  // app.vue until real order data exists; this stays correct for that day.
   typeIcons: {
     purchase: '🛍️',
     view: '👁️',
     quiz: '🎯',
-  },
+    success: '✓',
+    info: 'ℹ️',
+  } as Record<string, string>,
 }
 
 export const cookieConsent = {

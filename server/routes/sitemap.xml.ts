@@ -2,7 +2,10 @@ import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Post } from '~/types'
 
-const SITE = 'https://unevalem.ee'
+// Baked in at prerender time from the same env var nuxt.config reads, so the
+// staging build publishes a sitemap of staging URLs rather than advertising
+// production links from test.unevalem.ee.
+const SITE = process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'content-type', 'application/xml; charset=utf-8')

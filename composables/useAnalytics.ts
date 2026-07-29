@@ -9,8 +9,13 @@ export function gaEvent(name: string, params: Record<string, string | number> = 
 }
 
 export function useAnalytics() {
-  const { variant, sessionId } = useABTest()
+  const { sessionId } = useABTest()
+  const { attrPayload } = useAttribution()
   const config = useRuntimeConfig()
+
+  // Which deployment a row came from, so staging test rows stay filterable in
+  // the same sheet the production site writes to (they share one backend).
+  const env = (config.public.siteUrl as string).includes('test.') ? 'staging' : 'prod'
 
   const submitted = useState('analytics-submitted', () => false)
 
@@ -22,6 +27,7 @@ export function useAnalytics() {
     answers: Partial<UserProfile>,
     result: CalculatorResult,
     calcType: CalcType,
+    prefilledFrom = '',
   ) {
     if (submitted.value) return
     submitted.value = true
@@ -33,7 +39,11 @@ export function useAnalytics() {
       action:        'submit_calc',
       calcType,
       sessionId:     sessionId.value,
-      variant:       variant.value,
+      env,
+      // Which pain page (if any) sent this visitor into the calculator with
+      // answers pre-filled — lets prefilled sessions be excluded when reading
+      // the raw answer distribution.
+      prefilledFrom,
       position:        answers.position        ?? '',
       bodyType:        answers.bodyType        ?? '',
       neckPain:        answers.neckPain        ?? '',
@@ -56,6 +66,11 @@ export function useAnalytics() {
       currentScore:  result.currentScore,
       improvedScore: result.improvedScore,
       completedAt:   new Date().toISOString(),
+      // Campaign attribution. The sheet — not the ad pixel — is the reliable
+      // source here: with ad consent opt-in, a large share of EU visitors
+      // decline and pixel coverage is permanently partial. Don't expect these
+      // counts to reconcile with Meta's.
+      ...attrPayload(),
     }
 
     if (import.meta.dev) {
@@ -89,6 +104,10 @@ export function useAnalytics() {
       // sessionStorage unavailable (private mode edge cases) — still send once
     }
 
+    // No attribution fields here on purpose: post_stats is an aggregate
+    // slug→count tally with no per-visit row to hang them on, so they would be
+    // sent and discarded. Campaign attribution for article reads comes from the
+    // GA4 page_view instead.
     const payload = { action: 'post_view', slug, viewedAt: new Date().toISOString() }
     fetch(url, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) })
       .catch(() => { /* fire-and-forget */ })

@@ -1,7 +1,9 @@
-export type CalcVariant = 'pillow' | 'blanket' | 'sleep'
-
-const ALL_VARIANTS: CalcVariant[] = ['pillow', 'blanket', 'sleep']
-
+// Anonymous session id, nothing more. The variant-assignment half of this
+// composable was removed: the variant was written into every analytics row but
+// rendered nowhere (pages/index.vue computed a label it never used), and at this
+// site's completion volume no split test could reach significance. The sheet
+// column it occupied is better spent on utm_campaign. Reintroduce a real split
+// test only alongside the traffic to power one.
 function makeId(): string {
   return Array.from({ length: 12 }, () =>
     Math.floor(Math.random() * 36).toString(36),
@@ -16,17 +18,5 @@ export function useABTest() {
     sameSite: 'lax',
   })
 
-  // Variant assigned once based on session ID hash, stable for 30 days
-  const variant = useCookie<CalcVariant>('uva-variant', {
-    default: () => {
-      const hash = sessionId.value
-        .split('')
-        .reduce((acc, c) => acc + c.charCodeAt(0), 0)
-      return ALL_VARIANTS[hash % ALL_VARIANTS.length]
-    },
-    maxAge: 60 * 60 * 24 * 30,
-    sameSite: 'lax',
-  })
-
-  return { variant, sessionId }
+  return { sessionId }
 }

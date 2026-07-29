@@ -136,7 +136,34 @@ function handlePostView(ss, payload) {
   }
 }
 
-/** Calculator submission → <calcType>_responses, plus the completions counter. */
+/**
+ * Calculator submission → <calcType>_responses, plus the completions counter.
+ *
+ * Header-mapped, NOT positional. The previous version appended a fixed 18-cell
+ * array against a header written only when the tab was first created, which had
+ * two consequences: the seven newer answers the client already sends
+ * (complaint, age, pillowCount, sleepQuality, currentMattress, roomTemp,
+ * problemSeason) were silently dropped on every submission, and inserting a
+ * column in the sheet by hand would have misaligned every subsequent row.
+ *
+ * Now each payload key finds its own column by name, and an unknown key appends
+ * a new header cell first — same self-migrating shape as the orderNumber column
+ * in handleCreateOrder. Adding a field client-side needs no change here.
+ */
+
+// Written into a freshly created tab so the common columns keep a readable,
+// stable order. Anything else the payload carries is appended after these.
+var CALC_BASE_COLUMNS = [
+  'completedAt', 'sessionId', 'env', 'calcType', 'prefilledFrom',
+  'position', 'bodyType', 'neckPain', 'sweating', 'temp',
+  'blanketWeight', 'partner', 'allergies', 'pillowAge',
+  'backPain', 'mattressAge', 'complaint', 'age', 'pillowCount',
+  'sleepQuality', 'currentMattress', 'roomTemp', 'problemSeason',
+  'rec0', 'currentScore', 'improvedScore',
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+  'fbclid', 'gclid', 'ttclid', 'firstTouchAt'
+]
+
 function handleCalcSubmit(ss, payload) {
   var calcType = payload.calcType || 'pillow'
   var sheetName = calcType + '_responses'
@@ -144,34 +171,41 @@ function handleCalcSubmit(ss, payload) {
   var responseSheet = ss.getSheetByName(sheetName)
   if (!responseSheet) {
     responseSheet = ss.insertSheet(sheetName)
-    responseSheet.appendRow([
-      'completedAt', 'sessionId', 'variant', 'calcType',
-      'position', 'bodyType', 'neckPain', 'sweating', 'temp',
-      'blanketWeight', 'partner', 'allergies', 'pillowAge',
-      'backPain', 'mattressAge', 'rec0', 'currentScore', 'improvedScore'
-    ])
+    responseSheet.appendRow(CALC_BASE_COLUMNS)
+  }
+  // Hand-created empty tab: without headers every column would key as ''.
+  if (responseSheet.getLastRow() === 0) responseSheet.appendRow(CALC_BASE_COLUMNS)
+
+  var headers = responseSheet.getRange(1, 1, 1, responseSheet.getLastColumn()).getValues()[0]
+  var col = {}
+  for (var h = 0; h < headers.length; h++) {
+    var name = String(headers[h]).trim()
+    if (name) col[name] = h
   }
 
-  responseSheet.appendRow([
-    payload.completedAt   || '',
-    payload.sessionId     || '',
-    payload.variant       || '',
-    payload.calcType      || '',
-    payload.position      || '',
-    payload.bodyType      || '',
-    payload.neckPain      || '',
-    payload.sweating      || '',
-    payload.temp          || '',
-    payload.blanketWeight || '',
-    payload.partner       || '',
-    payload.allergies     || '',
-    payload.pillowAge     || '',
-    payload.backPain      || '',
-    payload.mattressAge   || '',
-    payload.rec0          || '',
-    payload.currentScore  || '',
-    payload.improvedScore || ''
-  ])
+  // `action` is routing metadata, not data. Everything else the client sends
+  // gets a column, creating one on first sight.
+  var newHeaders = []
+  for (var key in payload) {
+    if (!payload.hasOwnProperty(key) || key === 'action') continue
+    if (!(key in col)) {
+      col[key] = headers.length + newHeaders.length
+      newHeaders.push(key)
+    }
+  }
+  if (newHeaders.length) {
+    responseSheet.getRange(1, headers.length + 1, 1, newHeaders.length).setValues([newHeaders])
+  }
+
+  var width = headers.length + newHeaders.length
+  var row = new Array(width)
+  for (var i = 0; i < width; i++) row[i] = ''
+  for (var field in payload) {
+    if (!payload.hasOwnProperty(field) || field === 'action') continue
+    var value = payload[field]
+    row[col[field]] = (value === null || value === undefined) ? '' : value
+  }
+  responseSheet.appendRow(row)
 
   var lock = LockService.getScriptLock()
   try {

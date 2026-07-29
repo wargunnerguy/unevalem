@@ -126,7 +126,10 @@ export interface Post {
 export interface Notification {
   id:     number
   text:   string
-  type:   'purchase' | 'view' | 'quiz'
+  // Free text, not a union: the value comes from a spreadsheet column that has
+  // held values beyond the documented purchase/view/quiz set. Consumers look the
+  // icon up defensively (see socialProof.typeIcons).
+  type:   string
   active: boolean
   // No time field: the toast renders a fresh random "X ago" each show so social
   // proof always feels live (see SocialProofToast.vue). Don't add one back.
@@ -137,6 +140,22 @@ export interface Stat {
   value:       string
   displayText: string
   active:      boolean
+}
+
+// Campaign tags captured from the landing URL. Every field is optional: a direct
+// visitor has none, and a Google Ads click has gclid but no utm_* unless the
+// campaign was tagged manually. `landedAt` is set only on the first-touch record.
+export interface Attribution {
+  utm_source?:   string
+  utm_medium?:   string
+  utm_campaign?: string
+  utm_content?:  string
+  utm_term?:     string
+  fbclid?:       string
+  gclid?:        string
+  ttclid?:       string
+  msclkid?:      string
+  landedAt?:     string
 }
 
 export interface Tip {

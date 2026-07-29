@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { termsPage } from '~/utils/copy'
 
+const { siteUrl } = useRuntimeConfig().public
+
 useHead({
   title: termsPage.metaTitle,
   meta: [
     { name: 'description', content: termsPage.metaDescription },
     { property: 'og:title', content: termsPage.metaTitle },
-    { property: 'og:url', content: 'https://unevalem.ee/muugitingimused' },
+    { property: 'og:url', content: `${siteUrl}/muugitingimused` },
   ],
 })
 </script>

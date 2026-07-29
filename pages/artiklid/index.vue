@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { blogPage, common } from '~/utils/copy'
 
+const { siteUrl } = useRuntimeConfig().public
+
 useHead({
   title: blogPage.metaTitle,
   meta: [
     { name: 'description', content: blogPage.metaDescription },
     { property: 'og:title', content: blogPage.metaTitle },
     { property: 'og:description', content: blogPage.metaDescription },
-    { property: 'og:url', content: 'https://unevalem.ee/artiklid' },
+    { property: 'og:url', content: `${siteUrl}/artiklid` },
   ],
 })
 

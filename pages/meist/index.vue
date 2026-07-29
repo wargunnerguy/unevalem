@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { aboutPage } from '~/utils/copy'
 
+const { siteUrl } = useRuntimeConfig().public
+
 useHead({
   title: aboutPage.metaTitle,
   meta: [
     { name: 'description', content: aboutPage.metaDescription },
     { property: 'og:title', content: aboutPage.metaTitle },
-    { property: 'og:url', content: 'https://unevalem.ee/meist' },
+    { property: 'og:url', content: `${siteUrl}/meist` },
   ],
 })
 </script>

@@ -9,6 +9,8 @@ useHead({
 })
 
 const { lines, count, subtotalText, setQty, remove } = useCart()
+// Captured at setup: composables can't be called from inside the submit handler.
+const { attrPayload } = useAttribution()
 
 // Maksekeskus cancel_url lands here with ?makse=katkes. Shown once, then the
 // query is stripped so the notice doesn't reappear on refresh/return visits.
@@ -118,6 +120,9 @@ async function submit() {
       terminalName: terminal?.name ?? '',
     },
     note: form.value.note.trim(),
+    // Which campaign this order traces back to. First-touch, so a visitor who
+    // arrived from an ad in March and bought in April still credits the ad.
+    ...attrPayload(),
   }
 
   try {

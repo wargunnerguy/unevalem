@@ -13,7 +13,7 @@ const suppressed = computed(
 const shouldShow = computed(() => visible.value && !suppressed.value)
 
 const icon = computed(() =>
-  current.value ? socialProof.typeIcons[current.value.type] : '',
+  current.value ? (socialProof.typeIcons[current.value.type] ?? '') : '',
 )
 
 // Social proof should always feel live, so we don't show the real (possibly

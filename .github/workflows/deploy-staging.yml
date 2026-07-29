@@ -42,6 +42,16 @@ jobs:
         env:
           NUXT_APP_BASE_URL: /
           NUXT_PUBLIC_SITE_URL: https://test.unevalem.ee
+          # Without this the browser bundle bakes sheetsApiUrl as '' and every
+          # POST from staging (waitlist, subscribe, calc analytics, checkout)
+          # silently no-ops — staging could not test any write path.
+          SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
+          # Empty GA id makes plugins/analytics.client.ts return early AND hides
+          # the consent banner, so staging never touches the production GA
+          # property. No second GA property needed.
+          NUXT_PUBLIC_GA_ID: ''
+          # Keeps staging pageviews out of the unevalem.ee Plausible site.
+          NUXT_PUBLIC_PLAUSIBLE_DOMAIN: test.unevalem.ee
 
       - name: Add staging CNAME
         run: echo 'test.unevalem.ee' > .output/public/CNAME

@@ -135,7 +135,7 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
     <!-- No product for this category yet -->
     <div v-else class="border-t border-lavender/25 pt-5">
       <h3 class="font-heading text-lg text-midnight mb-1">{{ heading }}</h3>
-      <p class="text-sm text-muted">Madratsid on varsti poes saadaval — senikaua vaata muid soovitusi.</p>
+      <p class="text-sm text-muted">{{ calculator.result.noProductsYet[calcType] }}</p>
     </div>
 
     <!-- Research trust note -->

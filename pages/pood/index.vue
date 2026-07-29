@@ -2,12 +2,14 @@
 import type { Product, UserProfile } from '~/types'
 import { disclosure, shop } from '~/utils/copy'
 
+const { siteUrl } = useRuntimeConfig().public
+
 useHead({
   title: 'Pood — padjad, tekid ja voodipesu | Unevalem',
   meta: [
     { name: 'description', content: 'Unevalemi pood: tööriistad heaks uneks — padjad, tekid ja voodipesu, mis aitavad sul paremini magada.' },
     { property: 'og:title', content: 'Unevalem Pood' },
-    { property: 'og:url', content: 'https://unevalem.ee/pood' },
+    { property: 'og:url', content: `${siteUrl}/pood` },
   ],
 })
 
@@ -76,7 +78,7 @@ useHead(computed(() => ({
                 price: p.price,
                 priceCurrency: 'EUR',
                 availability: 'https://schema.org/PreOrder',
-                url: 'https://unevalem.ee/pood',
+                url: `${siteUrl}/pood`,
               },
             },
           })),

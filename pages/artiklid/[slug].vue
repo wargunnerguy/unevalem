@@ -10,6 +10,11 @@ definePageMeta({
 const route = useRoute()
 const slug = route.params.slug as string
 
+// Declared before useHead below: the JSON-LD computed reads it, and a const
+// declared after would be in the temporal dead zone if head ever resolves
+// during setup.
+const { siteUrl } = useRuntimeConfig().public
+
 const { posts, pending } = usePosts()
 
 const post = computed<Post | null>(() => posts.value.find(p => p.slug === slug) ?? null)
@@ -84,13 +89,13 @@ useHead(
               description: post.value.excerpt,
               datePublished: post.value.publishDate,
               inLanguage: 'et',
-              mainEntityOfPage: `https://unevalem.ee/artiklid/${post.value.slug}`,
+              mainEntityOfPage: `${siteUrl}/artiklid/${post.value.slug}`,
               ...(post.value.coverImage ? { image: post.value.coverImage } : {}),
-              author: { '@type': 'Organization', name: 'Unevalem', url: 'https://unevalem.ee' },
+              author: { '@type': 'Organization', name: 'Unevalem', url: siteUrl },
               publisher: {
                 '@type': 'Organization',
                 name: 'Unevalem',
-                logo: { '@type': 'ImageObject', url: 'https://unevalem.ee/unevalem_logo.png' },
+                logo: { '@type': 'ImageObject', url: `${siteUrl}/unevalem_logo.png` },
               },
             }),
           },
@@ -110,7 +115,6 @@ const categoryLabel = computed(() => {
 })
 
 // Share
-const { siteUrl } = useRuntimeConfig().public
 const postUrl = computed(() => `${siteUrl}/artiklid/${slug}`)
 
 const copied = ref(false)

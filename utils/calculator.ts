@@ -320,8 +320,8 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
 
   const tips: string[] = []
   if (profile.backPain === 'often' || profile.backPain === 'sometimes') tips.push('Seljavalu ei kao kohe, kuid õige kõvadusega madrats vähendab lihaspingeid juba esimestel nädalatel.')
-  if (profile.mattressAge === '5y+') tips.push('Sinu madrats on oma kasuliku eluea lõpus — üle 8 aasta vana madrats ei toesta enam lülisambat korralikult.')
-  else if (profile.mattressAge === '3-5y') tips.push('5–8 aasta vanune madrats hakkab enamasti vajuma ja kaotab tasapisi oma toestamisvõime.')
+  if (profile.mattressAge === '5y+') tips.push('Sinu madrats on oma kasuliku eluea lõpus — üle viie aasta vana madrats ei toesta enam lülisambat korralikult.')
+  else if (profile.mattressAge === '3-5y') tips.push('3–5 aasta vanune madrats hakkab enamasti vajuma ja kaotab tasapisi oma toestamisvõime.')
   if (profile.currentMattress === 'spring' && (profile.mattressAge === '3-5y' || profile.mattressAge === '5y+')) tips.push('Vanema vedrumadratsi tüüpiline murekoht on keskosa vajumine — kontrolli, kas voodi keskele on tekkinud lohk.')
   else if (profile.currentMattress === 'foam' && (profile.bodyType === 'broad')) tips.push('Vahtmadrats vajub raskema keha all aja jooksul rohkem — tugevama tsoonitoega variant peab kauem vastu.')
   else if (profile.currentMattress === 'unknown') tips.push('Ei tea, mis madrats sul on? Vajuta keskele: vedrud annavad vetruva vastupanu, vaht vajub aeglaselt ja ühtlaselt.')

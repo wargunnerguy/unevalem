@@ -5,13 +5,15 @@ import type { Tip } from '~/types'
 const { incrementVisit } = useReadHistory()
 onMounted(() => incrementVisit())
 
+const { siteUrl } = useRuntimeConfig().public
+
 useHead({
   title: homepage.metaTitle,
   meta: [
     { name: 'description', content: homepage.metaDescription },
     { property: 'og:title', content: homepage.metaTitle },
     { property: 'og:description', content: homepage.metaDescription },
-    { property: 'og:url', content: 'https://unevalem.ee/' },
+    { property: 'og:url', content: `${siteUrl}/` },
   ],
   script: [
     {
@@ -21,14 +23,14 @@ useHead({
           '@context': 'https://schema.org',
           '@type': 'Organization',
           name: 'Unevalem',
-          url: 'https://unevalem.ee',
-          logo: 'https://unevalem.ee/unevalem_logo.png',
+          url: siteUrl,
+          logo: `${siteUrl}/unevalem_logo.png`,
         },
         {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: 'Unevalem',
-          url: 'https://unevalem.ee',
+          url: siteUrl,
           inLanguage: 'et',
         },
       ]),
@@ -62,12 +64,6 @@ const basePosts = computed(() =>
 const isMounted = useMounted()
 const displayPosts = computed(() => (isMounted.value ? featuredPosts.value : basePosts.value))
 const showPersonalizedNote = computed(() => isMounted.value && completedCount.value > 0)
-
-// A/B variant label
-const { variant } = useABTest()
-const variantLabel = computed(() =>
-  calculator.variantLabels[variant.value] ?? calculator.heroLabel,
-)
 
 // Session — for revisit banner (client-only to avoid hydration mismatch)
 const { siteProfile, completedCount, activeCalcType } = useCalcSession()

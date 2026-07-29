@@ -13,7 +13,6 @@ const calcVersion = computed(() => {
 
 const { step, answers, result, analyzing, selectOption, submitQuiz, restore, finishAnalysis, goBack, reset } = useCalculator()
 const { products } = useProducts()
-const { variant } = useABTest()
 const { submitCalcResult, resetSubmitted } = useAnalytics()
 // gaEvent is auto-imported from composables/useAnalytics
 const {

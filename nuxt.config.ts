@@ -23,6 +23,11 @@ function articleRoutes(): string[] {
   }
 }
 
+// Resolved once here so the head defaults, the runtimeConfig and the sitemap
+// all agree. Staging sets NUXT_PUBLIC_SITE_URL=https://test.unevalem.ee, which
+// must not leak production URLs into og:image or JSON-LD.
+const SITE_URL = process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee'
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -78,8 +83,13 @@ export default defineNuxtConfig({
         { property: 'og:locale', content: 'et_EE' },
         { name: 'twitter:card', content: 'summary_large_image' },
         // Site-wide fallback social image; article pages override via key.
-        { key: 'og-image', property: 'og:image', content: 'https://unevalem.ee/unevalem_logo.png' },
-        { key: 'twitter-image', name: 'twitter:image', content: 'https://unevalem.ee/unevalem_logo.png' },
+        // Dimensions are declared so Facebook/LinkedIn render a large card on
+        // first scrape instead of falling back to a thumbnail.
+        { key: 'og-image', property: 'og:image', content: `${SITE_URL}/unevalem_logo.png` },
+        { key: 'twitter-image', name: 'twitter:image', content: `${SITE_URL}/unevalem_logo.png` },
+        { key: 'og-image-width', property: 'og:image:width', content: '1200' },
+        { key: 'og-image-height', property: 'og:image:height', content: '630' },
+        { key: 'og-image-alt', property: 'og:image:alt', content: 'Unevalem' },
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -94,8 +104,12 @@ export default defineNuxtConfig({
         },
         {
           defer: true,
-          'data-domain': 'unevalem.ee',
-          src: 'https://plausible.io/js/script.js',
+          // Staging must report to its own Plausible site (or none) rather than
+          // inflating unevalem.ee's numbers with test traffic.
+          'data-domain': process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN ?? 'unevalem.ee',
+          // tagged-events + outbound-links: outbound recommendation clicks land
+          // in the cookieless tool, which reports regardless of ad consent.
+          src: 'https://plausible.io/js/script.tagged-events.outbound-links.js',
         },
       ],
     },
@@ -103,7 +117,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      siteUrl:      process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee',
+      siteUrl:      SITE_URL,
       // Exposed to browser for fire-and-forget analytics POST (no-cors, not a secret)
       sheetsApiUrl: process.env.SHEETS_API_URL ?? '',
       // Google Analytics 4 Measurement ID (public, not a secret). Loaded via
