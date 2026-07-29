@@ -326,7 +326,37 @@ The blocker here is article count, not effort.
 
 ---
 
-## 8. Before the first euro is spent
+## 8. Checking that Google Analytics actually works
+
+**Realtime being empty is usually not a bug.** It shows only the last 30 minutes. A site with no
+campaigns running has no concurrent visitors, so Realtime is empty almost all the time while the
+standard reports still accumulate data over days. Use **DebugView**, not Realtime, to answer
+"is the tag alive?".
+
+Two-minute check:
+
+1. Open the site in a **private window with no ad blocker**. uBlock, Brave, AdGuard and Safari's
+   tracking protection all block `googletagmanager.com` outright, and then nothing is sent at all.
+2. Add `?ga_debug=1` to the URL — e.g. `https://unevalem.ee/?ga_debug=1`. This sets gtag's
+   `debug_mode`.
+3. In GA4 go to **Admin → DebugView**.
+4. Accept cookies on the banner.
+5. You should appear within seconds with a `page_view`. Open it and check `page_title` matches
+   the page you are actually on.
+6. Click through to an article and confirm the second `page_view` carries *that* page's title.
+
+If DebugView shows events but Realtime stays empty, everything works — there is simply no live
+traffic yet. If DebugView shows nothing at all, the tag is being blocked before it loads; check
+the measurement ID against **Admin → Data streams**.
+
+**One more thing to know:** if you ever clicked "Keeldun" on the old cookie banner, that stored a
+refusal for a full year and your own visits were sent without analytics storage, which keeps you
+out of Realtime. The consent rework uses a new cookie, so that old choice is discarded and you
+will be asked again — but clearing site data for unevalem.ee resolves it instantly.
+
+---
+
+## 9. Before the first euro is spent
 
 - [ ] Deactivate every fabricated row in the `notifications` sheet tab. The toast is unmounted in
       code, so this is belt-and-braces — but do it, because the component comes back one day.

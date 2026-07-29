@@ -33,19 +33,63 @@ export default defineNuxtPlugin(() => {
   window.gtag('set', 'url_passthrough', true)
   window.gtag('set', 'ads_data_redaction', true)
 
+  // Opt-in debug: load any page with ?ga_debug=1 to have the session appear in
+  // GA4 → Admin → DebugView. Far more reliable for "is the tag alive?" than
+  // Realtime, which only shows the last 30 minutes and needs live traffic.
+  const debugMode = new URLSearchParams(window.location.search).has('ga_debug')
+
   // send_page_view off: the router hook below fires on the initial route too,
   // so letting config also send one would double-count every landing.
+  // (No anonymize_ip — that is a Universal Analytics parameter; GA4 ignores it
+  // and always anonymises.)
   window.gtag('js', new Date())
-  window.gtag('config', gaId, { anonymize_ip: true, send_page_view: false })
+  window.gtag('config', gaId, {
+    send_page_view: false,
+    ...(debugMode ? { debug_mode: true } : {}),
+  })
 
   const script = document.createElement('script')
   script.async = true
   script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
   document.head.appendChild(script)
 
+  // Resolves once the new page's <title> has actually been written to the DOM.
+  //
+  // ⚠️ This matters more than it looks. router.afterEach fires BEFORE Vue
+  // renders the incoming page, and useHead applies the title later still, on
+  // its own DOM flush after paint. gtag auto-collects page_title from
+  // document.title at send time — so sending immediately (or even after one
+  // nextTick, which is too early; measured) filed every internal navigation
+  // under the PREVIOUS page's title. GA4's "Pages and screens" report keys on
+  // title by default, which made all in-site navigation look like the homepage.
+  //
+  // nextTick covers the render queue; the two rAFs carry us past the paint the
+  // head flush rides on. Falls back to sending anyway if the title never
+  // changes — some pages legitimately share a title.
+  function afterTitleSettles(previousTitle: string): Promise<void> {
+    return nextTick().then(
+      () =>
+        new Promise((resolve) => {
+          let frames = 0
+          const tick = () => {
+            if (document.title !== previousTitle || frames++ >= 3) return resolve()
+            requestAnimationFrame(tick)
+          }
+          requestAnimationFrame(tick)
+        }),
+    )
+  }
+
   // GA4 auto-sends a page_view only for the first load; the site navigates
   // client-side, so emit one on each route change.
-  useRouter().afterEach((to) => {
-    window.gtag('event', 'page_view', { page_path: to.fullPath })
+  useRouter().afterEach(async () => {
+    const titleBefore = document.title
+    await afterTitleSettles(titleBefore)
+    // GA4 parameters, not the Universal Analytics `page_path`: GA4 ignores that
+    // one and derives the page from page_location.
+    window.gtag('event', 'page_view', {
+      page_location: window.location.href,
+      page_title: document.title,
+    })
   })
 })
