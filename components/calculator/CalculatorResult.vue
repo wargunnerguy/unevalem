@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CalculatorResult, CalcType } from '~/types'
-import { calculator, disclosure } from '~/utils/copy'
+import { calculator, disclosure, lead } from '~/utils/copy'
 
 const props = defineProps<{
   result: CalculatorResult
@@ -83,6 +83,13 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
           <span>{{ tip }}</span>
         </li>
       </ul>
+    </div>
+
+    <!-- Newsletter. Placed after the advice and before any product: the result
+         itself is never withheld for an email, and this is framed as sending
+         the visitor their own result, not unlocking it. -->
+    <div class="border-t border-lavender/25 pt-5">
+      <LeadForm :source="`calc-result:${calcType}`" :heading="lead.heading" />
     </div>
 
     <!-- Matching products — compact, last, no hard-sell -->

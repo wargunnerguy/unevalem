@@ -65,6 +65,12 @@ onMounted(() => {
         </nav>
       </div>
 
+      <!-- The quiet, permanent sign-up surface: out of the way, easy to find,
+           never in anyone's face. -->
+      <div class="mt-6 max-w-md">
+        <LeadForm source="footer" variant="dark" />
+      </div>
+
       <div class="text-xs text-muted/60 mt-6 border-t border-dusk pt-4 space-y-1">
         <p>{{ footer.legal }}</p>
         <ClientOnly>

@@ -93,6 +93,7 @@ function doPost(e) {
     if (action === 'post_view')    return handlePostView(ss, payload)
     if (action === 'submit_calc')  return handleCalcSubmit(ss, payload)
     if (action === 'waitlist')     return handleWaitlist(ss, payload)
+    if (action === 'subscribe')    return handleSubscribe(ss, payload)
     if (action === 'create_order') return handleCreateOrder(ss, payload)
 
     return json({ ok: false, error: 'Unknown action: ' + String(action) })
@@ -260,6 +261,75 @@ function handleWaitlist(ss, payload) {
   if (sheet.getLastRow() === 0) sheet.appendRow(['createdAt', 'email', 'productId'])
   sheet.appendRow([new Date().toISOString(), email, productId])
   return json({ ok: true })
+}
+
+/**
+ * Newsletter sign-up → subscribers tab.
+ *
+ * ⚠️ The `subscribers` tab holds personal data and is deliberately NOT in
+ * SHEET_MAP — same rule as `orders` and `waitlist`. Never add it: doing so
+ * would publish the whole mailing list over an unauthenticated GET.
+ *
+ * Consent is stored as the exact wording shown, with a timestamp. Estonian
+ * ESS §103¹ requires prior consent for direct e-marketing, and consent that
+ * cannot be evidenced is not consent.
+ */
+function handleSubscribe(ss, payload) {
+  var email = String(payload.email || '').trim().toLowerCase().slice(0, 200)
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ ok: false, error: 'invalid email' })
+  // No consent, no row. The client requires the checkbox; this is the backstop.
+  if (payload.consent !== true) return json({ ok: false, error: 'consent required' })
+
+  var headers = [
+    'createdAt', 'email', 'source', 'sessionId', 'env',
+    'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+    'clickId', 'consentText', 'unsubscribed'
+  ]
+
+  // Sign-ups can arrive concurrently; without a lock two submissions can both
+  // read "not present" and write duplicate rows for the same address.
+  var lock = LockService.getScriptLock()
+  try {
+    lock.waitLock(10000)
+  } catch (err) {
+    return json({ ok: false, error: 'busy' })
+  }
+
+  try {
+    var sheet = ss.getSheetByName('subscribers')
+    if (!sheet) sheet = ss.insertSheet('subscribers')
+    if (sheet.getLastRow() === 0) sheet.appendRow(headers)
+
+    // Already subscribed: succeed quietly rather than creating a duplicate or
+    // leaking, via an error, whether an address is on the list.
+    var data = sheet.getDataRange().getValues()
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][1]).trim().toLowerCase() === email) {
+        return json({ ok: true, duplicate: true })
+      }
+    }
+
+    var clickId = payload.fbclid || payload.gclid || payload.ttclid || payload.msclkid || ''
+
+    sheet.appendRow([
+      new Date().toISOString(),
+      email,
+      String(payload.source || '').slice(0, 100),
+      String(payload.sessionId || '').slice(0, 50),
+      String(payload.env || '').slice(0, 20),
+      String(payload.utm_source || '').slice(0, 200),
+      String(payload.utm_medium || '').slice(0, 200),
+      String(payload.utm_campaign || '').slice(0, 200),
+      String(payload.utm_content || '').slice(0, 200),
+      String(payload.utm_term || '').slice(0, 200),
+      String(clickId).slice(0, 200),
+      String(payload.consentText || '').slice(0, 500),
+      ''
+    ])
+    return json({ ok: true })
+  } finally {
+    lock.releaseLock()
+  }
 }
 
 /**

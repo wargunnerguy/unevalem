@@ -496,6 +496,31 @@ export const quizPage = {
   empty: 'Unetest pole hetkel saadaval.',
 }
 
+// Newsletter sign-up. Deliberately quiet: no popup, no interstitial, no
+// exit-intent, and never a gate on a result. The calculator and the quiz stay
+// free and ungated, because the ads say "e-posti ei küsi" and that has to stay
+// literally true.
+export const lead = {
+  heading: 'Saada see tulemus endale',
+  headingGeneric: 'Üks kiri kuus, mitte rohkem',
+  // The frequency promise is on the form itself, not buried in a policy page —
+  // and it is then honoured.
+  promise: 'Kord või kaks kuus üks uneuuring või müüt lahti seletatud. Midagi ei müü.',
+  placeholder: 'sinu@email.ee',
+  submit: 'Telli',
+  sending: 'Saadan...',
+  confirm: 'Valmis. Kirjuta meile igal ajal, kui soovid tellimuse lõpetada.',
+  error: 'Midagi läks valesti. Proovi hetke pärast uuesti.',
+  invalidEmail: 'Kontrolli e-posti aadressi.',
+  // Estonian ESS §103¹ requires prior consent for direct e-marketing, so this
+  // is an explicit unticked checkbox, never pre-checked. CONSENT_TEXT is stored
+  // verbatim with each row: consent you cannot evidence is not consent.
+  consentLabel: 'Soovin saada Unevalemi uneteadmiste kirja ja nõustun oma e-posti aadressi töötlemisega.',
+  consentVersion: '2026-07-29',
+  privacyLink: 'Privaatsuspoliitika',
+  unsubscribeNote: 'Saad tellimuse igal ajal lõpetada.',
+}
+
 // Campaign landing page CHROME ONLY. Every editorial string on /probleem/*
 // (eyebrow, headline, body, CTA label) comes from the `pains` sheet tab so the
 // owner can add an ad angle without a developer — same split as quizPage.*.
@@ -535,16 +560,27 @@ export const privacyPage = {
   metaTitle: 'Privaatsuspoliitika | Unevalem',
   metaDescription: 'Kuidas Unevalem kogub ja kasutab andmeid ning milliseid küpsiseid kasutame.',
   heading: 'Privaatsuspoliitika',
-  lastUpdated: 'Viimati uuendatud: 21. juuli 2026',
+  lastUpdated: 'Viimati uuendatud: 29. juuli 2026',
   intro:
     'Sinu privaatsus on meile oluline. Siin selgitame lihtsalt ja ausalt, milliseid andmeid Unevalem kogub, miks ja kuidas saad seda ise kontrollida. Isikuandmete vastutav töötleja on Costlio OÜ (registrikood 14562345, e-post unevalem@gmail.com).',
   sections: [
     {
       heading: 'Milliseid andmeid kogume',
-      body: 'Lehe hariduslik osa — artiklid, kalkulaator ja testid — ei nõua sisselogimist ega isikuandmeid. Isikuandmeid vajame ainult siis, kui vormistad e-poes tellimuse (vt „Ostud, maksed ja tarne"). Muul juhul kogume vaid anonüümset kasutusstatistikat ja sinu kalkulaatori vastuseid.',
+      body: 'Lehe hariduslik osa — artiklid, kalkulaator ja testid — ei nõua sisselogimist ega isikuandmeid ning on kasutatav ilma midagi meile jagamata. Isikuandmeid vajame ainult kahel juhul: kui tellid uudiskirja või kui vormistad e-poes tellimuse. Muul juhul kogume vaid anonüümset kasutusstatistikat ja sinu kalkulaatori vastuseid.',
       items: [
         'Kalkulaatori vastused (nt magamisasend, temperatuurieelistus) — hoitakse sinu seadmes küpsistes ja saadetakse meile üksnes anonüümselt koondstatistikana.',
         'Anonüümne külastusstatistika — milliseid lehti vaadatakse ja kust külastajad tulevad.',
+        'Kampaaniaandmed — kui jõuad meieni reklaami kaudu, salvestame sinu seadmesse kampaania nime, et teada, milline reklaam töötab. See ei sisalda midagi, mis sind isikuna tuvastaks.',
+      ],
+    },
+    {
+      heading: 'Uudiskiri',
+      body: 'Kui tellid uneteadmiste kirja, töötleme sinu e-posti aadressi nõusoleku alusel (isikuandmete kaitse üldmääruse art 6 lg 1 p a). Nõusolek on vabatahtlik ja seda küsime alati eraldi märkeruuduga — ühtegi testi ega kalkulaatori tulemust me e-posti taha ei peida.',
+      items: [
+        'Salvestame e-posti aadressi, tellimise aja ja koha (nt milliselt lehelt tellisid) ning nõusoleku täpse sõnastuse.',
+        'Saadame kirja kord või kaks kuus. Aadressi ei müü ega jaga me kolmandatele isikutele.',
+        'Saad nõusoleku igal ajal tagasi võtta, kirjutades aadressil unevalem@gmail.com — eemaldame aadressi loendist ja kinnitame seda sulle.',
+        'Aadressi säilitame kuni tellimuse lõpetamiseni.',
       ],
     },
     {

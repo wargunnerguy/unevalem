@@ -217,6 +217,11 @@ const facebookShareUrl = computed(
           </ul>
         </div>
 
+        <!-- Newsletter, after the article has delivered something -->
+        <div class="mt-10 pt-6 border-t border-lavender/20">
+          <LeadForm :source="`article:${slug}`" />
+        </div>
+
         <!-- Share -->
         <div class="mt-10 pt-6 border-t border-lavender/20">
           <p class="text-sm font-semibold text-midnight mb-3">{{ blogPage.share.heading }}</p>

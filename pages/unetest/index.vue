@@ -219,6 +219,15 @@ const screenKey = computed(() => {
               </ul>
             </div>
 
+            <!-- Result is already shown above; this offers to send it, never
+                 gates it. quizPage.shareResult finally has a use. -->
+            <div class="mb-6">
+              <LeadForm
+                :source="`quiz:${quiz.id}:${result.key}`"
+                :heading="quizPage.shareResult"
+              />
+            </div>
+
             <div class="flex flex-col sm:flex-row gap-3">
               <NuxtLink
                 to="/"
