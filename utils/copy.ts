@@ -550,9 +550,10 @@ export const socialProof = {
 }
 
 export const cookieConsent = {
-  text: 'Kasutame analüütikat, et mõista, kuidas lehte kasutatakse, ja seda paremaks muuta. Võid soovi korral keelduda.',
-  accept: 'Selge',
-  decline: 'Keeldun',
+  text: 'Kasutame küpsiseid, et mõista, kuidas lehte kasutatakse, ja et mõõta oma reklaamide tulemuslikkust. Sina otsustad, mida lubad.',
+  acceptAll: 'Nõustun kõigega',
+  necessaryOnly: 'Ainult vajalikud',
+  analyticsOnly: 'Ainult statistika',
   learnMore: 'Loe lähemalt',
 }
 
@@ -602,19 +603,21 @@ export const privacyPage = {
       body: 'Küpsis on väike tekstifail sinu seadmes. Kasutame kahte tüüpi küpsiseid:',
       items: [
         'Vajalikud küpsised — salvestavad sinu kalkulaatori edenemise, eelistused (nt tume/hele režiim) ja küpsisevaliku. Need töötavad alati ega vaja nõusolekut.',
-        'Analüütika küpsised — Google Analytics kasutab neid külastuste mõõtmiseks. Neid seatakse alles siis, kui annad selleks nõusoleku.',
+        'Analüütika küpsised — Google Analytics kasutab neid külastuste mõõtmiseks. Kuni sa pole valikut teinud, töötab Google Analytics küpsisteta režiimis.',
+        'Reklaamiküpsised — mõõdavad, kas meie reklaam jõudis kohale. Neid seatakse ainult siis, kui vajutad „Nõustun kõigega". Vaikimisi on need välja lülitatud.',
       ],
     },
     {
       heading: 'Nõusolek ja selle muutmine',
-      body: 'Kuni sa pole nõusolekut andnud, töötab Google Analytics küpsisteta režiimis ega salvesta sinu seadmesse midagi. Kui vajutad „Nõustun\", lubad analüütika küpsised. Oma valikut saad igal ajal muuta, kustutades brauseris selle lehe küpsised — seejärel küsime nõusolekut uuesti.',
+      body: 'Küpsiseteates on kolm valikut ja keeldumine on täpselt sama lihtne kui nõustumine. „Ainult vajalikud" lülitab välja nii statistika kui reklaamiküpsised. „Ainult statistika" lubab külastusstatistika, aga mitte reklaamimõõtmist. „Nõustun kõigega" lubab mõlemad. Reklaamiküpsiseid me kunagi vaikimisi sisse ei lülita. Oma valikut saad igal ajal muuta, kustutades brauseris selle lehe küpsised — seejärel küsime uuesti.',
     },
     {
       heading: 'Kolmandad osapooled',
-      body: 'Anonüümse statistika kogumiseks kasutame kahte teenust:',
+      body: 'Kasutame järgmisi teenuseid:',
       items: [
         'Google Analytics (Google Ireland Ltd.) — veebiliikluse analüüs. IP-aadressid anonümiseeritakse.',
         'Plausible Analytics — privaatsussõbralik, küpsisevaba analüütika, mis ei jälgi üksikkasutajaid.',
+        'Meta Pixel (Meta Platforms Ireland Ltd.) — mõõdab meie Facebooki ja Instagrami reklaamide tulemuslikkust. Laeb ainult siis, kui oled reklaamiküpsistega nõustunud.',
       ],
     },
     {

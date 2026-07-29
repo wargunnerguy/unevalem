@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { cookieConsent } from '~/utils/copy'
 
-const { consent, grant, deny } = useConsent()
+const { decided, acceptAll, necessaryOnly, analyticsOnly } = useConsent()
 
-// Only ask for consent when analytics is actually configured — otherwise no
-// cookies are set and there is nothing to consent to.
-const gaEnabled = !!useRuntimeConfig().public.gaId
+// Only ask when there is actually something to consent to. With no GA id and
+// no pixel id configured (staging), nothing sets a cookie and the banner would
+// be asking about nothing.
+const config = useRuntimeConfig().public
+const trackingConfigured = !!config.gaId || !!config.metaPixelId
 </script>
 
 <template>
@@ -19,7 +21,7 @@ const gaEnabled = !!useRuntimeConfig().public.gaId
       leave-to-class="opacity-0 translate-y-2"
     >
       <div
-        v-if="gaEnabled && consent === null"
+        v-if="trackingConfigured && !decided"
         class="fixed bottom-0 inset-x-0 z-[60] bg-dusk border-t border-lavender/20 px-4 py-3"
         role="dialog"
         aria-label="Küpsiste nõusolek"
@@ -34,20 +36,29 @@ const gaEnabled = !!useRuntimeConfig().public.gaId
               {{ cookieConsent.learnMore }}
             </NuxtLink>
           </p>
-          <div class="flex items-center gap-2 shrink-0">
+          <!-- Reject is one click, same size and weight as accept. A refusal
+               must never be harder than agreement. -->
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
             <button
               type="button"
-              class="px-3 py-1.5 rounded-lg text-sm font-medium text-muted hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
-              @click="deny"
+              class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-midnight text-foam hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+              @click="necessaryOnly"
             >
-              {{ cookieConsent.decline }}
+              {{ cookieConsent.necessaryOnly }}
+            </button>
+            <button
+              type="button"
+              class="px-4 py-1.5 rounded-lg text-sm font-medium border border-lavender/40 text-foam/90 hover:border-lavender transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+              @click="analyticsOnly"
+            >
+              {{ cookieConsent.analyticsOnly }}
             </button>
             <button
               type="button"
               class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-gold text-midnight hover:bg-gold/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold/60"
-              @click="grant"
+              @click="acceptAll"
             >
-              {{ cookieConsent.accept }}
+              {{ cookieConsent.acceptAll }}
             </button>
           </div>
         </div>

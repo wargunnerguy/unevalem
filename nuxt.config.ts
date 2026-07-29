@@ -146,6 +146,9 @@ export default defineNuxtConfig({
       // plugins/analytics.client.ts behind Consent Mode. Override with
       // NUXT_PUBLIC_GA_ID; set it empty in a local .env to disable GA in dev.
       gaId:         process.env.NUXT_PUBLIC_GA_ID ?? 'G-D921C30JEQ',
+      // Meta Pixel id. Empty by default: the pixel plugin no-ops entirely
+      // unless this is set AND the visitor granted advertising consent.
+      metaPixelId:  process.env.NUXT_PUBLIC_META_PIXEL_ID ?? '',
     },
   },
 })

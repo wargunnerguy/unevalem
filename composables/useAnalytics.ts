@@ -4,8 +4,12 @@ import type { UserProfile, CalculatorResult, CalcType } from '~/types'
 // Consent Mode v2 handles the cookie side: when analytics_storage is denied
 // the hit goes out cookieless, so no extra gating is needed here.
 export function gaEvent(name: string, params: Record<string, string | number> = {}) {
-  if (!import.meta.client || typeof window.gtag !== 'function') return
-  window.gtag('event', name, params)
+  if (!import.meta.client) return
+  if (typeof window.gtag === 'function') window.gtag('event', name, params)
+  // Broadcast so the Meta pixel can mirror the events we already fire without
+  // every call site having to know whether a pixel exists. The listener is only
+  // attached after advertising consent, so this is a no-op otherwise.
+  window.dispatchEvent(new CustomEvent('unevalem:ga-event', { detail: { name, params } }))
 }
 
 export function useAnalytics() {
