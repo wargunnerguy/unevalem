@@ -18,6 +18,10 @@ public/data/stats.json
 public/data/products.json
 public/data/tips.json
 public/data/quizzes.json
+public/data/pains.json
+
+# Symlink some local tooling drops next to .output; never commit it
+/dist
 
 # OS
 .DS_Store
