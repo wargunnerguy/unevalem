@@ -1,5 +1,6 @@
 import type { UserProfile, CalculatorResult, CalcType } from '~/types'
 import { isProdSite } from '~/utils/site'
+import { gaTransport } from '~/utils/ga'
 
 // GA4 custom event, no-op when gtag is absent (GA disabled or blocked).
 // Consent Mode v2 handles the cookie side: when analytics_storage is denied
@@ -16,6 +17,7 @@ export function gaEvent(name: string, params: Record<string, string | number> = 
 export function useAnalytics() {
   const { sessionId } = useABTest()
   const { attrPayload } = useAttribution()
+  const { analyticsGranted, adsGranted } = useConsent()
   const config = useRuntimeConfig()
 
   // Which deployment a row came from, so test rows stay filterable in the same
@@ -78,6 +80,13 @@ export function useAnalytics() {
       // decline and pixel coverage is permanently partial. Don't expect these
       // counts to reconcile with Meta's.
       ...attrPayload(),
+      // Lets the Apps Script re-send this conversion to GA4 over the
+      // Measurement Protocol when a tracker blocker stopped the browser from
+      // reporting it. It only does so when gaBlocked is true, so a visitor
+      // whose gtag.js loaded normally is never counted twice.
+      ...gaTransport(config.public.gaId as string),
+      analyticsConsent: analyticsGranted.value,
+      adsConsent:       adsGranted.value,
     }
 
     if (import.meta.dev) {

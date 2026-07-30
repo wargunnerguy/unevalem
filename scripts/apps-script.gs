@@ -232,6 +232,14 @@ function handleCalcSubmit(ss, payload) {
     lock.releaseLock()
   }
 
+  // Recovers the funnel's main conversion for blocker-using visitors. Mirrors
+  // the client's own `submit_calc` event, and only fires when that one couldn't.
+  gaSendServerEvent_(payload, 'submit_calc', {
+    calc_type: String(payload.calcType || ''),
+    current_score: Number(payload.currentScore) || 0,
+    improved_score: Number(payload.improvedScore) || 0,
+  })
+
   return json({ ok: true })
 }
 
@@ -326,6 +334,13 @@ function handleSubscribe(ss, payload) {
       String(payload.consentText || '').slice(0, 500),
       ''
     ])
+    // Mirrors the client's `lead` event for blocked visitors. Inside the lock
+    // and after the duplicate check on purpose: a repeat sign-up returns above
+    // without reaching here, so re-submitting the same address cannot inflate
+    // the conversion count.
+    gaSendServerEvent_(payload, 'lead', {
+      source: String(payload.source || ''),
+    })
     return json({ ok: true })
   } finally {
     lock.releaseLock()
@@ -409,9 +424,17 @@ function handleCreateOrder(ss, payload) {
     if (orders.getLastRow() === 0) {
       orders.appendRow(['orderRef', 'createdAt', 'status', 'itemsJson', 'total',
         'name', 'email', 'phone', 'shipMethod', 'terminalId', 'terminalName',
-        'note', 'transactionId', 'paidAt', 'orderNumber'])
-    } else if (orders.getRange(1, 15).getValue() !== 'orderNumber') {
-      orders.getRange(1, 15).setValue('orderNumber') // migrate pre-existing tab
+        'note', 'transactionId', 'paidAt', 'orderNumber', 'gaMeta'])
+    } else {
+      if (orders.getRange(1, 15).getValue() !== 'orderNumber') {
+        orders.getRange(1, 15).setValue('orderNumber') // migrate pre-existing tab
+      }
+      // Column 16 appended rather than inserted: setOrderStatus_ and the
+      // payment callback address columns positionally, so nothing before it
+      // may shift.
+      if (orders.getRange(1, 16).getValue() !== 'gaMeta') {
+        orders.getRange(1, 16).setValue('gaMeta')
+      }
     }
 
     // Next number = max existing + 1, starting from 1001
@@ -423,10 +446,14 @@ function handleCreateOrder(ss, payload) {
     }
     orderNumber = maxN + 1
 
+    // gaMeta is stored, not acted on, at this point: the purchase only counts
+    // once payment is CONFIRMED, and by then the visitor has left for the
+    // payment provider and the browser cannot report anything.
     orders.appendRow([
       orderRef, new Date().toISOString(), 'PENDING', JSON.stringify(lines), total,
       name, email, phone, shipMethod, terminalId, terminalName,
-      String(payload.note || '').slice(0, 500), '', '', orderNumber
+      String(payload.note || '').slice(0, 500), '', '', orderNumber,
+      JSON.stringify(payload.gaMeta || {})
     ])
   } finally {
     lock.releaseLock()
@@ -622,6 +649,11 @@ function handlePaymentCallback(ss, jsonStr, mac) {
         orders.getRange(i + 1, 13).setValue(txId)
         orders.getRange(i + 1, 14).setValue(new Date().toISOString())
         sendOrderEmails_(data[i], orderRef)
+        // After the state change and the emails: a GA failure must never cost
+        // an order confirmation. The PAID guard above makes this idempotent —
+        // a duplicate callback returns before reaching here, so a retry from
+        // the payment provider cannot double-count the purchase.
+        gaSendPurchase_(data[i], txId)
       } else if ((status === 'CANCELLED' || status === 'EXPIRED') && current === 'PENDING') {
         orders.getRange(i + 1, 3).setValue(status)
       }
@@ -630,6 +662,52 @@ function handlePaymentCallback(ss, jsonStr, mac) {
     return json({ ok: false, error: 'order not found' })
   } finally {
     lock.releaseLock()
+  }
+}
+
+/**
+ * GA4 `purchase` for a confirmed order, using the gaMeta captured at checkout.
+ *
+ * Unlike the other two paths this is not merely a fallback: the browser can
+ * never send it. Payment confirmation arrives as a server-to-server callback
+ * while the visitor is on the payment provider's domain, and plenty never
+ * return to /aitah at all. gaSendServerEvent_ still gates on gaBlocked, so
+ * visitors whose gtag.js works keep reporting purchases from the browser via
+ * /aitah and are not counted twice.
+ */
+function gaSendPurchase_(orderRow, txId) {
+  try {
+    var meta = {}
+    try { meta = JSON.parse(String(orderRow[15] || '{}')) } catch (e) { meta = {} }
+    // Orders created before the gaMeta column existed have nothing to send.
+    if (!meta || !meta.gaBlocked) return
+
+    var items = []
+    try {
+      var lines = JSON.parse(String(orderRow[3] || '[]'))
+      for (var i = 0; i < lines.length; i++) {
+        items.push({
+          item_id: String(lines[i].id || ''),
+          item_name: String(lines[i].name || lines[i].id || ''),
+          price: Number(lines[i].price) || 0,
+          quantity: Number(lines[i].qty) || 1,
+        })
+      }
+    } catch (e) { /* items are a nice-to-have; the purchase still counts */ }
+
+    // env lives inside gaMeta for orders — the checkout payload has no
+    // top-level env field the way the calculator and newsletter ones do. No
+    // default: an order row written before this field existed must not be
+    // assumed to be production, or a local checkout test would report a real
+    // purchase. gaSendServerEvent_ drops anything that isn't 'prod'.
+    gaSendServerEvent_(meta, 'purchase', {
+      transaction_id: String(orderRow[14] || txId || ''),
+      value: Number(orderRow[4]) || 0,
+      currency: 'EUR',
+      items: items,
+    })
+  } catch (err) {
+    Logger.log('GA MP purchase failed (ignored): ' + err.message)
   }
 }
 
@@ -699,12 +777,151 @@ function bytesToHex_(bytes) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// GA4 MEASUREMENT PROTOCOL — server-side conversion recovery
+//
+// Tracker blockers (uBlock Origin, AdGuard, Brave Shields, filtering DNS) do
+// not block googletagmanager.com — they answer it with a neutered 200 stub. So
+// `window.gtag` still exists as a no-op and every client-side event silently
+// disappears. That is 15–30% of visitors, and a higher share of paid traffic
+// than organic, so ad optimisation and conversion counts are both distorted.
+//
+// These visitors still reach this backend: the calculator, newsletter and
+// checkout POST first-party, which no blocker touches. So the conversions that
+// matter get re-sent to GA4 from here.
+//
+// ONLY when the client reports it was blocked (`gaBlocked: true`). A visitor
+// whose gtag.js loaded normally already sent the event from the browser and
+// must not be counted twice.
+//
+// Script Properties (File → Project properties → Script properties):
+//   GA_MEASUREMENT_ID — e.g. G-D921C30JEQ
+//   GA_API_SECRET     — GA4 Admin → Data Streams → your stream →
+//                       Measurement Protocol API secrets → Create
+// Absent either one, every call below is a silent no-op.
+// ═══════════════════════════════════════════════════════════════════════════
+
+var GA_MP_ENDPOINT = 'https://www.google-analytics.com/mp/collect'
+var GA_MP_DEBUG_ENDPOINT = 'https://www.google-analytics.com/debug/mp/collect'
+
+function gaConfig_() {
+  var props = PropertiesService.getScriptProperties()
+  return {
+    measurementId: props.getProperty('GA_MEASUREMENT_ID'),
+    apiSecret: props.getProperty('GA_API_SECRET'),
+  }
+}
+
+/**
+ * Re-send one conversion to GA4. Never throws: analytics must not be able to
+ * fail an order, a sign-up or a calculator submission.
+ *
+ * `meta` carries what the client observed — gaBlocked, gaClientId,
+ * gaSessionId, analyticsConsent, adsConsent, env, sessionId. For orders it is
+ * the `gaMeta` object stored on the row at checkout; for the other paths the
+ * payload itself carries those fields.
+ */
+function gaSendServerEvent_(meta, eventName, params) {
+  try {
+    if (!meta) return
+    // Review builds (localhost) must not pollute the property.
+    if (String(meta.env || '') !== 'prod') return
+    // The browser sent this already — re-sending would double-count.
+    if (meta.gaBlocked !== true) return
+    // An explicit analytics opt-out applies to server-side sends too. Undefined
+    // means the field predates this feature, not that consent was refused —
+    // analytics is opt-out on this site, so absence is treated as granted.
+    if (meta.analyticsConsent === false) return
+
+    var cfg = gaConfig_()
+    if (!cfg.measurementId || !cfg.apiSecret) return
+
+    // A blocked visitor has no _ga cookie — gtag.js never ran to write one — so
+    // this is nearly always the uva-sid fallback. That means the conversion is
+    // counted under a synthetic user that cannot be joined to a web session.
+    // A counted conversion under a synthetic user beats a lost one.
+    var clientId = String(meta.gaClientId || meta.sessionId || '').trim()
+    if (!clientId) return
+
+    var eventParams = params || {}
+    // GA4 discards events with no engagement time; 1ms is the documented
+    // minimum for server-sent events that should still count as engaged.
+    eventParams.engagement_time_msec = 1
+    if (meta.gaSessionId) eventParams.session_id = String(meta.gaSessionId)
+
+    var body = {
+      client_id: clientId,
+      non_personalized_ads: meta.adsConsent !== true,
+      events: [{ name: eventName, params: eventParams }],
+    }
+
+    UrlFetchApp.fetch(gaMpUrl_(GA_MP_ENDPOINT, cfg), {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true,
+    })
+  } catch (err) {
+    Logger.log('GA MP send failed (ignored): ' + err.message)
+  }
+}
+
+function gaMpUrl_(base, cfg) {
+  return base +
+    '?measurement_id=' + encodeURIComponent(cfg.measurementId) +
+    '&api_secret=' + encodeURIComponent(cfg.apiSecret)
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // ONE-TIME ADMIN HELPERS — run manually from the Apps Script editor
 // (select the function in the toolbar dropdown → Run). Not reachable over
 // the web app; they exist so sheet setup doesn't require hand-pasting.
 // ═══════════════════════════════════════════════════════════════════════════
 
 var REPO_RAW = 'https://raw.githubusercontent.com/wargunnerguy/unevalem/main'
+
+/**
+ * Verifies the Measurement Protocol setup without waiting for a real
+ * conversion. Run it from the editor and read the log.
+ *
+ * Sends to GA4's /debug/mp/collect, which VALIDATES ONLY — it never records an
+ * event, so this cannot pollute reports. An empty validationMessages array
+ * means the payload and credentials are good; anything else names the problem.
+ *
+ * Then sends one real `submit_calc` with client_id "mp-debug-ping" so you can
+ * watch it land in GA4 → Admin → DebugView. Delete nothing afterwards: one
+ * synthetic conversion is not worth the effort of filtering out.
+ */
+function gaDebugPing() {
+  var cfg = gaConfig_()
+  if (!cfg.measurementId || !cfg.apiSecret) {
+    Logger.log('MISSING Script Properties: set GA_MEASUREMENT_ID and GA_API_SECRET')
+    return
+  }
+
+  var body = {
+    client_id: 'mp-debug-ping',
+    events: [{ name: 'submit_calc', params: { calc_type: 'debug', engagement_time_msec: 1 } }],
+  }
+
+  var validation = UrlFetchApp.fetch(gaMpUrl_(GA_MP_DEBUG_ENDPOINT, cfg), {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(body),
+    muteHttpExceptions: true,
+  })
+  Logger.log('validation response: ' + validation.getContentText())
+
+  var live = UrlFetchApp.fetch(gaMpUrl_(GA_MP_ENDPOINT, cfg), {
+    method: 'post',
+    contentType: 'application/json',
+    payload: JSON.stringify(body),
+    muteHttpExceptions: true,
+  })
+  // A real MP send always answers 204 with an empty body, even for a payload
+  // GA will silently discard — which is exactly why the validation call above
+  // is the one that tells you anything.
+  Logger.log('live send status: ' + live.getResponseCode() + ' (204 expected)')
+}
 
 /**
  * Imports scripts/sources-import.tsv from the repo into the `sources` tab

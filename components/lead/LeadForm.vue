@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { lead } from '~/utils/copy'
 import { isProdSite } from '~/utils/site'
+import { gaTransport } from '~/utils/ga'
 
 // Generalised from shop/WaitlistForm.vue, which stays as it is: a product
 // waitlist is a different purpose and a different legal basis, and merging the
@@ -19,6 +20,7 @@ const props = withDefaults(defineProps<{
 
 const { sessionId } = useABTest()
 const { attrPayload } = useAttribution()
+const { analyticsGranted, adsGranted } = useConsent()
 const config = useRuntimeConfig()
 
 const email = ref('')
@@ -73,6 +75,11 @@ async function submit() {
         sessionId: sessionId.value,
         env: isProdSite(config.public.siteUrl as string) ? 'prod' : 'test',
         ...attrPayload(),
+        // Recovers this sign-up in GA4 when a blocker stopped the browser's
+        // own `lead` event. Server-side send is gated on gaBlocked.
+        ...gaTransport(config.public.gaId as string),
+        analyticsConsent: analyticsGranted.value,
+        adsConsent:       adsGranted.value,
       }),
     })
     state.value = 'done'

@@ -2,6 +2,8 @@
 import { useStorage } from '@vueuse/core'
 import type { ParcelTerminal, ShippingMethod } from '~/types'
 import { shop } from '~/utils/copy'
+import { gaTransport } from '~/utils/ga'
+import { isProdSite } from '~/utils/site'
 
 useHead({
   title: shop.checkout.metaTitle,
@@ -11,6 +13,9 @@ useHead({
 const { lines, count, subtotalText, setQty, remove } = useCart()
 // Captured at setup: composables can't be called from inside the submit handler.
 const { attrPayload } = useAttribution()
+const { analyticsGranted, adsGranted } = useConsent()
+const gaId = useRuntimeConfig().public.gaId as string
+const siteUrl = useRuntimeConfig().public.siteUrl as string
 
 // Maksekeskus cancel_url lands here with ?makse=katkes. Shown once, then the
 // query is stripped so the notice doesn't reappear on refresh/return visits.
@@ -123,6 +128,18 @@ async function submit() {
     // Which campaign this order traces back to. First-touch, so a visitor who
     // arrived from an ad in March and bought in April still credits the ad.
     ...attrPayload(),
+    // Stored on the order row and read back when the payment callback confirms
+    // PAID, so the GA4 `purchase` event can be sent server-side. The browser
+    // cannot send it at all: by then the visitor is on the payment provider's
+    // domain, and may never return to the site.
+    gaMeta: {
+      ...gaTransport(gaId),
+      analyticsConsent: analyticsGranted.value,
+      adsConsent:       adsGranted.value,
+      // Carried inside gaMeta because create_order has no top-level env field.
+      // Without it a local review checkout would report a real purchase.
+      env: isProdSite(siteUrl) ? 'prod' : 'test',
+    },
   }
 
   try {

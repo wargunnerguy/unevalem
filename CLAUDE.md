@@ -997,3 +997,74 @@ case where the hook never sees the initial navigation.
 The `afterTitleSettles` rAF loop stays: it fixes a different bug (GA4 filing
 client-side navigations under the previous page's title) and does not apply to
 the first load, where the prerendered HTML already carries the right `<title>`.
+
+**Postscript — that was not the reported bug.** The owner's "GA doesn't work"
+was a tracker blocker in their own browser, diagnosed only after four wrong
+turns. The lesson is procedural: for "analytics shows nothing", ask for the
+browser's console state FIRST (`typeof window.gtag`,
+`window.google_tag_manager`, the Network status of `gtag/js`, console errors).
+Reasoning from source cannot see an extension. The `send_page_view` change
+above is still correct, but it fixed nothing the owner was experiencing.
+
+### 2026-07-30 — Tracker blockers, and GA4 Measurement Protocol
+
+**Blockers do not fail loudly.** uBlock Origin, AdGuard and Brave Shields do
+NOT block `googletagmanager.com/gtag/js` — they answer it with a neutered
+**200** carrying a no-op `gtag`. So `typeof window.gtag === 'function'` stays
+true, the Network tab shows a successful request, every client-side event
+silently evaporates, and nothing in the page can tell. The real gtag.js is
+~490KB; a stub is ~1KB.
+
+**`window.google_tag_manager` is the only honest check** — only the real
+library defines it. `typeof window.gtag` proves nothing. This is what
+`isGaBlocked()` in `utils/ga.ts` tests.
+
+**Server-side conversion recovery.** 15–30% of visitors run a blocker, more on
+paid traffic than organic, so client-only measurement understates exactly the
+conversions ad spend is optimised against. Those visitors still reach the Apps
+Script backend — the calculator, newsletter and checkout POST first-party,
+which no blocker touches. So conversions are re-sent from there via the GA4
+Measurement Protocol:
+
+- `gaSendServerEvent_()` in `scripts/apps-script.gs`, wired into
+  `handleCalcSubmit` (`submit_calc`), `handleSubscribe` (`lead`) and the
+  payment callback (`purchase`, via `gaSendPurchase_`).
+- **Only fires when the client reports `gaBlocked: true`.** A visitor whose
+  gtag.js loaded normally already sent the event from the browser; sending
+  both would double-count. `utils/ga.ts` `gaTransport()` supplies the flag
+  plus GA's own `_ga` / `_ga_<streamId>` identifiers for session stitching.
+- Blocked visitors have no `_ga` cookie (gtag.js never ran to write one), so
+  `client_id` falls back to the `uva-sid` cookie. The conversion counts, under
+  a synthetic user that cannot be joined to a web session. That is the
+  intended trade — a counted conversion beats a lost one.
+- `isGaBlocked()` has a **3-second grace period**: gtag.js is async, so a page
+  one second old may legitimately not have it yet. Claiming "blocked" then
+  would double-count. An undercount is recoverable; a double count silently
+  corrupts the funnel.
+- Gated on `env === 'prod'`, and skipped when `analyticsConsent === false`.
+  For orders the env lives *inside* `gaMeta` (the checkout payload has no
+  top-level `env`), with **no default** — an order row predating the field
+  must not be assumed production.
+- Every send is wrapped so analytics can never fail an order, a sign-up or a
+  calculator submission.
+
+**`purchase` is not a fallback — the browser can never send it.** Payment
+confirmation arrives as a server-to-server callback while the visitor is still
+on the payment provider's domain, and many never return to `/aitah`. The
+`orders` tab gained a **`gaMeta`** column (16) holding the checkout's transport
+data; the callback reads it back. Column *appended*, never inserted —
+`setOrderStatus_` and `handlePaymentCallback` address columns positionally.
+Idempotency comes free from the existing `PAID` guard: a duplicate callback
+returns before reaching the GA send.
+
+**Script Properties needed** (alongside the MK_* ones):
+`GA_MEASUREMENT_ID`, `GA_API_SECRET` (GA4 Admin → Data Streams → your stream →
+Measurement Protocol API secrets). Absent either, every call is a silent no-op.
+Verify with the `gaDebugPing()` admin helper — it hits GA's
+`/debug/mp/collect`, which validates without recording. An empty
+`validationMessages` array means the setup is good. A real MP send always
+returns 204 even for a payload GA discards, so the debug endpoint is the only
+one that tells you anything.
+
+**Ordinary pageviews stay under-reported and that is fine.** Only conversions
+are recovered. When GA and the sheet disagree on volume, the sheet is right.
