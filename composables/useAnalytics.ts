@@ -1,4 +1,5 @@
 import type { UserProfile, CalculatorResult, CalcType } from '~/types'
+import { isProdSite } from '~/utils/site'
 
 // GA4 custom event, no-op when gtag is absent (GA disabled or blocked).
 // Consent Mode v2 handles the cookie side: when analytics_storage is denied
@@ -17,9 +18,11 @@ export function useAnalytics() {
   const { attrPayload } = useAttribution()
   const config = useRuntimeConfig()
 
-  // Which deployment a row came from, so staging test rows stay filterable in
-  // the same sheet the production site writes to (they share one backend).
-  const env = (config.public.siteUrl as string).includes('test.') ? 'staging' : 'prod'
+  // Which deployment a row came from, so test rows stay filterable in the same
+  // sheet the production site writes to (every environment shares one backend).
+  // Allowlist, not a 'test.' denylist: staging is retired and review now happens
+  // on localhost, which the old check silently filed as production.
+  const env = isProdSite(config.public.siteUrl as string) ? 'prod' : 'test'
 
   const submitted = useState('analytics-submitted', () => false)
 

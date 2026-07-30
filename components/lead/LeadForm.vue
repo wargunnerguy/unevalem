@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { lead } from '~/utils/copy'
+import { isProdSite } from '~/utils/site'
 
 // Generalised from shop/WaitlistForm.vue, which stays as it is: a product
 // waitlist is a different purpose and a different legal basis, and merging the
@@ -70,7 +71,7 @@ async function submit() {
         // to is reconstructable later.
         consentText: `${lead.consentLabel} [v${lead.consentVersion}]`,
         sessionId: sessionId.value,
-        env: (config.public.siteUrl as string).includes('test.') ? 'staging' : 'prod',
+        env: isProdSite(config.public.siteUrl as string) ? 'prod' : 'test',
         ...attrPayload(),
       }),
     })

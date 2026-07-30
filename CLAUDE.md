@@ -888,6 +888,9 @@ rhythm, and the rule that every number in an ad traces to a `sources` row.
 
 ### 2026-07-17 — Staging environment (branching rules)
 
+> **Superseded 2026-07-30 — see "Staging retired" below.** Kept for context on
+> why `dev` exists and why staging shared the production backend.
+
 - **`dev` branch → test.unevalem.ee** (staging, via deploy-staging.yml →
   pushes built site to wargunnerguy/unevalem-test repo's gh-pages, whose
   Pages serves the subdomain). Staging robots.txt disallows everything.
@@ -898,3 +901,49 @@ rhythm, and the rule that every number in an ad traces to a `sources` row.
   tab, MK credentials). Harmless while MK_ENV=test; BEFORE switching MK to
   live, revisit this — staging test purchases would otherwise create real
   payment transactions.
+
+### 2026-07-30 — Staging retired, review happens locally
+
+test.unevalem.ee is gone. GitHub Pages offers no authentication on any free
+plan — a private repo still publishes a public site — so a hosted staging
+environment could not be restricted to the owner without either moving the
+`unevalem.ee` zone to Cloudflare or moving staging to Cloudflare Pages. Since
+there is exactly one reviewer, a local build is the proportionate answer.
+
+What changed:
+- `deploy-staging.yml` deleted. `deploy.yml` (main → unevalem.ee) is the only
+  deployment workflow.
+- The `unevalem-test` repo's `gh-pages` branch was emptied down to `CNAME` +
+  a disallow-all `robots.txt`, so the host serves 404. **`CNAME` is kept on
+  purpose**: while the DNS record still points at GitHub, an unclaimed
+  hostname could be taken over by someone else's Pages site. Delete the repo
+  or its CNAME only after the DNS record is gone.
+- The `test` CNAME at Elkdata must be deleted by the domain owner — that is
+  the step that actually retires the hostname.
+
+**`dev` still exists and is still the integration branch.** Feature work
+merges to `dev`, gets verified with a local production build, then `dev`
+merges to `main`. The only thing that changed is where verification happens.
+
+**How to review a build locally:**
+```bash
+npm ci
+NUXT_PUBLIC_SITE_URL=http://localhost:4000 npm run build:full
+npx serve .output/public -l 4000     # not `nuxt dev` — prerendered output differs
+```
+Setting `NUXT_PUBLIC_SITE_URL` to a non-production host matters: it is what
+tags calculator and newsletter rows as non-production in the sheet (see
+`useAnalytics.ts` / `LeadForm.vue`), keeps localhost URLs out of the sitemap,
+and leaves GA/Plausible pointed at the production property only when the site
+URL really is production.
+
+**⚠️ A local `build:full` overwrites `public/data/terminals.json`, which IS
+committed** (unlike the other generated JSON). A truncated Omniva response
+passes the `if (!omniva.length)` guard and would empty the checkout terminal
+dropdown in production. After any local build:
+`git diff --stat public/data/terminals.json` — if it shrank, `git checkout --`
+it. Never commit that file from a local build.
+
+Local review still hits the PRODUCTION Apps Script backend (same sheet, same
+`orders` tab, same MK credentials). Harmless while `MK_ENV=test`; revisit
+before switching Maksekeskus to live.

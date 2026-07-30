@@ -46,8 +46,9 @@ function painRoutes(): string[] {
 }
 
 // Resolved once here so the head defaults, the runtimeConfig and the sitemap
-// all agree. Staging sets NUXT_PUBLIC_SITE_URL=https://test.unevalem.ee, which
-// must not leak production URLs into og:image or JSON-LD.
+// all agree. A review build sets NUXT_PUBLIC_SITE_URL to its own host (e.g.
+// http://localhost:4000), which must not leak production URLs into og:image or
+// JSON-LD — nor be mistaken for production when tagging sheet rows.
 const SITE_URL = process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee'
 
 export default defineNuxtConfig({
@@ -126,8 +127,8 @@ export default defineNuxtConfig({
         },
         {
           defer: true,
-          // Staging must report to its own Plausible site (or none) rather than
-          // inflating unevalem.ee's numbers with test traffic.
+          // A review build must report to its own Plausible site (or none)
+          // rather than inflating unevalem.ee's numbers with test traffic.
           'data-domain': process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN ?? 'unevalem.ee',
           // tagged-events + outbound-links: outbound recommendation clicks land
           // in the cookieless tool, which reports regardless of ad consent.
