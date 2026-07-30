@@ -38,15 +38,25 @@ export default defineNuxtPlugin(() => {
   // Realtime, which only shows the last 30 minutes and needs live traffic.
   const debugMode = new URLSearchParams(window.location.search).has('ga_debug')
 
-  // send_page_view off: the router hook below fires on the initial route too,
-  // so letting config also send one would double-count every landing.
+  // send_page_view stays ON — do not disable it again.
+  //
+  // It used to be off, on the assumption that the router hook below also covers
+  // the initial route. It does not, reliably: afterEach is registered while
+  // plugins run, but Nuxt performs its own initial navigation inside the
+  // `app:created` hook, so whether the hook ever observes that first navigation
+  // depends on framework init order rather than on anything here. When it does
+  // not, the landing page_view is never emitted and gtag sends no request at
+  // all — a visitor who lands and leaves without navigating is invisible, and
+  // GA looks completely dead. That was live on unevalem.ee.
+  //
+  // The title race that motivated the manual hook does not apply to the first
+  // load: the prerendered HTML already carries the correct <title> before gtag
+  // reads it. That bug only ever affected client-side navigation.
+  //
   // (No anonymize_ip — that is a Universal Analytics parameter; GA4 ignores it
   // and always anonymises.)
   window.gtag('js', new Date())
-  window.gtag('config', gaId, {
-    send_page_view: false,
-    ...(debugMode ? { debug_mode: true } : {}),
-  })
+  window.gtag('config', gaId, debugMode ? { debug_mode: true } : {})
 
   const script = document.createElement('script')
   script.async = true
@@ -82,9 +92,24 @@ export default defineNuxtPlugin(() => {
 
   // GA4 auto-sends a page_view only for the first load; the site navigates
   // client-side, so emit one on each route change.
+  //
+  // gtag has already sent the landing page_view itself. If afterEach *does* also
+  // fire for Nuxt's initial navigation we would double-count it — so the very
+  // first hook call is dropped, and only when it is still on the landing URL.
+  // Both conditions matter: dropping unconditionally would lose a real pageview
+  // in the case where the hook never sees the initial navigation at all.
+  const landingLocation = window.location.href
+  let firstHookCall = true
+
   useRouter().afterEach(async () => {
+    const isFirstHookCall = firstHookCall
+    firstHookCall = false
+
     const titleBefore = document.title
     await afterTitleSettles(titleBefore)
+
+    if (isFirstHookCall && window.location.href === landingLocation) return
+
     // GA4 parameters, not the Universal Analytics `page_path`: GA4 ignores that
     // one and derives the page from page_location.
     window.gtag('event', 'page_view', {

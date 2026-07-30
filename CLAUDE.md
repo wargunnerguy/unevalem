@@ -772,8 +772,10 @@ If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
   pillow; currentMattress → mattress tips). Don't add steps the engine ignores.
 - Analytics: Plausible + GA4 (`G-D921C30JEQ`, Consent Mode v2, opt-out).
   `gaEvent()` in composables/useAnalytics.ts; funnel + shop + scroll + quiz
-  events are instrumented. `send_page_view:false` — the router hook emits
-  page_views; don't re-enable both (double-counting).
+  events are instrumented. **`send_page_view` stays ON** (see the 2026-07-30
+  entry below) — gtag sends the landing page_view, the router hook sends every
+  client-side navigation, and the hook drops its own first call when it is
+  still on the landing URL so the two cannot double-count.
 
 **Legal identity (facts, do not change):**
 - Owner: Costlio OÜ, registrikood 14562345. Contact: **unevalem@gmail.com**
@@ -964,3 +966,34 @@ it. Never commit that file from a local build.
 Local review still hits the PRODUCTION Apps Script backend (same sheet, same
 `orders` tab, same MK credentials). Harmless while `MK_ENV=test`; revisit
 before switching Maksekeskus to live.
+
+### 2026-07-30 — GA4 sent no hits at all (`send_page_view`)
+
+**Never set `send_page_view: false` in `plugins/analytics.client.ts` again.**
+
+The plugin disabled gtag's own page_view and emitted every page_view from
+`useRouter().afterEach`, on the assumption that the hook also covers the
+initial route. It does not, reliably. `afterEach` is registered while plugins
+run (`applyPlugins` in Nuxt's client entry), but Nuxt performs its initial
+navigation inside the `app:created` hook that fires afterwards — so whether
+the hook ever observes that first navigation is a function of framework init
+order, not of this code.
+
+When it doesn't fire, **nothing is sent at all**: no page_view, no network
+request to `/g/collect`, no Realtime, no DebugView. GA looks entirely dead
+while the tag is loaded and correctly configured. Any visitor who lands and
+leaves without an in-site navigation is invisible — which is most ad traffic.
+
+This masqueraded as an environment problem because staging appeared to work:
+review sessions there involved clicking through pages, and every one of those
+client-side navigations does fire the hook.
+
+The arrangement now: gtag sends the landing page_view itself; the router hook
+sends each client-side navigation; the hook drops its own first call, and only
+when still on the landing URL, so the two cannot double-count. Both halves of
+that condition matter — dropping unconditionally loses a real pageview in the
+case where the hook never sees the initial navigation.
+
+The `afterTitleSettles` rAF loop stays: it fixes a different bug (GA4 filing
+client-side navigations under the previous page's title) and does not apply to
+the first load, where the prerendered HTML already carries the right `<title>`.
