@@ -925,17 +925,34 @@ What changed:
 merges to `dev`, gets verified with a local production build, then `dev`
 merges to `main`. The only thing that changed is where verification happens.
 
-**How to review a build locally:**
+**How to review a build locally** (bash / Git Bash):
 ```bash
 npm ci
-NUXT_PUBLIC_SITE_URL=http://localhost:4000 npm run build:full
+NUXT_PUBLIC_SITE_URL=http://localhost:4000 \
+NUXT_PUBLIC_GA_ID= \
+NUXT_PUBLIC_PLAUSIBLE_DOMAIN=localhost \
+npm run build:full
 npx serve .output/public -l 4000     # not `nuxt dev` — prerendered output differs
 ```
-Setting `NUXT_PUBLIC_SITE_URL` to a non-production host matters: it is what
-tags calculator and newsletter rows as non-production in the sheet (see
-`useAnalytics.ts` / `LeadForm.vue`), keeps localhost URLs out of the sitemap,
-and leaves GA/Plausible pointed at the production property only when the site
-URL really is production.
+
+**⚠️ PowerShell needs a different incantation for the empty GA id.**
+`$env:NUXT_PUBLIC_GA_ID = ''` *deletes* the variable in PowerShell rather than
+setting it to an empty string, and `nuxt.config.ts:149` falls back to the
+production id `G-D921C30JEQ` when the variable is absent — so the obvious
+translation silently sends review traffic to the live GA property. Use:
+```powershell
+$env:NUXT_PUBLIC_SITE_URL = 'http://localhost:4000'
+[Environment]::SetEnvironmentVariable('NUXT_PUBLIC_GA_ID', '', 'Process')
+$env:NUXT_PUBLIC_PLAUSIBLE_DOMAIN = 'localhost'
+npm run build:full
+npx serve .output/public -l 4000
+```
+Verify before trusting the build: `.output/public/index.html` must not contain
+`G-D921C30JEQ`, and its `data-domain` must not be `unevalem.ee`.
+
+Setting `NUXT_PUBLIC_SITE_URL` to a non-production host matters separately: it
+is what tags calculator and newsletter rows as non-production in the sheet (see
+`isProdSite` in `utils/site.ts`) and keeps localhost URLs out of the sitemap.
 
 **⚠️ A local `build:full` overwrites `public/data/terminals.json`, which IS
 committed** (unlike the other generated JSON). A truncated Omniva response
