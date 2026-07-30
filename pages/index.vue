@@ -132,6 +132,27 @@ const revisitSummary = computed(() => {
       <SleepCalculator />
     </section>
 
+    <!-- ─── VALUE CLAIMS STRIP ─── -->
+    <!-- Removed in the 2026-07-21 declutter, restored 2026-07-30: the page read
+         as too stripped without it, and these three claims are qualitative and
+         true (unlike the "60+ uneuuringut" badge, which stays deleted). -->
+    <section class="bg-dusk sleep-pattern px-4 py-6">
+      <div class="max-w-xl mx-auto flex justify-center gap-6 sm:gap-10">
+        <div
+          v-for="claim in homepage.valueClaims"
+          :key="claim.title"
+          class="text-center"
+        >
+          <p class="font-heading text-gold text-lg sm:text-xl font-bold leading-none">
+            {{ claim.title }}
+          </p>
+          <p class="text-lavender/70 text-xs mt-1.5 leading-snug max-w-[140px]">
+            {{ claim.text }}
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- ─── DAILY TIP ─── -->
     <section class="px-4 py-8">
       <div class="max-w-xl mx-auto">
@@ -163,6 +184,22 @@ const revisitSummary = computed(() => {
             :key="post.id"
             class="py-5 first:pt-0"
           >
+            <!-- Badge row: removed in the 2026-07-21 declutter, restored
+                 2026-07-30. Mirrors PostCard.vue so a post looks the same
+                 wherever it appears — including the MÜÜT pill, which did not
+                 exist when this row was first written. -->
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full border border-lavender/30 bg-foam text-midnight">
+                {{ post.category }}
+              </span>
+              <span v-if="post.isFeatured" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gold text-midnight">
+                {{ common.popularBadge }}
+              </span>
+              <span v-if="post.isMyth" class="text-xs px-2.5 py-0.5 rounded-full bg-midnight text-gold font-bold uppercase tracking-wide">
+                ✕ MÜÜT
+              </span>
+            </div>
+
             <h3 class="font-heading text-xl text-midnight leading-snug mb-2 hover:text-dusk transition-colors">
               <NuxtLink :to="`/artiklid/${post.slug}`" class="focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
                 {{ post.title }}

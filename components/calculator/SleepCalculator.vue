@@ -259,9 +259,10 @@ function getProductName(type: CalcType): string {
     <div class="bg-foam rounded-2xl shadow-lg overflow-hidden">
 
       <!-- Calc journey breadcrumb — each type is clickable to switch.
-           Hidden until at least one calc is done: first-time visitors get a
-           clean card, the breadcrumb appears once it has meaning. -->
-      <div v-if="step <= totalSteps && !analyzing && completedCount > 0" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
+           Always visible (restored 2026-07-30): it was gated on completedCount
+           in the 2026-07-21 declutter, which meant a first-time visitor never
+           learned that a blanket and a mattress calculator exist at all. -->
+      <div v-if="step <= totalSteps && !analyzing" class="flex items-center justify-center gap-1.5 px-5 pt-4 pb-1 text-[11px]">
         <template v-for="(type, idx) in (['pillow', 'blanket', 'mattress'] as const)" :key="type">
           <!-- Active type: plain label, not clickable -->
           <span
@@ -289,8 +290,7 @@ function getProductName(type: CalcType): string {
       <!-- Progress header (steps 1–5 only) -->
       <div
         v-if="step <= totalSteps && !analyzing"
-        class="flex items-center gap-3 px-5 pb-0"
-        :class="completedCount > 0 ? 'pt-2' : 'pt-5'"
+        class="flex items-center gap-3 px-5 pb-0 pt-2"
       >
         <button
           v-if="step > 1"
