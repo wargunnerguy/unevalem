@@ -188,6 +188,34 @@ export interface Tip {
   active: boolean
 }
 
+// ── Calculators ─────────────────────────────────────────────────────────────
+// Assembled at build time from the `calculators` + `calc_questions` sheet tabs.
+// Only the Estonian is editable there: `answerKey` and each option `value` are
+// validated against utils/calc-schema.ts during the build, because the
+// recommendation engine branches on them and a typo would fail silently.
+
+export interface CalcOption {
+  label: string
+  /** One of ANSWER_VALUES[answerKey] — never free text. */
+  value: string
+}
+
+export interface CalcQuestion {
+  order:     number
+  /** A key of UserProfile; names the answer and its *_responses column. */
+  answerKey: keyof UserProfile
+  question:  string
+  options:   CalcOption[]
+}
+
+export interface CalcConfig {
+  id:          CalcType
+  icon:        string
+  title:       string
+  description: string
+  questions:   CalcQuestion[]
+}
+
 export interface QuizOption {
   label: string
   value: number

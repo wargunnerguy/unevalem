@@ -16,12 +16,20 @@
  */
 import { readFileSync } from 'node:fs'
 import { getRecommendations } from '../utils/calculator'
-import { calculator } from '../utils/copy'
+import type { CalcConfig } from '../types'
 
 type Any = Record<string, string>
 
 const CALC_TYPES = ['pillow', 'blanket', 'mattress'] as const
 const products = JSON.parse(readFileSync('public/data/products.json', 'utf8'))
+// Calculators now come from the sheet (calculators.json), not copy.ts, so this
+// checks the questions that will actually ship.
+const CONFIGS: CalcConfig[] = JSON.parse(readFileSync('public/data/calculators.json', 'utf8'))
+const configOf = (t: string): CalcConfig => {
+  const c = CONFIGS.find(x => x.id === t)
+  if (!c) throw new Error(`calculators.json has no "${t}" — run npm run fetch-content first`)
+  return c
+}
 
 // Same defaults useCalculator.buildProfile applies to an unanswered field.
 const BASE: Any = {
@@ -39,16 +47,16 @@ function fingerprint(profile: Any, calcType: typeof CALC_TYPES[number]): string 
 console.log('QUESTION INFLUENCE')
 let dead = 0
 for (const calcType of CALC_TYPES) {
-  const config = calculator.configs[calcType]
-  const keys = config.stepKeys as readonly string[]
+  const config = configOf(calcType)
+  const keys = config.questions.map(q => q.answerKey) as readonly string[]
   console.log(`\n  ${calcType}`)
 
   keys.forEach((key, i) => {
-    const options = config.steps[i].options.map(o => o.value)
+    const options = config.questions[i].options.map(o => o.value)
     // Fill every other question with its first option so the baseline is a
     // fully answered profile, not one leaning on defaults.
     const others: Any = { ...BASE }
-    keys.forEach((k, j) => { if (k !== key) others[k] = config.steps[j].options[0].value })
+    keys.forEach((k, j) => { if (k !== key) others[k] = config.questions[j].options[0].value })
 
     const seen = new Set(options.map(v => fingerprint({ ...others, [key]: v }, calcType)))
     const flag = seen.size === 1 ? 'DEAD   ' : seen.size < options.length ? 'partial' : 'ok     '
@@ -61,12 +69,12 @@ for (const calcType of CALC_TYPES) {
 // A response tab receives a column per payload key. Now that the client sends
 // only its own stepKeys, every other answer field is a column that can never
 // be filled in that tab.
-const ALL_ANSWER_KEYS = [...new Set(CALC_TYPES.flatMap(t => calculator.configs[t].stepKeys as readonly string[]))]
+const ALL_ANSWER_KEYS = [...new Set(CALC_TYPES.flatMap(t => configOf(t).questions.map(q => q.answerKey)))]
 
 console.log('\n\nDEAD COLUMNS PER RESPONSE TAB')
 console.log('  (delete these in the sheet — only after the new client code is live)')
 for (const calcType of CALC_TYPES) {
-  const asked = calculator.configs[calcType].stepKeys as readonly string[]
+  const asked = configOf(calcType).questions.map(q => q.answerKey) as readonly string[]
   const never = ALL_ANSWER_KEYS.filter(k => !asked.includes(k)).sort()
   console.log(`\n  ${calcType}_responses  (${never.length} columns)`)
   console.log(`    ${never.join(', ')}`)

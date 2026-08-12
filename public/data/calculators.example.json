@@ -1,0 +1,514 @@
+[
+  {
+    "id": "pillow",
+    "icon": "🛏️",
+    "title": "Padi",
+    "description": "Leia täpselt sulle sobiv padi",
+    "questions": [
+      {
+        "order": 1,
+        "answerKey": "neckPain",
+        "question": "Kas ärkad hommikul kaela- või õlavaluga?",
+        "options": [
+          {
+            "label": "Jah, sageli",
+            "value": "often"
+          },
+          {
+            "label": "Mõnikord",
+            "value": "sometimes"
+          },
+          {
+            "label": "Ei, valusid pole",
+            "value": "never"
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "answerKey": "position",
+        "question": "Mis asendis sa enamasti magad?",
+        "options": [
+          {
+            "label": "Küljel",
+            "value": "side"
+          },
+          {
+            "label": "Selili",
+            "value": "back"
+          },
+          {
+            "label": "Kõhuli",
+            "value": "stomach"
+          },
+          {
+            "label": "Vahelduvalt",
+            "value": "combo"
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "answerKey": "bodyType",
+        "question": "Milline on sinu kehaehitus?",
+        "options": [
+          {
+            "label": "Sale, kitsamate õlgadega",
+            "value": "slim"
+          },
+          {
+            "label": "Keskmine",
+            "value": "medium"
+          },
+          {
+            "label": "Tugevam, laiemate õlgadega",
+            "value": "broad"
+          }
+        ]
+      },
+      {
+        "order": 4,
+        "answerKey": "age",
+        "question": "Kui vana sa oled?",
+        "options": [
+          {
+            "label": "18–30",
+            "value": "young"
+          },
+          {
+            "label": "31–45",
+            "value": "adult"
+          },
+          {
+            "label": "46–60",
+            "value": "middle"
+          },
+          {
+            "label": "60+",
+            "value": "senior"
+          }
+        ]
+      },
+      {
+        "order": 5,
+        "answerKey": "complaint",
+        "question": "Mis häirib sinu und kõige rohkem?",
+        "options": [
+          {
+            "label": "Raske uinuda",
+            "value": "cant-sleep"
+          },
+          {
+            "label": "Ärkan öösel üles",
+            "value": "wake-at-night"
+          },
+          {
+            "label": "Ärkan väsinuna",
+            "value": "wake-tired"
+          },
+          {
+            "label": "Pole erilisi probleeme",
+            "value": "none"
+          }
+        ]
+      },
+      {
+        "order": 6,
+        "answerKey": "pillowCount",
+        "question": "Mitu patja kasutad korraga?",
+        "options": [
+          {
+            "label": "Ühte patja",
+            "value": "one"
+          },
+          {
+            "label": "Kahte või rohkem",
+            "value": "two-plus"
+          }
+        ]
+      },
+      {
+        "order": 7,
+        "answerKey": "allergies",
+        "question": "Kas sul on mõni allergia või tundlikkus?",
+        "options": [
+          {
+            "label": "Tolmulestade suhtes",
+            "value": "dust-mites"
+          },
+          {
+            "label": "Sünteetiliste materjalide suhtes",
+            "value": "synthetic"
+          },
+          {
+            "label": "Muu allergia või tundlikkus",
+            "value": "other"
+          },
+          {
+            "label": "Teadaolevalt ei ole",
+            "value": "none"
+          }
+        ]
+      },
+      {
+        "order": 8,
+        "answerKey": "pillowAge",
+        "question": "Kui vana on sinu praegune padi?",
+        "options": [
+          {
+            "label": "Uus (alla 1 aasta)",
+            "value": "new"
+          },
+          {
+            "label": "1–3 aastat vana",
+            "value": "1-3y"
+          },
+          {
+            "label": "Üle 3 aasta vana",
+            "value": "3y+"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "blanket",
+    "icon": "🌙",
+    "title": "Tekk",
+    "description": "Leia täpselt sulle sobiv tekk",
+    "questions": [
+      {
+        "order": 1,
+        "answerKey": "sweating",
+        "question": "Kas higistad öösel või ärkad kuumalt?",
+        "options": [
+          {
+            "label": "Jah, sageli",
+            "value": "often"
+          },
+          {
+            "label": "Mõnikord",
+            "value": "sometimes"
+          },
+          {
+            "label": "Harva",
+            "value": "rarely"
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "answerKey": "temp",
+        "question": "Kas sul on öösiti pigem külm või palav?",
+        "options": [
+          {
+            "label": "Mul on öösiti tihti külm",
+            "value": "cold"
+          },
+          {
+            "label": "Enamasti parasjagu",
+            "value": "normal"
+          },
+          {
+            "label": "Mul on öösiti tihti palav",
+            "value": "hot"
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "answerKey": "age",
+        "question": "Kui vana sa oled?",
+        "options": [
+          {
+            "label": "18–30",
+            "value": "young"
+          },
+          {
+            "label": "31–45",
+            "value": "adult"
+          },
+          {
+            "label": "46–60",
+            "value": "middle"
+          },
+          {
+            "label": "60+",
+            "value": "senior"
+          }
+        ]
+      },
+      {
+        "order": 4,
+        "answerKey": "blanketWeight",
+        "question": "Millist teki kaalu eelistad?",
+        "options": [
+          {
+            "label": "Kerget — peaaegu et ei tunne seda",
+            "value": "light"
+          },
+          {
+            "label": "Keskmist — tavalist soojust",
+            "value": "medium"
+          },
+          {
+            "label": "Rasket ja sooja",
+            "value": "heavy"
+          }
+        ]
+      },
+      {
+        "order": 5,
+        "answerKey": "partner",
+        "question": "Kas magad üksi või koos partneriga?",
+        "options": [
+          {
+            "label": "Üksi",
+            "value": "solo"
+          },
+          {
+            "label": "Koos — jagame tekki",
+            "value": "shared"
+          },
+          {
+            "label": "Koos — eraldi tekid",
+            "value": "separate"
+          }
+        ]
+      },
+      {
+        "order": 6,
+        "answerKey": "roomTemp",
+        "question": "Kui soe on sinu magamistuba tavaliselt?",
+        "options": [
+          {
+            "label": "Jahe (alla 18 °C)",
+            "value": "cool"
+          },
+          {
+            "label": "Keskmine (18–21 °C)",
+            "value": "moderate"
+          },
+          {
+            "label": "Soe (üle 21 °C)",
+            "value": "warm"
+          }
+        ]
+      },
+      {
+        "order": 7,
+        "answerKey": "allergies",
+        "question": "Kas sul on mõni allergia või tundlikkus?",
+        "options": [
+          {
+            "label": "Tolmulestade suhtes",
+            "value": "dust-mites"
+          },
+          {
+            "label": "Sünteetiliste materjalide suhtes",
+            "value": "synthetic"
+          },
+          {
+            "label": "Muu allergia või tundlikkus",
+            "value": "other"
+          },
+          {
+            "label": "Teadaolevalt ei ole",
+            "value": "none"
+          }
+        ]
+      },
+      {
+        "order": 8,
+        "answerKey": "problemSeason",
+        "question": "Mis aastaajal on sul kõige rohkem uneprobleeme?",
+        "options": [
+          {
+            "label": "Talvel — on liiga külm",
+            "value": "winter"
+          },
+          {
+            "label": "Suvel — on liiga palav",
+            "value": "summer"
+          },
+          {
+            "label": "Ühtemoodi aastaringselt",
+            "value": "year-round"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mattress",
+    "icon": "💤",
+    "title": "Madrats",
+    "description": "Leia täpselt sulle sobiv madrats",
+    "questions": [
+      {
+        "order": 1,
+        "answerKey": "sleepQuality",
+        "question": "Kuidas hindad oma praegust unekvaliteeti?",
+        "options": [
+          {
+            "label": "Halb — ärkan väsinuna",
+            "value": "poor"
+          },
+          {
+            "label": "Keskpärane — võiks parem olla",
+            "value": "fair"
+          },
+          {
+            "label": "Hea — ärkan puhanuna",
+            "value": "good"
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "answerKey": "position",
+        "question": "Mis asendis sa enamasti magad?",
+        "options": [
+          {
+            "label": "Küljel",
+            "value": "side"
+          },
+          {
+            "label": "Selili",
+            "value": "back"
+          },
+          {
+            "label": "Kõhuli",
+            "value": "stomach"
+          },
+          {
+            "label": "Vahelduvalt",
+            "value": "combo"
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "answerKey": "bodyType",
+        "question": "Milline on sinu kehakaal?",
+        "options": [
+          {
+            "label": "Kerge (alla 65 kg)",
+            "value": "slim"
+          },
+          {
+            "label": "Keskmine (65–90 kg)",
+            "value": "medium"
+          },
+          {
+            "label": "Raskem (üle 90 kg)",
+            "value": "broad"
+          }
+        ]
+      },
+      {
+        "order": 4,
+        "answerKey": "backPain",
+        "question": "Kas ärkad hommikul seljavaluga?",
+        "options": [
+          {
+            "label": "Jah, sageli",
+            "value": "often"
+          },
+          {
+            "label": "Mõnikord",
+            "value": "sometimes"
+          },
+          {
+            "label": "Ei",
+            "value": "never"
+          }
+        ]
+      },
+      {
+        "order": 5,
+        "answerKey": "age",
+        "question": "Kui vana sa oled?",
+        "options": [
+          {
+            "label": "18–30",
+            "value": "young"
+          },
+          {
+            "label": "31–45",
+            "value": "adult"
+          },
+          {
+            "label": "46–60",
+            "value": "middle"
+          },
+          {
+            "label": "60+",
+            "value": "senior"
+          }
+        ]
+      },
+      {
+        "order": 6,
+        "answerKey": "partner",
+        "question": "Kas magad üksi või koos partneriga?",
+        "options": [
+          {
+            "label": "Üksi",
+            "value": "solo"
+          },
+          {
+            "label": "Koos",
+            "value": "shared"
+          }
+        ]
+      },
+      {
+        "order": 7,
+        "answerKey": "mattressAge",
+        "question": "Kui vana on sinu praegune madrats?",
+        "options": [
+          {
+            "label": "Uus (alla aasta)",
+            "value": "new"
+          },
+          {
+            "label": "1–3 aastat",
+            "value": "1-3y"
+          },
+          {
+            "label": "3–5 aastat",
+            "value": "3-5y"
+          },
+          {
+            "label": "Üle 5 aasta",
+            "value": "5y+"
+          }
+        ]
+      },
+      {
+        "order": 8,
+        "answerKey": "currentMattress",
+        "question": "Millist madratsit kasutad praegu?",
+        "options": [
+          {
+            "label": "Vedrumadratsit",
+            "value": "spring"
+          },
+          {
+            "label": "Vahtmadratsit",
+            "value": "foam"
+          },
+          {
+            "label": "Hübriidmadratsit",
+            "value": "hybrid"
+          },
+          {
+            "label": "Ei tea täpselt",
+            "value": "unknown"
+          }
+        ]
+      }
+    ]
+  }
+]

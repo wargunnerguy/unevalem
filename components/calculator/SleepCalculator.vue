@@ -38,9 +38,19 @@ const {
   syncActiveCalcType, getNextAfter, storeCompletion, getPrefilledAnswers,
 } = useCalcSession()
 
+// Questions come from the `calculators` / `calc_questions` sheet tabs, baked
+// into calculators.json at build time. Same useFetch pattern as useProducts,
+// which this component already depends on: the landing page is prerendered, so
+// the payload ships in the HTML and there is no loading flash on the hero.
+const { configFor } = useCalculators()
+
 // Step keys for an arbitrary calc type — reset() needs the keys of the calc it
 // is switching TO, which is not always the currently active one.
-const keysFor = (type: CalcType) => calculator.configs[type].stepKeys as readonly string[]
+const keysFor = (type: CalcType): readonly string[] =>
+  configFor(type)?.questions.map(q => q.answerKey) ?? []
+
+/** Prefill lookup now needs the keys passed in — see useCalcSession. */
+const prefillFor = (type: CalcType) => getPrefilledAnswers(type, keysFor(type))
 
 // True while restoring a saved result, so the storeCompletion/analytics watch
 // below doesn't re-fire on the synthetic jump to the result step.
@@ -70,7 +80,7 @@ function initFromProfile() {
   if (props.calcType) {
     activeCalcType.value = props.calcType
     reset(
-      { ...getPrefilledAnswers(props.calcType), ...props.prefill },
+      { ...prefillFor(props.calcType), ...props.prefill },
       keysFor(props.calcType),
     )
     didInit = true
@@ -81,7 +91,7 @@ function initFromProfile() {
     const prevType = activeCalcType.value
     syncActiveCalcType()
     if (activeCalcType.value !== prevType) {
-      reset(getPrefilledAnswers(activeCalcType.value), keysFor(activeCalcType.value))
+      reset(prefillFor(activeCalcType.value), keysFor(activeCalcType.value))
     }
     didInit = true
     return
@@ -100,11 +110,11 @@ function initFromProfile() {
 onMounted(initFromProfile)
 watch(products, () => { if (!didInit) initFromProfile() })
 
-const calcConfig = computed(() => calculator.configs[activeCalcType.value])
-const stepKeys = computed(() => calcConfig.value.stepKeys as readonly string[])
-const totalSteps = computed(() => calcConfig.value.steps.length)
+const calcConfig = computed(() => configFor(activeCalcType.value))
+const stepKeys = computed<readonly string[]>(() => calcConfig.value?.questions.map(q => q.answerKey) ?? [])
+const totalSteps = computed(() => calcConfig.value?.questions.length ?? 0)
 
-const currentStepData = computed(() => calcConfig.value.steps[step.value - 1])
+const currentStepData = computed(() => calcConfig.value?.questions[step.value - 1] ?? null)
 
 // ── Progress counts only the steps this visitor is actually asked ───────────
 // `step` stays the true index into stepKeys (the engine and the copy arrays are
@@ -140,7 +150,7 @@ watch(step, (val, prev) => {
   if (val === totalSteps.value + 1 && result.value) {
     const productName = result.value.recommendations[0]?.name ?? ''
     storeCompletion(activeCalcType.value, answers.value, productName)
-    submitCalcResult(answers.value, result.value, activeCalcType.value, props.prefilledFrom)
+    submitCalcResult(answers.value, result.value, activeCalcType.value, stepKeys.value, props.prefilledFrom)
     gaEvent('calc_result_shown', {
       calc_type: activeCalcType.value,
       score: result.value.currentScore,
@@ -171,7 +181,7 @@ function handleSelect(value: string) {
 function startNextCalc() {
   const next = nextCalcType.value
   if (!next) return
-  const prefill = getPrefilledAnswers(next)
+  const prefill = prefillFor(next)
   activeCalcType.value = next
   reset(prefill, keysFor(next))
   // Everything this calc asks was already answered elsewhere — go straight to
@@ -303,7 +313,7 @@ function getProductName(type: CalcType): string {
             v-if="type === activeCalcType"
             class="flex items-center gap-0.5 text-midnight font-semibold"
           >
-            {{ calculator.configs[type].icon }} {{ calculator.session.doneLabel[type] }}
+            {{ configFor(type)?.icon }} {{ calculator.session.doneLabel[type] }}
           </span>
           <!-- Other types: button to switch -->
           <button
@@ -312,10 +322,10 @@ function getProductName(type: CalcType): string {
             class="flex items-center gap-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
             :class="isCalcDone(type) ? 'text-success hover:text-midnight' : 'text-gray-300 hover:text-muted'"
             :aria-label="`Lülitu ${calculator.session.doneLabel[type]} kalkulaatorile`"
-            @click="() => { const prefill = getPrefilledAnswers(type); activeCalcType = type; reset(prefill, keysFor(type)) }"
+            @click="() => { const prefill = prefillFor(type); activeCalcType = type; reset(prefill, keysFor(type)) }"
           >
             <span v-if="isCalcDone(type)" aria-hidden="true">✓ </span>
-            {{ calculator.configs[type].icon }} {{ calculator.session.doneLabel[type] }}
+            {{ configFor(type)?.icon }} {{ calculator.session.doneLabel[type] }}
           </button>
           <span v-if="idx < 2" class="text-gray-200" aria-hidden="true">›</span>
         </template>
@@ -365,7 +375,7 @@ function getProductName(type: CalcType): string {
 
             <!-- Steps: auto-advance on click -->
             <CalculatorStep
-              v-if="step >= 1 && step <= totalSteps && !analyzing"
+              v-if="currentStepData && step >= 1 && step <= totalSteps && !analyzing"
               :question="currentStepData.question"
               :options="(currentStepData.options as any)"
               :selected="currentAnswer"

@@ -1,5 +1,4 @@
 import type { CalcType, SiteProfile, UserProfile } from '~/types'
-import { calculator } from '~/utils/copy'
 
 export function useCalcSession() {
   const siteProfile = useCookie<SiteProfile>('uva-profile', {
@@ -61,11 +60,15 @@ export function useCalcSession() {
     return merged as Partial<UserProfile>
   })
 
-  function getPrefilledAnswers(type: CalcType): Partial<UserProfile> {
-    const keys = calculator.configs[type].stepKeys as readonly string[]
+  /**
+   * `stepKeys` is passed in rather than looked up here: the questions now come
+   * from the sheet via useCalculators(), and this composable is also used from
+   * places that have no business fetching them.
+   */
+  function getPrefilledAnswers(type: CalcType, stepKeys: readonly string[]): Partial<UserProfile> {
     const merged = mergedAnswers.value as Record<string, unknown>
     return Object.fromEntries(
-      keys.filter(k => merged[k] !== undefined).map(k => [k, merged[k]]),
+      stepKeys.filter(k => merged[k] !== undefined).map(k => [k, merged[k]]),
     ) as Partial<UserProfile>
   }
 

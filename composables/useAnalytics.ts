@@ -1,19 +1,18 @@
 import type { UserProfile, CalculatorResult, CalcType } from '~/types'
 import { isProdSite } from '~/utils/site'
 import { gaTransport } from '~/utils/ga'
-import { calculator } from '~/utils/copy'
-
 /**
  * The answer fields a given calculator actually asks about, keyed by name so
  * the Apps Script's header mapping puts each in its own column.
  *
- * `stepKeys` is the single source of truth for which questions a calculator
- * has, so adding or removing a step needs no change here.
+ * The caller supplies `stepKeys` because the questions now come from the sheet
+ * (useCalculators). Adding or removing a question in the sheet therefore also
+ * adds or removes its response column, with no code change here — and removes
+ * the risk of this list drifting from the one the UI rendered.
  */
-function answersForCalc(answers: Partial<UserProfile>, calcType: CalcType): Record<string, string> {
-  const keys = calculator.configs[calcType].stepKeys as readonly string[]
+function answersForCalc(answers: Partial<UserProfile>, stepKeys: readonly string[]): Record<string, string> {
   const source = answers as Record<string, string | undefined>
-  return Object.fromEntries(keys.map(key => [key, source[key] ?? '']))
+  return Object.fromEntries(stepKeys.map(key => [key, source[key] ?? '']))
 }
 
 // GA4 custom event, no-op when gtag is absent (GA disabled or blocked).
@@ -50,6 +49,7 @@ export function useAnalytics() {
     answers: Partial<UserProfile>,
     result: CalculatorResult,
     calcType: CalcType,
+    stepKeys: readonly string[],
     prefilledFrom = '',
   ) {
     if (submitted.value) return
@@ -72,7 +72,7 @@ export function useAnalytics() {
       // handleCalcSubmit creates a column for any key it sees, so an always-''
       // field is an always-blank column. Deleting them in the sheet without
       // this change would only bring them back on the next submission.
-      ...answersForCalc(answers, calcType),
+      ...answersForCalc(answers, stepKeys),
       rec0:          result.recommendations[0]?.id ?? '',
       currentScore:  result.currentScore,
       improvedScore: result.improvedScore,

@@ -1,0 +1,25 @@
+## Estonian corrections for the chronotype quiz, 2026-08-12.
+## Paste each block into the matching tab, replacing the cells shown.
+## Columns are tab-separated and match the sheet's own column order.
+##
+## Options encoding: Label|value;Label|value  (";" between options, "|" splits label from value)
+## Values are UNCHANGED throughout — only the Estonian is corrected, so scoring
+## and the result bands keep working exactly as they do now.
+
+### TAB: quizzes  (columns: id, title, description, tipsHeading, sharePrefix, active)
+chronotype	Kas sa oled öökull või lõoke?	Vasta 8 küsimusele ja saa teada oma kronotüüp — see selgitab, miks mõnel on energiat hommikul ja teisel õhtul.	Nõuanded sinu kronotüübile	Minu unetüüp:	TRUE
+
+### TAB: quiz_questions  (columns: quizId, order, question, options)
+chronotype	1	Mis kell ärkad nädalavahetusel, kui äratuskella pole?	Enne kella 7|3;Kella 7–9 vahel|2;Pärast kella 9|1
+chronotype	2	Millal tunned end kõige energilisemana?	Hommikul (7–10)|3;Päeval (11–14)|2;Õhtul (18–22)|1
+chronotype	3	Kui raske on sul hommikul ärgata?	Üldse mitte raske — ärkan ise|3;Natuke raske, aga saan hakkama|2;Väga raske, vajan mitut äratust|1
+chronotype	4	Millal lähed tööpäeviti tavaliselt magama?	Enne kella 22|3;Kella 22–24 vahel|2;Pärast südaööd|1
+chronotype	5	Kui tihti oled hommikusöögi ajal juba täiesti ärkvel?	Alati|3;Mõnikord|2;Harva või mitte kunagi|1
+chronotype	6	Millal teed kõige meelsamini oma tähtsaimat tööd?	Varahommikul|3;Keskpäeval|2;Hilisõhtul|1
+chronotype	7	Mis juhtub, kui pead nädalavahetusel enne kella 7 ärkama?	Pole probleem|3;Natuke tüütu, aga talutav|2;Õudus — olen terve päeva täiesti kurnatud|1
+chronotype	8	Millal tunned end kõige unisemana?	Õhtul pärast kella 21|3;Pärast lõunat kella 14–15 paiku|2;Hommikul kuni kella 10-ni|1
+
+### TAB: quiz_results  (columns: quizId, key, minScore, maxScore, type, description, tips)
+chronotype	lark	20	24	Lõoke 🐦	Sa oled selge hommikuinimene — lõoke! Ärkad kergelt, oled hommikuti produktiivne ja väsid õhtul vara. See on geneetiliselt määratud ja täiesti normaalne. Sinu suurim raskus on hilisõhtused kohustused, mis lükkavad une hilisemaks.	Tee kõige tähtsaimad ülesanded hommikul, kui su tähelepanu on parim.;Kui õhtul on üritus, jälgi, et jõuaksid siiski oma tavalisel ajal magama.
+chronotype	intermediate	15	19	Vahepealne 🌅	Sa oled vahepealne tüüp — ei liiga vara, ei liiga hilja. Enamik inimesi kuulub siia. Sul on paindlikkust kohaneda nii hommiku- kui õhtugraafikuga, kuigi kõige produktiivsem oled tavaliselt hommikupoolikul.	Hoia ühtlast unegraafikut, et keha sisemine kell püsiks paigas.;Väldi ekraane enne magamaminekut — nii uinud kiiremini.
+chronotype	owl	8	14	Öökull 🦉	Sa oled öökull — sul on loomulik kalduvus hiljem ärgata ja hiljem magama minna. Õhtul on su energia tipus. Ühiskonna varane päevagraafik võib sulle raske olla, aga see pole iseloomunõrkus — see on bioloogia.	Nihuta magamaminekuaega järk-järgult, umbes 15 minutit korraga.;Hommikune valgus aitab sisekella nihutada — ava kardinad kohe pärast ärkamist.

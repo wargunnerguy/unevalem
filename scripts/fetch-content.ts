@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
+import { CALC_TYPES, isAnswerKey, isAnswerValue } from '../utils/calc-schema'
 
 // ---------------------------------------------------------------------------
 // Load .env for local dev (CI sets secrets directly as env vars, no file needed)
@@ -190,7 +191,7 @@ if (!BASE_URL) {
   console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
-  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes', 'terminals', 'pains']) {
+  for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes', 'calculators', 'terminals', 'pains']) {
     const src = join(DATA_DIR, `${name}.example.json`)
     const dst = join(DATA_DIR, `${name}.json`)
     if (existsSync(src)) {
@@ -212,7 +213,7 @@ if (!BASE_URL) {
   } else {
     console.warn('  missing notifications.example.json — skipping')
   }
-  console.log(`[fetch-content] done (${ok}/8 example files processed)`)
+  console.log(`[fetch-content] done (${ok}/9 example files processed)`)
   process.exit(0)
 }
 
@@ -276,6 +277,122 @@ async function fetchSheet(sheet: string): Promise<unknown[]> {
   }
   console.log(`  ✓ ${sheet} (${data.length} rows)`)
   return data
+}
+
+// ---------------------------------------------------------------------------
+// Calculators: `calculators` + `calc_questions` tabs → calculators.json
+//
+// Only the Estonian is editable in the sheet. `answerKey` and each option's
+// value are the contract with utils/calculator.ts (see utils/calc-schema.ts):
+// the engine branches on them, useCalcSession matches them when prefilling a
+// later calculator, and they name the columns in each *_responses tab. A typo
+// in one of them throws nowhere at runtime — the engine would just stop
+// recognising the answer and score everyone as though they had skipped the
+// question. So every row is validated here and a mismatch fails the build,
+// which is the only place the mistake is still cheap.
+// ---------------------------------------------------------------------------
+function parseCalcOptions(v: unknown, answerKey: string, where: string): { label: string; value: string }[] {
+  const raw = String(v ?? '').trim()
+  if (!raw) return []
+  return raw.split(';').map(part => {
+    const [label, value] = part.split('|')
+    const cleanLabel = (label ?? '').trim()
+    const cleanValue = (value ?? '').trim()
+    if (!cleanLabel || !cleanValue) {
+      throw new Error(`${where}: malformed option "${part}" — expected "Label|value"`)
+    }
+    if (isAnswerKey(answerKey) && !isAnswerValue(answerKey, cleanValue)) {
+      throw new Error(
+        `${where}: "${cleanValue}" is not a valid value for ${answerKey}. ` +
+        `The recommendation engine would silently ignore it. Edit the label, never the value.`,
+      )
+    }
+    return { label: cleanLabel, value: cleanValue }
+  })
+}
+
+function assembleCalculators(
+  meta: Record<string, unknown>[],
+  questions: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  const assembled = meta
+    .filter(m => parseBool(m.active))
+    .map(m => {
+      const id = String(m.id ?? '').trim()
+      if (!(CALC_TYPES as readonly string[]).includes(id)) {
+        throw new Error(`calculators tab: unknown calculator id "${id}" — expected one of ${CALC_TYPES.join(', ')}`)
+      }
+
+      const qs = questions
+        .filter(q => String(q.calcId ?? '').trim() === id)
+        .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
+        .map((q, i) => {
+          const answerKey = String(q.answerKey ?? '').trim()
+          const where = `calc_questions row for ${id} #${i + 1}`
+          if (!isAnswerKey(answerKey)) {
+            throw new Error(`${where}: unknown answerKey "${answerKey}" — see utils/calc-schema.ts`)
+          }
+          const options = parseCalcOptions(q.options, answerKey, where)
+          if (options.length < 2) throw new Error(`${where}: needs at least two options`)
+          return {
+            order:     i + 1,
+            answerKey,
+            question:  String(q.question ?? '').trim(),
+            options,
+          }
+        })
+
+      if (!qs.length) throw new Error(`calculator "${id}" has no questions — refusing to ship an empty calculator`)
+
+      // Asking the same thing twice inside one calculator would make the skip
+      // logic drop the second copy, leaving a step that can never be reached.
+      const keys = qs.map(q => q.answerKey)
+      const dupe = keys.find((k, i) => keys.indexOf(k) !== i)
+      if (dupe) throw new Error(`calculator "${id}" asks "${dupe}" more than once`)
+
+      return {
+        id,
+        icon:        String(m.icon ?? ''),
+        title:       String(m.title ?? ''),
+        description: String(m.description ?? ''),
+        questions:   qs,
+      }
+    })
+
+  for (const type of CALC_TYPES) {
+    if (!assembled.some(c => c.id === type)) {
+      throw new Error(`calculators tab is missing "${type}" (or it is not active) — the funnel offers all three`)
+    }
+  }
+  return assembled
+}
+
+/**
+ * Optional while the sheet tabs are being created: with neither tab present the
+ * committed example file is used, which is exactly the definitions that used to
+ * live in utils/copy.ts. Once `calculators` exists, it becomes authoritative and
+ * any problem in it fails the build rather than silently falling back — a bad
+ * edit must not be papered over with stale questions.
+ */
+async function fetchCalculators(): Promise<unknown[]> {
+  const meta = await tryFetchSheet('calculators')
+  if (meta === null) {
+    const example = join(DATA_DIR, 'calculators.example.json')
+    if (!existsSync(example)) {
+      throw new Error('no `calculators` tab and no calculators.example.json — nothing to build the calculator from')
+    }
+    console.log('  · calculators tab absent — using calculators.example.json')
+    return JSON.parse(readFileSync(example, 'utf-8')) as unknown[]
+  }
+
+  const questions = await fetchSheet('calc_questions')
+  const assembled = assembleCalculators(
+    meta      as Record<string, unknown>[],
+    questions as Record<string, unknown>[],
+  )
+  const count = assembled.reduce((n, c) => n + (c.questions as unknown[]).length, 0)
+  console.log(`  ✓ calculators (${assembled.length} calculators, ${count} questions)`)
+  return assembled
 }
 
 // Quizzes live across three tabs and are assembled into nested objects here.
@@ -370,6 +487,7 @@ async function main(): Promise<void> {
   const inventory     = await fetchSheet('inventory')
   const tipsRaw       = await fetchSheet('tips')
   const quizzes       = await fetchQuizzes()
+  const calculators   = await fetchCalculators()
   const postStats     = await tryFetchSheet('post_stats')  // optional; absent until the sheet exists
   const sourcesRaw    = await tryFetchSheet('sources')     // optional; posts fall back to column M
   const painsRaw      = await tryFetchSheet('pains')       // optional; campaign landing pages
@@ -454,6 +572,7 @@ async function main(): Promise<void> {
   writeFileSync(join(DATA_DIR, 'products.json'),      JSON.stringify(transformedProducts, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'tips.json'),          JSON.stringify(tips, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'quizzes.json'),       JSON.stringify(quizzes, null, 2), 'utf-8')
+  writeFileSync(join(DATA_DIR, 'calculators.json'),   JSON.stringify(calculators, null, 2), 'utf-8')
   // Always written, even as [] — nuxt.config reads this file to build the
   // prerender route list and warns when it is missing.
   writeFileSync(join(DATA_DIR, 'pains.json'),         JSON.stringify(pains, null, 2), 'utf-8')
@@ -462,7 +581,7 @@ async function main(): Promise<void> {
     `[fetch-content] done — ${transformedPosts.length} posts · ` +
     `${notifications.length} notifications · ${stats.length} stats · ` +
     `${transformedProducts.length} products · ${tips.length} tips · ` +
-    `${quizzes.length} quizzes · ${pains.length} pains`,
+    `${quizzes.length} quizzes · ${calculators.length} calculators · ${pains.length} pains`,
   )
 }
 

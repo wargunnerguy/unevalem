@@ -1,930 +1,74 @@
 # CLAUDE.md — Unevalem Project Bible
 
 > Read this file completely at the start of every session before touching any code.
-> This is the single source of truth for all decisions already made.
+> It describes **how the project is now**, not how it got here. Where a past
+> mistake is still easy to repeat, it is recorded under "Traps" at the end —
+> those are the only historical notes kept, and they are kept because the code
+> alone does not explain why it is shaped that way.
+>
+> Last full revision: 2026-08-12.
 
 ---
 
-## What Is Unevalem
+## What Unevalem Is
 
-**Unevalem** (Estonian: "sleep formula") is an Estonian-language sleep education website.
-Philosophy: **educate first, sell second**. Be the #1 sleep resource in Estonia. If someone
-learns here and buys a competitor's pillow, that is fine. Trust and authority over hard selling.
+**Unevalem** (Estonian: "sleep formula") is an Estonian-language sleep education
+site with a small shop attached. Philosophy: **educate first, sell second**. If
+someone learns here and buys a competitor's pillow, that is fine. Trust and
+authority over hard selling.
 
-The site is built around a **Fit Calculator** (funnel hero), a **sleep blog** (posts from
-Google Sheets), **interactive quizzes**, and subtle **social proof notifications**.
+The site is built around **three sleep calculators** (the funnel), a **sleep
+blog** fed from Google Sheets, an **interactive quiz**, and a **small shop**.
 
-**Target domain:** unevalem.ee
-**Language:** All UI copy in Estonian. Codebase, comments, variable names in English.
-**Audience:** Estonian adults, 25–55, interested in sleep quality.
+- **Domain:** unevalem.ee
+- **Language:** all UI copy in Estonian. Code, comments and identifiers in English.
+- **Audience:** Estonian adults 25–55.
+- **Owner:** Costlio OÜ, registrikood 14562345, unevalem@gmail.com.
+  **Not VAT-registered** — never render "sisaldab käibemaksu" or "km-ga";
+  prices are final. Delivery promise everywhere: 2–5 tööpäeva.
 
 ---
 
 ## Tech Stack (locked — do not change without discussion)
 
-| Layer | Technology | Notes |
-|-------|-----------|-------|
-| Framework | **Nuxt (latest stable)** | Vue 3, TypeScript, `nuxt generate` for static output |
-| Styling | **Tailwind CSS** | via `@nuxtjs/tailwindcss` |
-| Icons | **@nuxt/icon** | |
-| Animation | **Vue `<Transition>`** built-in | For calculator step slides; upgrade to `@vueuse/motion` if needed |
-| Utilities | **@vueuse/core** | composable utilities |
-| Content backend | **Google Sheets API v4** | Fetched at build time only, never at runtime |
-| Hosting | **GitHub Pages** | Static output, custom domain unevalem.ee |
-| Build/Deploy | **GitHub Actions** | Daily cron + on push to main |
-| Rebuild schedule | Daily cron `0 4 * * *` (UTC) = 06:00 EET | |
-| Analytics | **Plausible** | GDPR-friendly, no cookie banner needed |
-| Fonts | **DM Serif Display + Inter** | via `@nuxtjs/google-fonts` |
+| Layer | Technology |
+|-------|-----------|
+| Framework | Nuxt 3 (Vue 3, TypeScript, `nuxt generate` → static) |
+| Styling | Tailwind CSS via `@nuxtjs/tailwindcss` |
+| Icons | `@nuxt/icon` |
+| Utilities | `@vueuse/core` |
+| Fonts | **Plus Jakarta Sans** (headings) + **Inter** (body) via `@nuxtjs/google-fonts` |
+| Content backend | Google Sheets, read through an **Apps Script Web App** at build time |
+| Hosting | GitHub Pages, custom domain unevalem.ee |
+| Build/Deploy | GitHub Actions — push to `main`, plus daily cron `0 4 * * *` UTC (06:00 EET) |
+| Analytics | Plausible + GA4 (`G-D921C30JEQ`), Consent Mode v2 |
+| Payments | Maksekeskus / MakeCommerce behind an adapter in `scripts/apps-script.gs` |
 
-**No server, no API routes, no database.** Everything is static files on GitHub Pages.
-The only "backend" is Google Sheets, read at build time to generate JSON files.
-
----
-
-## Project Structure
-
-```
-unevalem/
-├── CLAUDE.md                        ← you are here — always read first
-├── nuxt.config.ts
-├── tailwind.config.ts
-├── tsconfig.json
-├── package.json
-│
-├── app.vue                          ← root app shell with <NuxtPage />
-│
-├── pages/
-│   ├── index.vue                    ← landing page (calculator is the hero)
-│   ├── artiklid/
-│   │   ├── index.vue                ← blog post listing
-│   │   └── [slug].vue               ← individual blog post
-│   └── viktoriin/
-│       └── index.vue                ← quizzes & games
-│
-├── components/
-│   ├── calculator/
-│   │   ├── SleepCalculator.vue      ← orchestrates the full 5-step flow
-│   │   ├── CalculatorStep.vue       ← single step (question + options)
-│   │   └── CalculatorResult.vue     ← result: score, recommendations, tips
-│   ├── social/
-│   │   └── SocialProofToast.vue     ← rotating bottom-left notifications
-│   ├── blog/
-│   │   ├── PostCard.vue
-│   │   └── PostGrid.vue
-│   └── layout/
-│       ├── AppHeader.vue
-│       └── AppFooter.vue
-│
-├── composables/
-│   ├── useCalculator.ts             ← calculator state (step, answers, result)
-│   ├── usePosts.ts                  ← fetch + filter blog posts from static JSON
-│   └── useNotifications.ts          ← rotating social proof toast logic
-│
-├── utils/
-│   ├── calculator.ts                ← pure recommendation engine (no Vue deps)
-│   └── copy.ts                      ← ALL Estonian UI strings — never hardcode
-│
-├── types/
-│   └── index.ts                     ← shared TypeScript interfaces
-│
-├── assets/
-│   └── css/
-│       └── main.css                 ← CSS custom properties + global styles
-│
-├── public/
-│   └── data/                        ← generated at build time, served as static JSON
-│       ├── posts.json               ← real data (from Sheets, gitignored)
-│       ├── notifications.json       ← real data (from Sheets, gitignored)
-│       ├── stats.json               ← real data (from Sheets, gitignored)
-│       ├── posts.example.json       ← sample data for dev (committed to git)
-│       ├── notifications.example.json
-│       └── stats.example.json
-│
-├── scripts/
-│   └── fetch-content.ts             ← Google Sheets → public/data/*.json
-│
-└── .github/
-    └── workflows/
-        └── deploy.yml               ← build + deploy to GitHub Pages
-```
+**No server, no database.** Everything is static files on GitHub Pages. The only
+backend is the Apps Script Web App in front of the spreadsheet. `server/api/*`
+routes exist only to serve the build-time JSON during dev and prerender — they
+do not exist on the static host, which is why page keys must never include a
+query string (see Traps).
 
 ---
 
-## nuxt.config.ts
-
-```typescript
-export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
-
-  modules: [
-    '@nuxtjs/tailwindcss',
-    '@nuxt/icon',
-    '@nuxtjs/google-fonts',
-    '@vueuse/nuxt',
-  ],
-
-  googleFonts: {
-    families: {
-      'DM+Serif+Display': { ital: [0, 1] },
-      'Inter': [300, 400, 500, 600],
-    },
-    display: 'swap',
-  },
-
-  css: ['~/assets/css/main.css'],
-
-  // Static generation for GitHub Pages
-  nitro: {
-    preset: 'static',
-  },
-
-  // If using custom domain (unevalem.ee), baseURL is '/'.
-  // If deploying to username.github.io/unevalem/ without custom domain,
-  // set NUXT_APP_BASE_URL=/unevalem/ in the GitHub Actions environment.
-  app: {
-    baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
-  },
-
-  // Runtime config (public = exposed to client)
-  runtimeConfig: {
-    public: {
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee',
-    },
-  },
-})
-```
-
----
-
-## Design System
-
-### Color Palette (`assets/css/main.css`)
-
-```css
-:root {
-  --color-midnight:  #0D1B2A;   /* deep navy — primary dark background */
-  --color-dusk:      #1B2D45;   /* secondary dark — cards, toasts */
-  --color-lavender:  #B8A9C9;   /* soft purple — accent */
-  --color-moonlight: #F0EDF5;   /* near-white — page background */
-  --color-foam:      #FFFFFF;
-  --color-gold:      #C9A96E;   /* warm gold — CTA buttons only */
-  --color-muted:     #7B8794;   /* secondary text */
-  --color-success:   #4CAF7D;   /* positive result states */
-}
-
-body {
-  background-color: var(--color-moonlight);
-  color: var(--color-midnight);
-  font-family: 'Inter', sans-serif;
-}
-```
-
-Map these to Tailwind in `tailwind.config.ts` under `theme.extend.colors`:
-```typescript
-colors: {
-  midnight: 'var(--color-midnight)',
-  dusk: 'var(--color-dusk)',
-  lavender: 'var(--color-lavender)',
-  moonlight: 'var(--color-moonlight)',
-  foam: 'var(--color-foam)',
-  gold: 'var(--color-gold)',
-  muted: 'var(--color-muted)',
-  success: 'var(--color-success)',
-}
-```
-
-### Typography
-- **Headings:** `DM Serif Display` — elegant, trustworthy, serif warmth
-- **Body:** `Inter` — clean, readable at small sizes
-- **Pull quotes / accents:** `DM Serif Display` italic
-
-### Tone of Voice
-- Informal **"sina" form** (never formal "teie")
-- No aggressive urgency — no "Osta kohe!", no countdown timers
-- Understanding language: "Leia oma unelahendus", "Vaata, mis sulle sobib"
-- Science made accessible: "Teadlased on avastanud..." not jargon
-- Warm but knowledgeable — a well-informed friend, not a salesperson
-
----
-
-## The Fit Calculator
-
-The calculator is the **hero of the landing page** — visible immediately without scrolling.
-No long intro copy above it. The page opens and the calculator is right there.
-
-### Flow
-- **5 steps**, one question per screen
-- **Progress bar** at top (Step X of 5, or dots)
-- **Slide animation** between steps (Vue `<Transition name="slide">`)
-- Steps 1–4: selecting an option **auto-advances** (no Next button)
-- Step 5: multi-select, requires explicit **"Kuva minu valem"** button
-- **Back button** available on all steps ≥ 2
-
-### Calculator State (`composables/useCalculator.ts`)
-
-```typescript
-// State shape
-const step = ref(1)          // 1–5, then 6 = result
-const answers = ref<Partial<UserProfile>>({})
-const result = ref<CalculatorResult | null>(null)
-
-// Actions
-function selectOption(key: keyof UserProfile, value: any) { ... }
-function goBack() { ... }
-function submitIssues() { ... }  // called on step 5 submit
-function reset() { ... }
-```
-
-### Step 1 — Sleep Position
-**Question:** `"Kuidas sa tavaliselt magad?"`
-
-| Icon | Label | Value |
-|------|-------|-------|
-| 🫃 | Küljel | `"side"` |
-| 🙆 | Selili | `"back"` |
-| 😮‍💨 | Kõhuli | `"stomach"` |
-| 🔄 | Vahelduvalt | `"combo"` |
-
-### Step 2 — Temperature
-**Question:** `"Kas sa magad pigem soojalt või jahedalt?"`
-
-| Icon | Label | Value |
-|------|-------|-------|
-| 🥶 | Olen öösiti külm | `"cold"` |
-| 😊 | Normaalselt | `"normal"` |
-| 🥵 | Higistan öösel | `"hot"` |
-
-### Step 3 — Pillow Loft
-**Question:** `"Millist peatuge eelistad?"`
-
-If user picks "Ei tea" → infer from position: stomach→low, back→medium, side→high, combo→medium
-
-| Icon | Label | Value |
-|------|-------|-------|
-| 📏 | Madalat (alla 8 cm) | `"low"` |
-| 📐 | Keskmist (8–12 cm) | `"medium"` |
-| 🛏️ | Kõrget (üle 12 cm) | `"high"` |
-| ❓ | Ei tea | inferred |
-
-### Step 4 — Partner Situation
-**Question:** `"Kas magad üksi või kellegagi koos?"`
-
-| Icon | Label | Value |
-|------|-------|-------|
-| 🛏️ | Üksi | `"solo"` |
-| 👫 | Kahekesi, ühine tekk | `"shared"` |
-| 💨 | Kahekesi, eraldi tekid | `"separate"` |
-
-### Step 5 — Sleep Issues (multi-select)
-**Question:** `"Kas sul esineb mõni neist probleemidest?"`
-
-| Label | Value added to issues array |
-|-------|-----------------------------|
-| Ärkan kuumalt / higistades | `"hot"` |
-| Kaela- või õlavalu hommikul | `"neck"` |
-| Raske uinuda | `"insomnia"` |
-| Olen kergesti ärkav | `"light"` |
-| Pole probleeme | clears all others |
-
-**Submit button:** `"Kuva minu valem →"`
-
-### TypeScript Types (`types/index.ts`)
-
-```typescript
-export type SleepPosition = 'side' | 'back' | 'stomach' | 'combo'
-export type TempPreference = 'cold' | 'normal' | 'hot'
-export type PillowLoft = 'low' | 'medium' | 'high'
-export type PartnerSituation = 'solo' | 'shared' | 'separate'
-export type SleepIssue = 'hot' | 'neck' | 'insomnia' | 'light'
-
-export interface UserProfile {
-  position: SleepPosition
-  temp: TempPreference
-  loft: PillowLoft
-  partner: PartnerSituation
-  issues: SleepIssue[]
-}
-
-export interface ProductRec {
-  id: string
-  name: string         // Estonian
-  reason: string       // Why recommended, 1 sentence, Estonian
-  urgency: 'must-have' | 'nice-to-have'
-  category: 'pillow' | 'blanket' | 'topper' | 'extra'
-  linkUrl?: string     // external product URL, optional
-}
-
-export interface CalculatorResult {
-  currentScore: number    // 0–100 estimated current sleep quality
-  improvedScore: number   // 0–100 estimated with recommendations
-  recommendations: ProductRec[]
-  personalTips: string[]  // 2–3 tips in Estonian
-}
-```
-
-### Recommendation Logic (`utils/calculator.ts`)
-
-**Pillow (by position + loft):**
-- side → "Bambuspadi külilimagajale" — high side support, spinal alignment
-- back → "Bambuspadi selilimagajale" — medium neutral spine support
-- stomach → "Õhuke bambuspadi" — low, prevents neck strain
-- combo → "Universaalne bambuspadi" — medium, adaptable
-- + `issues.neck` → always add tip about cervical support pillow
-
-**Blanket (by temp):**
-- `hot` → bamboo blanket (thermoregulating, breathable)
-- `cold` → heavier fill, flannel option
-- `normal` → all-season bamboo
-- `partner: shared` → add tip: separate blankets reduce sleep disruption ~30%
-- `partner: separate` → lightweight single bamboo blanket recommended
-
-**Score calculation:**
-- Base score starts at 60
-- Bad position+loft combo → subtract up to 15
-- Hot sleeper without breathable blanket → subtract 10
-- Each issue adds −5 to current score
-- Improved score = current + 20 (with right products)
-
-**Result page sections:**
-1. Score visual — "Sinu praegune uneskoor: X/100 → pärast muutusi: Y/100"
-2. Primary recommendation (large card with reason)
-3. Secondary 1–2 recommendations (smaller cards)
-4. 3 personalised tips
-5. Soft CTA: `"Vaata soovitatud tooteid →"` (links to product pages or placeholder `#`)
-
----
-
-## Google Sheets Schema
-
-The Google Sheet has 3 tabs. A pre-build Node script reads them and writes static JSON.
-
-### Tab: `posts`
-| Col | Field | Type | Example |
-|-----|-------|------|---------|
-| A | id | number | 1 |
-| B | slug | string | `miks-uni-on-oluline` |
-| C | title | string | `Miks on uni oluline?` |
-| D | excerpt | string | Short 1–2 sentence summary |
-| E | content | string | Full Markdown |
-| F | category | string | `teadus` / `nõuanded` / `tooted` / `uneaeg` |
-| G | publishDate | string | `2025-03-01` |
-| H | tags | string | `tervis,uni,teadus` |
-| I | coverImage | string | Full URL or empty |
-| J | status | string | `published` / `draft` |
-| K | isFeatured | boolean | `TRUE` / `FALSE` |
-| L | readingTimeMin | number | `4` |
-| M | diveDeeper | string | `Kofeiini uuring\|https://pubmed…;https://doi.org/…` |
-| N | proofread | boolean/string | `TRUE` / initials / date — see below |
-
-**Citations live in the `sources` tab** (one row per citation):
-| Col | Field | Example |
-|-----|-------|---------|
-| A | slug | `kohvi-ajastus-ja-uni` (foreign key — must match a posts-tab slug) |
-| B | title | `Caffeine effects on sleep taken 0, 3, or 6 hours before going to bed` — blank → hostname is used |
-| C | url | `https://pubmed.ncbi.nlm.nih.gov/24235903/` |
-
-Source titles stay in the study's **original language** (usually English) — they
-are citations, not article copy. Only the articles themselves are Estonian.
-
-Rendered under "Uuri lähemalt" as "Allikas: <title> →" on the article page and
-in expanded PostCards. Multiple rows per slug = multiple citations, in row order.
-
-The posts tab's column M (`diveDeeper`, pipe-encoded `Title|URL;URL;…`) is the
-LEGACY encoding: it still works as a per-article fallback when the sources tab
-has no rows for that slug, but new citations belong in the sources tab. If M's
-header cell is ever blanked, Apps Script keys the column as `""` and its data
-silently disappears (this happened pre-2026-07-16).
-
-**`proofread` — human-review gate (column N).** Articles are AI-drafted; nothing
-goes live until a person has read and corrected it. A post is published only when
-`status = published` AND `proofread` is non-empty and not `FALSE` (a checkbox,
-initials, or a date all count — initials/date double as a review record). The
-gate is enforced in `fetch-content.ts` and only arms once the column exists in
-the sheet: while the header is missing the build warns and publishes as before,
-so the code could ship ahead of the sheet change. Once the header exists, every
-unmarked row is held back — adding the header and ticking the reviewed rows must
-happen in the same sitting or the site empties on the next build.
-
-**Content convention — myth-busting posts:**
-Post titles prefixed with `MÜÜT: ` in the Sheet mark myth-busting content
-(e.g. `MÜÜT: Saan hakkama viie tunni unega`). Parsed once in
-`composables/usePosts.ts` via `/^MÜÜT:\s*/i`: sets `isMyth = true` on the
-`Post` object and strips the prefix from `title`. All consumers (PostCard,
-article page, related posts, search) receive clean data. Rendered as a
-`✕ MÜÜT` pill badge (`bg-midnight text-gold`) next to the category chip —
-never as title text or page metadata. No separate Sheet column needed;
-a dedicated `isMyth` boolean column is a future option if prefix styles vary.
-
-### Tab: `notifications`
-| Col | Field | Type | Example |
-|-----|-------|------|---------|
-| A | id | number | 1 |
-| B | text | string | `Kristina ostis bambuspadja` |
-| C | type | string | `purchase` / `view` / `quiz` |
-| D | active | boolean | `TRUE` / `FALSE` |
-
-**No time column.** The toast fabricates a fresh random "X ago" (capped ~2 h,
-heavily weighted toward "just now") on every show, so social proof always reads
-as live activity. A real/stale timestamp would undermine that — don't add one.
-
-### Tab: `stats`
-| Col | Field | Type | Example |
-|-----|-------|------|---------|
-| A | key | string | `calculatorCompletions` |
-| B | value | string | `1 247` |
-| C | displayText | string | `inimest on leidnud oma unevalemi` |
-| D | active | boolean | `TRUE` / `FALSE` |
-
----
-
-## Content Fetch Script (`scripts/fetch-content.ts`)
-
-Run via `npm run fetch-content` before `nuxt generate`.
-
-```typescript
-// Reads from Google Sheets → writes to public/data/*.json
-// Requires env vars: GOOGLE_SHEETS_API_KEY, SHEETS_ID
-// Filters: only status=published rows for posts, only active=TRUE for notifications/stats
-// On error: exits with code 1 so the build fails loudly rather than deploying stale data
-// On dev (no API key): copies *.example.json → *.json so dev works without credentials
-```
-
-Add to `package.json`:
-```json
-{
-  "scripts": {
-    "fetch-content": "tsx scripts/fetch-content.ts",
-    "generate": "nuxt generate",
-    "build:full": "npm run fetch-content && npm run generate",
-    "dev": "nuxt dev"
-  }
-}
-```
-
----
-
-## Social Proof
-
-### Floating Toast (`components/social/SocialProofToast.vue`)
-- **Source:** `public/data/notifications.json` (baked in at build, same for all users)
-- **Position:** bottom-left corner, `fixed`, z-50
-- **Animation:** slide up + fade in via Vue `<Transition>`
-- **Timing:** show one every 15–25s (random), visible for 6s, then slide out
-- **Rotation:** random order, loop after all shown
-- **Mobile (< 640px):** hide while calculator is in progress to avoid covering it
-- **Design:** ~280px wide, `bg-dusk` dark card, white text, small icon per type:
-  - purchase → 🛍️, view → 👁️, quiz → 🎯
-- Example text: `"Kristina ostis bambuspadja · 2 tundi tagasi"`
-
-### Stats Line
-- **Source:** `public/data/stats.json` (active only)
-- Small muted text near the calculator, e.g.: `"Üle 1 200 inimese on leidnud oma unevalemi"`
-- Not a banner — quiet, integrated
-
-### "Always Active" Rules
-The site must never feel abandoned or stale:
-1. **No publication dates on post cards** — only inside the full post
-2. `isFeatured: true` posts show a `"Populaarne"` badge
-3. **"Päeva unenipp"** — daily sleep tip, rotates by day-of-year from a static 30-item array in `utils/copy.ts`. No date shown.
-4. The calculator and quizzes are always inherently "live" — interactive content never ages
-5. Category tabs on blog ensure there are always recent posts per category even with low total volume
-
----
-
-## Blog Categories
-
-| Key | UI label | Content |
-|-----|----------|---------|
-| `teadus` | Teadus | Sleep science, research, biology |
-| `nõuanded` | Nõuanded | Practical tips, routines, bedroom setup |
-| `tooted` | Tooted | Product education (bamboo, pillow types) — educational, not promotional |
-| `uneaeg` | Uneaeg | Lifestyle (kids, shift work, aging, travel) |
-
-Post page features: reading time shown, related posts at bottom (same category), share buttons (FB + copy link). No comments.
-
----
-
-## Quizzes (`pages/unetest/index.vue`)
-
-Quizzes are **content from Google Sheets** (migrated out of `utils/copy.ts`).
-They live across three tabs, assembled at build time by `fetch-content.ts` into
-a single `public/data/quizzes.json` (array of nested `Quiz` objects), served via
-`/api/quizzes` and consumed with the `useQuizzes()` / `useQuiz(id?)` composable.
-The page renders the first active quiz; pass an id to `useQuiz` to target a specific one.
-
-Only the quiz **UI chrome** stays in `copy.ts` (`quizPage.*`: headings, button
-labels, loading/empty states). All editorial content (questions, options, result
-bands, tips) is editable in Sheets without a developer.
-
-### Sheets schema
-
-**Tab: `quizzes`** (one row per quiz)
-| Col | Field | Example |
-|-----|-------|---------|
-| A | id | `chronotype` |
-| B | title | `Kas sa oled öökulli või lõoke?` |
-| C | description | Intro paragraph |
-| D | tipsHeading | `Nõuanded sinu kronotüübile` |
-| E | sharePrefix | `Minu unetüüp:` |
-| F | active | `TRUE` / `FALSE` |
-
-**Tab: `quiz_questions`** (one row per question)
-| Col | Field | Example |
-|-----|-------|---------|
-| A | quizId | `chronotype` |
-| B | order | `1` |
-| C | question | `Millal ärkad eelistatult…?` |
-| D | options | `Enne kella 7\|3;Kella 7–9 vahel\|2;Pärast kella 9\|1` (`;` separates options, `\|` splits label\|value) |
-
-**Tab: `quiz_results`** (one row per result band)
-| Col | Field | Example |
-|-----|-------|---------|
-| A | quizId | `chronotype` |
-| B | key | `lark` |
-| C | minScore | `20` |
-| D | maxScore | `24` |
-| E | type | `Lõoke 🐦` |
-| F | description | Result paragraph |
-| G | tips | `Tip one.;Tip two.` (`;` separated) |
-
-Result selection: bands are sorted highest-`minScore` first at build time; the
-page picks the band where `minScore ≤ score ≤ maxScore`. If the quiz tabs are
-absent, the build falls back to the committed `quizzes.example.json`.
-
-**Calculator version** is likewise a single source of truth in the `stats` tab:
-add a `calculatorVersion` row (value e.g. `v2.5`). `SleepCalculator.vue` reads it,
-falling back to the `calculator.version` constant in `copy.ts` when absent.
-
-**Planned additional quizzes** (just add rows to the three tabs):
-1. "Mitu punkti saad oma une hügieenis?" — Sleep hygiene score
-2. "Mis on sinu unepersoonalitsus?" — Sleep personality
-
-Each quiz ends with personalized advice + soft link back to the Fit Calculator.
-
----
-
-## GitHub Actions: Build & Deploy
-
-```yaml
-# .github/workflows/deploy.yml
-name: Build & Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-  schedule:
-    - cron: '0 4 * * *'   # 06:00 EET daily
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - run: npm ci
-
-      - name: Fetch content from Google Sheets
-        run: npm run fetch-content
-        env:
-          GOOGLE_SHEETS_API_KEY: ${{ secrets.GOOGLE_SHEETS_API_KEY }}
-          SHEETS_ID: ${{ secrets.SHEETS_ID }}
-
-      - name: Generate static site
-        run: npm run generate
-        env:
-          NUXT_APP_BASE_URL: /       # change to /unevalem/ if no custom domain
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .output/public       # Nuxt static output directory
-
-      - uses: actions/deploy-pages@v4
-        id: deployment
-```
-
-**GitHub Secrets needed:**
-- `GOOGLE_SHEETS_API_KEY`
-- `SHEETS_ID`
-
-GitHub Pages must be configured to use **GitHub Actions** as the source (not branch deploy).
-Do this in: repo Settings → Pages → Source → "GitHub Actions".
-
----
-
-## Environment Variables
-
-```bash
-# .env (local dev only — never commit)
-GOOGLE_SHEETS_API_KEY=your_key_here
-SHEETS_ID=your_google_sheet_id_here
-NUXT_PUBLIC_SITE_URL=https://unevalem.ee
-```
-
-For local dev without Sheets credentials, the `fetch-content` script should detect missing
-env vars and copy `*.example.json` → `*.json` automatically.
-
----
-
-## Coding Standards
-
-- **Always TypeScript** — no `.js` files
-- **All Estonian copy** goes in `utils/copy.ts` — never hardcode strings in `.vue` files
-- **Composables** for all shared state — no prop drilling
-- **`public/data/*.json`** are the only data source at runtime — never call Sheets API from browser
-- **Mobile-first** — design for 390px viewport first, then scale up
-- **Accessibility** — keyboard-navigable calculator, min contrast 4.5:1, proper `aria-` labels on interactive elements
-- **No Pinia needed yet** — `useCalculator()` composable with `ref`s is sufficient
-- **No `any` types** — proper interfaces in `types/index.ts`
-- **Auto-imports** are on (Nuxt default) — don't import `ref`, `computed`, `defineComponent` etc.
-
----
-
-## Build Priority Order
-
-Work through these in order. Do not skip ahead.
-
-- [ ] 1. Nuxt scaffold + Tailwind + modules + fonts
-- [ ] 2. Design tokens in `assets/css/main.css` + `tailwind.config.ts`
-- [ ] 3. `types/index.ts` + `utils/copy.ts` skeleton (all Estonian strings + 30 daily tips)
-- [ ] 4. **Fit Calculator** — `useCalculator` composable + all 5 steps + result screen (most important feature)
-- [ ] 5. Landing page `pages/index.vue` — calculator as hero, stats line, post preview grid below
-- [ ] 6. `scripts/fetch-content.ts` + example JSON files in `public/data/`
-- [ ] 7. Blog listing `pages/artiklid/index.vue` + post page `pages/artiklid/[slug].vue`
-- [ ] 8. `SocialProofToast.vue` component
-- [ ] 9. GitHub Actions workflow `deploy.yml`
-- [ ] 10. Quizzes page `pages/viktoriin/index.vue`
-- [ ] 11. SEO: `useHead()` per page, OG tags, sitemap, robots.txt
-- [ ] 12. Plausible analytics
-
----
-
-## Open Questions
-
-- Product catalog: will we host products on this site or always link externally? (For now: external links, placeholder `#`)
-- Email newsletter: Brevo or MailerLite for sleep tips sign-up?
-- Russian language version? (Large Estonian-Russian demographic — future consideration)
-- Affiliate links on product recommendations?
-
----
-
-*Update this file whenever a significant architectural decision is made.*
-
----
-
-## UPDATES — Read these after everything above, they override earlier sections
-
-### Backend: Apps Script (not Sheets API directly)
-
-The Google Sheets content backend uses an **Apps Script Web App** as a proxy,
-not the Sheets API v4 with an API key. The sheet is private; the script filters
-and serves only publishable content.
-
-Env var is a single URL (the sheet moved to the dedicated Unevalem Google
-account on 2026-07-16; this is that account's deployment):
-```bash
-SHEETS_API_URL=https://script.google.com/macros/s/AKfycbxacVFUEpBK1rpkOwUF8_-0YHgtizXqz0TE9NosgsARQiNHbMeFOZ4sxt7dD48023DNpQ/exec
-```
-
-The fetch-content script calls one endpoint per tab:
-${SHEETS_API_URL}?sheet=<posts|notifications|stats|inventory|tips|quizzes|quiz_questions|quiz_results>
-
-An unknown tab returns `{"error":"Unknown sheet: <name>"}` rather than an array;
-`tryFetchSheet` treats any non-array as absent and falls back to the example file.
-
-**Do not trust the script to filter drafts.** Despite the intent above, the
-deployed Apps Script returns `status: draft` posts as well as published ones.
-`fetch-content.ts` filters to `status === 'published'` before writing
-`public/data/posts.json`, which is the single choke point that `/api/posts`,
-`server/routes/sitemap.xml.ts` and the prerenderer all read. Keep the filter
-there even if the Apps Script is later fixed — defence in depth against a draft
-becoming a public page.
-
-No Google Cloud project, no API key, no OAuth. Just the URL.
-
-### Prerendering articles
-
-`crawlLinks` alone is not sufficient. `PostGrid.vue` paginates (`PAGE_SIZE = 10`
-plus infinite scroll), so the server-rendered listing only links the first page
-of posts and the crawler never discovers the rest — they 404 on GitHub Pages
-while still being advertised in `sitemap.xml`. `nuxt.config.ts` therefore reads
-`public/data/posts.json` and passes every `/artiklid/<slug>` explicitly in
-`nitro.prerender.routes`. This is why `fetch-content` must run before
-`generate` (`npm run build:full` does both, in that order).
-
-### GitHub Actions Secret
-
-Only one secret is needed:
-- Name: `SHEETS_API_URL`
-- Value: the Apps Script Web App URL
-
-Remove any references to `GOOGLE_SHEETS_API_KEY` or `SHEETS_ID` from the
-workflow file and fetch-content script.
-
-### .env file
-```bash
-SHEETS_API_URL=https://script.google.com/macros/s/LONG_ID/exec
-```
-
-### dev without credentials
-If `SHEETS_API_URL` is missing, copy `public/data/*.example.json` →
-`public/data/*.json` and exit cleanly so `npm run dev` still works.
-
-### 2026-07-17 — Honesty overhaul + full shop (overrides anything above)
-
-**Corrections to stale sections above:**
-- Quiz page path is `pages/unetest/index.vue` (not /viktoriin); nav label "Unetest".
-- The calculator is THREE sequential 8-step calculators (pillow → blanket →
-  mattress funnel via `useCalcSession`), not the single 5-step flow described
-  above. Result screen leads with score + `profileSummary` (advice), tips next,
-  products LAST in a compact section — never restore product-first layout.
-- Fonts: Plus Jakarta Sans (headings) + Inter (body), not DM Serif Display.
-- NO fabricated social proof: the homepage stats strip was replaced by three
-  static value claims (Teaduspõhine / Eesti oma / Tasuta) in `homepage.valueClaims`.
-  Never reintroduce fake counters or ratings. Purchase-toast notifications stay
-  sheet-gated (`active` flag). (2026-07-21: the value-claims strip was removed
-  from the landing page entirely during a declutter pass — copy stays in
-  `homepage.valueClaims` for possible reuse elsewhere, e.g. /meist.)
-- Calculator questions: every step must visibly influence the result (score,
-  summary, tips or product tags) — dead questions were wired in 2026-07-21
-  (roomTemp/problemSeason → blanket warmth class; complaint/pillowCount →
-  pillow; currentMattress → mattress tips). Don't add steps the engine ignores.
-- Analytics: Plausible + GA4 (`G-D921C30JEQ`, Consent Mode v2, opt-out).
-  `gaEvent()` in composables/useAnalytics.ts; funnel + shop + scroll + quiz
-  events are instrumented. **`send_page_view` stays ON** (see the 2026-07-30
-  entry below) — gtag sends the landing page_view, the router hook sends every
-  client-side navigation, and the hook drops its own first call when it is
-  still on the landing URL so the two cannot double-count.
-
-**Legal identity (facts, do not change):**
-- Owner: Costlio OÜ, registrikood 14562345. Contact: **unevalem@gmail.com**
-  (also Apps Script OWNER_EMAIL for order alerts).
-- NOT VAT-registered — never render "sisaldab käibemaksu"/"km-ga"; prices are
-  final. Delivery promise everywhere: 2–5 tööpäeva.
-- Pages: /meist (who/why/funding — disclosure links to #rahastus), /muugitingimused
-  (VÕS-based terms), /privaatsus. Footer carries the legal line + links.
-
-**Transparency rules (product surfaces):**
-- Every recommendation surface shows `disclosure.short` + badge
-  "Unevalemi toode" / "Väline pood" (derived from storeUrl host via
-  `utils/products.ts isExternalStore` — external = any non-unevalem.ee host).
-- Recommendation engine only suggests products matching ≥1 profile tag; a
-  zero-product result is a valid, intended outcome.
-
-**Shop (static frontend + Apps Script backend):**
-- Flow: /pood → useCart (localStorage `uva-cart`, ids+qty ONLY — prices are
-  never trusted from the client) → CartDrawer → /kassa (name/email/phone +
-  Omniva terminal dropdown + note) → Apps Script `create_order` (server-side
-  price lookup from inventory sheet, rejects unknown/inactive/unavailable)
-  → Maksekeskus gateway redirect → /aitah?ref=<uuid> polls `order_status`
-  and shows ONLY the server-verified status.
-- Inventory sheet has an `available` column: only explicit TRUE is purchasable;
-  blank/missing = waitlist mode ("Anna teada, kui saadaval" → waitlist tab).
-- Parcel terminals are fetched at BUILD time (fetch-content → 
-  public/data/terminals.json, ~408 Omniva rows) because browser CORS blocks
-  carrier APIs. SmartPosti has no public feed since the rebrand — the checkout
-  shows a carrier only if terminals.json contains rows for it.
-- Payment: Maksekeskus/MakeCommerce behind a swappable adapter in
-  scripts/apps-script.gs (`createPayment_`, `handlePaymentCallback`). Creds in
-  Script Properties (MK_SHOP_ID / MK_SECRET_KEY / MK_ENV=test|live), never in
-  code. Callbacks: MAC = UPPER(HEX(SHA512(json+secret))) verified BEFORE any
-  state change; idempotent on duplicate COMPLETED; only COMPLETED ⇒ PAID ⇒
-  MailApp emails owner + customer.
-- `orders` and `waitlist` tabs hold PII and are deliberately NOT in the Apps
-  Script GET allowlist. Never add them to SHEET_MAP.
-- Admin helpers in apps-script.gs (run manually in the editor): `importSources()`
-  pulls scripts/sources-import.tsv from the repo into the sources tab;
-  `setupShop()` adds the available column + waitlist/orders tabs.
-
-**Gotchas:**
-- @vueuse `useStorage` is NOT auto-imported in `composables/*.ts` during SSR
-  (only in .vue) — import it explicitly or every page 500s at prerender.
-- Backticks inside double-quoted `git commit -m` get command-substituted by
-  bash — use single quotes.
-
-### 2026-07-29 — Paid-traffic readiness (overrides anything above)
-
-**Social proof toast is UNMOUNTED.** `app.vue` no longer renders
-`<SocialProofToast />`. Every notification row was fabricated (purchases that
-never happened), which contradicts the 2026-07-17 honesty overhaul and is a
-per-se unfair commercial practice under Omnibus-amended EU Directive
-2005/29/EC Annex I once ads drive traffic. The component, composable and
-`notifications` tab all stay. Remount ONLY when real orders can feed it —
-never with hand-written rows. `notifications.example.json` is now `[]` because
-it is the production fallback when `SHEETS_API_URL` is unset.
-
-**Campaign landing pages: `pages/probleem/[slug].vue`**, driven by a new
-`pains` sheet tab (slug, eyebrow, headline, subhead, bodyMd, ctaType, ctaLabel,
-prefill, relatedSlugs, ogImage, metaTitle, metaDescription, active, noindex).
-Optional fetch — the build works before the tab exists. Routes are added to
-`nitro.prerender.routes` by `painRoutes()`; without that every ad click 404s,
-since nothing on the site links to them. The headline must mirror the ad's
-wording verbatim and is rendered server-side (never inside `ClientOnly`).
-`SleepCalculator` takes optional `calcType` / `prefill` / `prefilledFrom` props
-so the calculator embeds inline rather than being linked.
-
-**⚠️ Page keys must NOT be `route.fullPath`.** Any query string then produces a
-different key, which discards the prerendered payload and makes `useFetch` call
-`/api/*` — routes that do not exist on a static host. The fetch 404s and the
-not-found redirect fires. This was live: Facebook appends `fbclid` to shared
-links, so every Facebook click on an article landed on `/artiklid`. Both
-`[slug].vue` pages now key on the slug param, and their redirects fire only
-when the list actually loaded without the slug — never on a failed fetch.
-
-**Attribution.** `useAttribution` writes first-touch utm_*/fbclid/gclid/ttclid
-to a 90d `uva-attr` cookie (last-touch in sessionStorage);
-`plugins/attribution.client.ts` captures on any landing route.
-`attrPayload()` flows into `submit_calc` and `create_order`. The sheet, not the
-pixel, is the reliable record — don't reconcile the two.
-
-**`handleCalcSubmit` is header-mapped, not positional.** It was dropping seven
-answers the client already sent. Adding a payload field now needs no script
-change. Don't reintroduce a fixed-array `appendRow`.
-
-**A/B testing removed.** `useABTest` now returns only `sessionId`. The variant
-was written to every row, rendered nowhere, and could never reach significance.
-
-**Newsletter.** `components/lead/LeadForm.vue` at four placements (calc result,
-footer, quiz result, article end). NO popup, NO interstitial, NO gate — the ads
-promise "e-posti ei küsi" and that must stay literally true. Explicit unticked
-consent checkbox required (Estonian ESS §103¹); the exact wording is stored
-with a version. Writes to a `subscribers` tab which — like `orders` and
-`waitlist` — must NEVER be added to `SHEET_MAP`. No ESP until ~300 subscribers.
-
-**Consent v2.** `uva-consent-v2` holds `{ analytics, ads }`. Renamed, not
-migrated, so an old `'granted'` (analytics-only) can't be read as ad consent.
-Advertising storage is opt-IN, denied by default; analytics stays opt-out.
-Three-button banner, reject as easy as accept. `plugins/meta-pixel.client.ts`
-no-ops unless ads are granted AND `NUXT_PUBLIC_META_PIXEL_ID` is set; it
-mirrors GA events via a `unevalem:ga-event` window event. **Optimise Meta
-toward `Lead`, not `Purchase`, while nothing is purchasable.**
-
-**Non-production builds no longer pollute production analytics.** Plausible
-domain, og:image and the sitemap host all derive from env, so a build with
-`NUXT_PUBLIC_SITE_URL` set to a non-production host reports as non-production.
-(Written for the staging workflow, which is now retired — the same env plumbing
-is what makes the local review recipe below safe.)
-
-**Campaign playbook: `docs/kampaaniad.md`.** Ad angles, the weekly posting
-rhythm, and the rule that every number in an ad traces to a `sources` row.
-
-### 2026-07-30 — Staging retired, review happens locally
-
-test.unevalem.ee is gone. GitHub Pages offers no authentication on any free
-plan — a private repo still publishes a public site — so a hosted staging
-environment could not be restricted to the owner without either moving the
-`unevalem.ee` zone to Cloudflare or moving staging to Cloudflare Pages. Since
-there is exactly one reviewer, a local build is the proportionate answer.
-
-What changed:
-- `deploy-staging.yml` deleted. `deploy.yml` (main → unevalem.ee) is the only
+## Environments and Branching
+
+**There are exactly two environments: local, and unevalem.ee.**
+
+- Develop against `npm run dev`.
+- Verify with a local production build (recipe below).
+- Feature work gets its own `feat/*` branch so it can be parked, reviewed or
+  dropped as a unit, then merges straight to `main`.
+- `main` → unevalem.ee via `.github/workflows/deploy.yml`. It is the only
   deployment workflow.
-- The `unevalem-test` repo's `gh-pages` branch was emptied down to `CNAME` +
-  a disallow-all `robots.txt`, so the host serves 404. **`CNAME` is kept on
-  purpose**: while the DNS record still points at GitHub, an unclaimed
-  hostname could be taken over by someone else's Pages site. Delete the repo
-  or its CNAME only after the DNS record is gone.
-- The `test` CNAME at Elkdata must be deleted by the domain owner — that is
-  the step that actually retires the hostname.
 
-**There are exactly two environments: local, and unevalem.ee.** Develop against
-`npm run dev`, verify with a local production build (recipe below), then merge to
-`main` and push — `deploy.yml` publishes it. That is the whole flow.
+There is **no `dev` integration branch and no staging tier**. test.unevalem.ee
+was retired on 2026-07-30 (GitHub Pages has no auth on any free plan, so a
+hosted staging site could not be restricted to one reviewer). `dev` and
+`feat/funnel-readiness` were fully merged and deleted on 2026-08-12.
 
-**Branch model (2026-08-12): `feat/*` branches → `main`, nothing in between.**
-Feature work still gets its own branch — that is deliberate, so a feature can be
-parked, reviewed or dropped as a unit — but it merges straight to `main` once it
-checks out on a local build. The `dev` integration tier is gone: `dev` and
-`feat/funnel-readiness` were fully merged and were deleted (local + origin) on
-2026-08-12. Do not propose landing work on `dev`, and do not treat any branch as
-a staging tier — only `main` deploys.
-
-The 2026-07-17 staging/branching rules this replaced are deleted from this file
-rather than marked superseded, because a "superseded" block kept being read as
-current.
-
-**How to review a build locally** (bash / Git Bash):
+**Local production review** (bash / Git Bash):
 ```bash
 npm ci
 NUXT_PUBLIC_SITE_URL=http://localhost:4000 \
@@ -934,134 +78,428 @@ npm run build:full
 npx serve .output/public -l 4000     # not `nuxt dev` — prerendered output differs
 ```
 
-**⚠️ PowerShell needs a different incantation for the empty GA id.**
-`$env:NUXT_PUBLIC_GA_ID = ''` *deletes* the variable in PowerShell rather than
-setting it to an empty string, and `nuxt.config.ts:149` falls back to the
-production id `G-D921C30JEQ` when the variable is absent — so the obvious
-translation silently sends review traffic to the live GA property. Use:
-```powershell
-$env:NUXT_PUBLIC_SITE_URL = 'http://localhost:4000'
-[Environment]::SetEnvironmentVariable('NUXT_PUBLIC_GA_ID', '', 'Process')
-$env:NUXT_PUBLIC_PLAUSIBLE_DOMAIN = 'localhost'
-npm run build:full
-npx serve .output/public -l 4000
-```
-Verify before trusting the build: `.output/public/index.html` must not contain
+Verify before trusting it: `.output/public/index.html` must not contain
 `G-D921C30JEQ`, and its `data-domain` must not be `unevalem.ee`.
 
-Setting `NUXT_PUBLIC_SITE_URL` to a non-production host matters separately: it
-is what tags calculator and newsletter rows as non-production in the sheet (see
-`isProdSite` in `utils/site.ts`) and keeps localhost URLs out of the sitemap.
+`NUXT_PUBLIC_SITE_URL` also tags calculator and newsletter rows as non-production
+in the sheet (`isProdSite` in `utils/site.ts`) and keeps localhost out of the
+sitemap.
 
-**⚠️ A local `build:full` overwrites `public/data/terminals.json`, which IS
+Local review hits the **production** Apps Script backend — same sheet, same
+`orders` tab, same MK credentials. Harmless while `MK_ENV=test`; revisit before
+switching Maksekeskus to live.
+
+---
+
+## Project Structure
+
+```
+unevalem/
+├── CLAUDE.md
+├── nuxt.config.ts                   ← prerender routes read posts.json + pains.json
+├── app.vue
+│
+├── pages/
+│   ├── index.vue                    ← landing; calculator is the hero
+│   ├── artiklid/{index,[slug]}.vue  ← blog
+│   ├── unetest/index.vue            ← quiz
+│   ├── pood/index.vue               ← shop
+│   ├── kassa/index.vue              ← checkout
+│   ├── aitah/index.vue              ← post-payment, polls order_status
+│   ├── tellimus/index.vue           ← buyer order lookup
+│   ├── probleem/[slug].vue          ← campaign landing pages (from `pains` tab)
+│   └── {meist,muugitingimused,privaatsus}/index.vue
+│
+├── components/
+│   ├── calculator/{SleepCalculator,CalculatorStep,CalculatorResult}.vue
+│   ├── lead/LeadForm.vue            ← newsletter, 4 placements
+│   ├── shop/{...}.vue
+│   ├── blog/{PostCard,PostGrid}.vue
+│   ├── social/SocialProofToast.vue  ← EXISTS BUT UNMOUNTED (see Honesty)
+│   └── layout/{AppHeader,AppFooter,CookieConsent}.vue
+│
+├── composables/
+│   ├── useCalculator.ts             ← step state, skip logic
+│   ├── useCalcSession.ts            ← cross-calculator funnel state (cookie)
+│   ├── useCalculators.ts            ← the sheet-driven question definitions
+│   ├── useAnalytics.ts              ← gaEvent + sheet submissions
+│   ├── useAttribution.ts, useConsent.ts, useCart.ts, usePosts.ts, …
+│
+├── utils/
+│   ├── calculator.ts                ← pure recommendation engine
+│   ├── calc-schema.ts               ← answer keys + allowed values (the contract)
+│   ├── copy.ts                      ← Estonian UI chrome; never hardcode in .vue
+│   ├── products.ts, affinity.ts, ga.ts, site.ts
+│
+├── scripts/
+│   ├── fetch-content.ts             ← Sheets → public/data/*.json
+│   ├── apps-script.gs               ← MIRROR of the live backend (paste to deploy)
+│   ├── check-influence.ts           ← every question must change the result
+│   ├── export-calculators.ts        ← one-shot copy.ts → sheet migration
+│   └── *-import.tsv                 ← seed data for the Apps Script importers
+│
+└── public/data/                     ← generated at build; *.example.json committed
+```
+
+---
+
+## Design System
+
+Tokens in `assets/css/main.css`, mapped into Tailwind under `theme.extend.colors`:
+
+```css
+--color-midnight:  #0D1B2A;   --color-dusk:      #1B2D45;
+--color-lavender:  #B8A9C9;   --color-moonlight: #F0EDF5;
+--color-foam:      #FFFFFF;   --color-gold:      #C9A96E;
+--color-muted:     #7B8794;   --color-success:   #4CAF7D;
+```
+
+**Light/dark is done with semantic surface classes, not colour utilities.**
+Once the themes diverged, the same Tailwind colour meant different things per
+section — in light mode the hero band is page-toned with dark text while the
+value band below stays deep teal with light text, and no single `text-foam`
+override expresses both. So text colour travels with its surface
+(`hero-band`/`hero-title` and friends). Dark is the default: `nuxt.config`
+stamps `class="dark"` and an inline script strips it before first paint when the
+stored choice is light — hence base values on `:root`, overridden under
+`html.dark`.
+
+Header colour must land **on** the palette ramp (midnight → dusk → lavender →
+moonlight). An invented in-between reads as foreign no matter how well it
+measures. Ink is per-theme rather than tinted: between roughly #26707F and
+#3591A5 neither white nor dark ink reaches 4.5:1.
+
+**Tone of voice:** informal "sina", never "teie". No urgency, no countdowns, no
+"Osta kohu!". Science made accessible. A well-informed friend, not a salesperson.
+
+---
+
+## The Calculators
+
+**Three sequential 8-step calculators** — pillow → blanket → mattress — chained
+by `useCalcSession`. (There is no single 5-step flow; that was the original 2024
+design and is long gone.)
+
+### Where the questions live
+
+**In the `calculators` and `calc_questions` sheet tabs**, since 2026-08-12,
+assembled at build time into `public/data/calculators.json`, served by
+`/api/calculators`, read through `useCalculators()`. The Estonian is editable
+without a developer.
+
+**What is NOT editable in the sheet:** each question's `answerKey` and the value
+half of each option (`Label|value`). Those are the contract with
+`utils/calculator.ts` — the engine branches on them, `useCalcSession` matches
+them when prefilling a later calculator, and they name the columns in each
+`<calcType>_responses` tab. The allowed set is `utils/calc-schema.ts`, and
+`fetch-content.ts` validates every sheet row against it and **fails the build**
+on a mismatch. That is deliberate: a bad value throws nowhere at runtime, it
+just makes the engine silently ignore that answer for everyone.
+
+`utils/copy.ts` keeps only the calculator **chrome** — `heroTitle`,
+`progressLabel`, `timeLeft`, `session.*`, `result.*`.
+
+### Rules the questions must obey
+
+- **Every step must visibly influence the result** — score, `profileSummary`,
+  tips or product tags. `scripts/check-influence.ts` enforces this: it varies
+  each question with the others held fixed and counts distinct outcomes, exiting
+  non-zero if any question changes nothing. Run it after touching the engine or
+  the sheet.
+- **Answered questions are never re-asked.** `reset()` starts at the first
+  unanswered step and advance/back hop over prefilled ones, so the funnel asks
+  18 questions rather than 24 and the mattress calculator asks 4 rather than 8.
+  The visible counter and progress bar count only steps actually asked.
+
+### Result screen order
+
+Score + `profileSummary` (advice) first, tips next, **products last** in a
+compact section. Never restore a product-first layout.
+
+Recommendations only suggest products matching ≥1 profile tag. **A zero-product
+result is a valid, intended outcome** — `result.noProductsYet` covers it.
+
+---
+
+## Google Sheets Schema
+
+One Apps Script Web App fronts everything:
+
+```bash
+SHEETS_API_URL=https://script.google.com/macros/s/AKfycbxacVFUEpBK1rpkOwUF8_-0YHgtizXqz0TE9NosgsARQiNHbMeFOZ4sxt7dD48023DNpQ/exec
+```
+
+`${SHEETS_API_URL}?sheet=<name>` returns that tab as JSON. `SHEET_MAP` in
+`apps-script.gs` is the allowlist; an unknown tab returns `{"error":…}`, which
+`tryFetchSheet` treats as absent.
+
+**`orders`, `subscribers` and `waitlist` hold PII and are deliberately NOT in
+`SHEET_MAP`. Never add them.**
+
+| Tab | Contents |
+|---|---|
+| `posts` | id, slug, title, excerpt, content (Markdown), category, publishDate, tags, coverImage, status, isFeatured, readingTimeMin, diveDeeper *(legacy)*, **proofread** |
+| `sources` | slug → title, url. One row per citation; titles stay in the study's original language |
+| `notifications` | id, text, type, active *(component unmounted — see Honesty)* |
+| `stats` | key, value, displayText, active. Includes `calculatorVersion` |
+| `inventory` | products, incl. an `available` column — only explicit TRUE is purchasable |
+| `tips` | daily sleep tips |
+| `quizzes` / `quiz_questions` / `quiz_results` | the unetest quiz |
+| `calculators` / `calc_questions` | the three calculators |
+| `pains` | campaign landing pages for `/probleem/<slug>` |
+| `post_stats` | slug → views |
+
+### The `proofread` gate
+
+Articles are AI-drafted; nothing goes live until a person has read and corrected
+it. A post publishes only when `status = published` **AND** `proofread` is
+non-empty and not `FALSE`. Enforced in `fetch-content.ts`.
+
+These are two distinct states and the build log distinguishes them — "not
+proofread by a human yet" is not the same as "status: draft". Don't conflate
+them when reporting.
+
+**This gate is the site's real bottleneck.** As of 2026-08-12, 4 of 22 articles
+are live. It also throttles the myth quiz, whose questions link to their article.
+The gate is correct and should not be loosened.
+
+### Content conventions
+
+- Post titles prefixed `MÜÜT: ` mark myth-busting content. Parsed once in
+  `usePosts.ts` (`/^MÜÜT:\s*/i`), which sets `isMyth` and strips the prefix.
+  Rendered as a `✕ MÜÜT` pill, never as title text.
+- **Do not trust the Apps Script to filter drafts** — it returns them.
+  `fetch-content.ts` filters `status === 'published'` before writing
+  `posts.json`, which is the single choke point every consumer reads. Keep the
+  filter even if the script is fixed.
+
+---
+
+## Content Fetch (`scripts/fetch-content.ts`)
+
+```bash
+npm run fetch-content     # Sheets → public/data/*.json
+npm run build:full        # fetch-content && nuxt generate  ← always use this
+```
+
+- **Sheet requests are issued one at a time.** They used to run as one
+  `Promise.all` of twelve, which the Apps Script throttled; retries then
+  collided with each other and the daily cron failed roughly as often as it
+  succeeded. Backoff is exponential with jitter. Costs ~10s; do not
+  re-parallelise it.
+- **A failed required sheet kills the build.** Example data must never ship to
+  production — it did once (run 29510944443), publishing 5 dummy articles.
+- No `SHEETS_API_URL` → copies `*.example.json` → `*.json` and exits 0, so
+  `npm run dev` works without credentials.
+- `fetch-content` must run **before** `generate`: `nuxt.config.ts` reads
+  `posts.json` and `pains.json` to build `nitro.prerender.routes`. `crawlLinks`
+  alone is not enough — `PostGrid` paginates, so the crawler only ever finds the
+  first page of articles and the rest 404 while still appearing in the sitemap.
+
+---
+
+## Shop
+
+/pood → `useCart` (localStorage `uva-cart`, **ids + qty only** — prices are
+never trusted from the client) → CartDrawer → /kassa (name, email, phone, Omniva
+terminal, note) → Apps Script `create_order` (server-side price lookup from
+`inventory`, rejects unknown/inactive/unavailable) → Maksekeskus redirect →
+/aitah?ref=<uuid> polls `order_status` and shows only the server-verified status.
+
+- `available` blank/missing ⇒ waitlist mode ("Anna teada, kui saadaval").
+- **Parcel terminals are fetched at BUILD time** (browser CORS blocks carrier
+  APIs) into `public/data/terminals.json`, ~437 Omniva rows. SmartPost has no
+  public feed since the rebrand; checkout shows a carrier only if
+  `terminals.json` has rows for it.
+- Payment creds live in Script Properties (`MK_SHOP_ID`, `MK_SECRET_KEY`,
+  `MK_ENV=test|live`), never in code. Callbacks verify
+  `MAC = UPPER(HEX(SHA512(json+secret)))` **before** any state change,
+  are idempotent on duplicate COMPLETED, and only COMPLETED ⇒ PAID ⇒ emails.
+
+---
+
+## Honesty Rules (non-negotiable)
+
+These exist because the site's whole positioning is trust, and because
+fabricated social proof is a per-se unfair commercial practice under
+Omnibus-amended EU Directive 2005/29/EC Annex I once ads drive traffic.
+
+- **No fabricated social proof.** `SocialProofToast` is **unmounted** —
+  `app.vue` does not render it. Every notification row described a purchase that
+  never happened. The component, composable and tab all remain; remount **only**
+  when real orders can feed it, never with hand-written rows.
+  `notifications.example.json` is `[]` because it is the production fallback.
+- **No invented counters or ratings.** No "60+ uuringut" unless a `sources` row
+  backs it. Keep claims qualitative otherwise.
+- **Every recommendation surface** shows `disclosure.short` plus a badge —
+  "Unevalemi toode" or "Väline pood", derived from the storeUrl host by
+  `isExternalStore`.
+- **Every number in an ad traces to a `sources` row.** See `docs/kampaaniad.md`.
+- **No popup, interstitial or gate on the newsletter.** The ads promise
+  "e-posti ei küsi" and that must stay literally true.
+
+---
+
+## Newsletter
+
+`components/lead/LeadForm.vue`, four placements: calculator result, footer, quiz
+result, article end. Writes to a `subscribers` tab.
+
+**Consent is the submit itself — there is no checkbox.** ESS §103¹ requires
+prior consent for direct e-marketing but does not prescribe a mechanism; GDPR
+Art 4(11) and Recital 32 accept "conduct which clearly indicates in this
+context", and submitting a single-purpose form via a button labelled "Telli" is
+that. The checkbox restated a decision the button already made and cost sign-ups
+for it.
+
+What consent must still be is **informed**, which `headingGeneric` + `promise`
+above the button carry: what arrives, how often, that nothing is sold. Keep
+those three facts whatever the wording. `consentText` records the whole visible
+context verbatim with a version — consent you cannot evidence is not consent.
+
+**If this form ever gains a second purpose** (bundled with an order, gating a
+result), the separate checkbox has to come back.
+
+---
+
+## Analytics
+
+Plausible + GA4 (`G-D921C30JEQ`), Consent Mode v2. `gaEvent()` in
+`useAnalytics.ts`; funnel, shop, scroll and quiz events instrumented.
+
+- **`send_page_view` stays ON.** gtag sends the landing page_view; the router
+  hook sends each client-side navigation and drops its own first call only when
+  still on the landing URL, so the two cannot double-count.
+- **Consent v2** — `uva-consent-v2` holds `{ analytics, ads }`. Advertising
+  storage is opt-IN and denied by default; analytics is opt-out. Three-button
+  banner, reject as easy as accept.
+- **Attribution** — `useAttribution` writes first-touch utm_*/fbclid/gclid/ttclid
+  to a 90d `uva-attr` cookie (last-touch in sessionStorage). `attrPayload()`
+  flows into `submit_calc` and `create_order`. **The sheet, not the pixel, is the
+  reliable record** — don't try to reconcile them.
+- **Meta Pixel** no-ops unless ads are granted and `NUXT_PUBLIC_META_PIXEL_ID`
+  is set. **Optimise toward `Lead`, not `Purchase`,** while nothing is purchasable.
+
+### Server-side conversion recovery
+
+15–30% of visitors run a tracker blocker, more on paid traffic. Blockers do not
+fail loudly: they answer `gtag/js` with a neutered **200** carrying a no-op
+`gtag`, so `typeof window.gtag === 'function'` stays true and events silently
+evaporate. **`window.google_tag_manager` is the only honest check** — that is
+what `isGaBlocked()` in `utils/ga.ts` tests.
+
+Blocked visitors still reach the Apps Script backend, so conversions are re-sent
+from there over the GA4 Measurement Protocol (`gaSendServerEvent_`), wired into
+`handleCalcSubmit` (`submit_calc`), `handleSubscribe` (`lead`) and the payment
+callback (`purchase`).
+
+- **Only fires when the client reports `gaBlocked: true`** — otherwise the
+  browser already sent it and both would count.
+- `isGaBlocked()` has a **3-second grace period**; gtag.js is async and a
+  one-second-old page may legitimately not have it yet. An undercount is
+  recoverable, a double count silently corrupts the funnel.
+- `purchase` is **not** a fallback — the browser can never send it. Payment
+  confirmation is a server-to-server callback while the visitor is still on the
+  provider's domain. The `orders` tab's `gaMeta` column (16) holds the
+  checkout's transport data for the callback to read back.
+- Needs Script Properties `GA_MEASUREMENT_ID` and `GA_API_SECRET`. Verify with
+  `gaDebugPing()` — a real MP send always returns 204 even for a payload GA
+  discards, so the debug endpoint is the only one that tells you anything.
+- **Ordinary pageviews stay under-reported and that is fine.** Only conversions
+  are recovered. When GA and the sheet disagree on volume, the sheet is right.
+
+---
+
+## Campaign Landing Pages
+
+`pages/probleem/[slug].vue`, driven by the `pains` tab (slug, eyebrow, headline,
+subhead, bodyMd, ctaType, ctaLabel, prefill, relatedSlugs, ogImage, metaTitle,
+metaDescription, active, noindex).
+
+Routes are added to `nitro.prerender.routes` by `painRoutes()` — without that
+every ad click 404s, since nothing on the site links to them. The headline must
+mirror the ad's wording verbatim and is rendered **server-side**, never inside
+`ClientOnly`. `SleepCalculator` takes `calcType` / `prefill` / `prefilledFrom`
+props so the calculator embeds inline rather than being linked.
+
+---
+
+## Apps Script Admin Helpers
+
+`scripts/apps-script.gs` is a **mirror**, not the running code. Edit here, paste
+into the editor, save. Editor-run helpers need no redeploy; changing
+`doGet`/`doPost` behaviour does.
+
+| Helper | Does |
+|---|---|
+| `importSources()` | seeds the `sources` tab from `scripts/sources-import.tsv` |
+| `importCalculators()` | one-shot seed of `calculators` + `calc_questions`; refuses to run if they exist |
+| `setupShop()` | adds `available`, creates `waitlist` + `orders` |
+| `reportEmptyCalcColumns()` | **dry run** — lists always-blank `*_responses` columns |
+| `deleteEmptyCalcColumns()` | deletes them, right-to-left, protecting sparse attribution columns |
+| `gaDebugPing()` | validates the Measurement Protocol setup |
+
+**Column cleanup order matters:** deploy the site first. The client must stop
+sending a key before its column is deleted, or `handleCalcSubmit` recreates it.
+
+**Never delete or insert columns in `orders`** — `setOrderStatus_` and
+`handlePaymentCallback` address it positionally. Append only.
+
+---
+
+## Coding Standards
+
+- TypeScript only, no `.js`. No `any`; interfaces in `types/index.ts`.
+- **All Estonian copy in `utils/copy.ts`** or the sheet — never hardcoded in `.vue`.
+- Composables for shared state; no prop drilling. No Pinia.
+- `public/data/*.json` is the only runtime data source — never call Sheets from the browser.
+- Mobile-first (390px), then scale up.
+- Accessibility: keyboard-navigable, 4.5:1 contrast, proper `aria-` labels.
+- Auto-imports are on — don't import `ref`, `computed`, etc.
+
+---
+
+## Traps
+
+Things that have already gone wrong here and would go wrong the same way again.
+
+**Page keys must NOT be `route.fullPath`.** Any query string produces a
+different key, which discards the prerendered payload and makes `useFetch` call
+`/api/*` — routes that don't exist on a static host. The fetch 404s and the
+not-found redirect fires. This was live: Facebook appends `fbclid`, so every
+Facebook click on an article landed on `/artiklid`. Both `[slug].vue` pages key
+on the slug param, and their redirects fire only when the list actually loaded
+without the slug — never on a failed fetch.
+
+**`@vueuse/useStorage` is NOT auto-imported in `composables/*.ts`** during SSR
+(only in `.vue`). Import it explicitly or every page 500s at prerender.
+
+**A local `build:full` overwrites `public/data/terminals.json`, which IS
 committed** (unlike the other generated JSON). A truncated Omniva response
-passes the `if (!omniva.length)` guard and would empty the checkout terminal
-dropdown in production. After any local build:
-`git diff --stat public/data/terminals.json` — if it shrank, `git checkout --`
-it. Never commit that file from a local build.
+passes the `if (!omniva.length)` guard and would empty the checkout dropdown in
+production. After any local build: `git diff --stat public/data/terminals.json`
+— if it shrank, `git checkout --` it.
 
-Local review still hits the PRODUCTION Apps Script backend (same sheet, same
-`orders` tab, same MK credentials). Harmless while `MK_ENV=test`; revisit
-before switching Maksekeskus to live.
+**PowerShell deletes an env var when you assign `''`.** `$env:NUXT_PUBLIC_GA_ID = ''`
+removes it, and `nuxt.config.ts` then falls back to the production GA id — so
+the obvious translation of the review recipe sends review traffic to the live
+property. Use
+`[Environment]::SetEnvironmentVariable('NUXT_PUBLIC_GA_ID', '', 'Process')`.
 
-### 2026-07-30 — GA4 sent no hits at all (`send_page_view`)
+**Backticks inside double-quoted `git commit -m` get command-substituted** by
+bash. Use single quotes or a heredoc.
 
-**Never set `send_page_view: false` in `plugins/analytics.client.ts` again.**
+**Nuxt won't `generate` while `nuxt dev` holds the lock.** Stop the dev server
+first — but stop *that process*, not every `node.exe` on the machine.
 
-The plugin disabled gtag's own page_view and emitted every page_view from
-`useRouter().afterEach`, on the assumption that the hook also covers the
-initial route. It does not, reliably. `afterEach` is registered while plugins
-run (`applyPlugins` in Nuxt's client entry), but Nuxt performs its initial
-navigation inside the `app:created` hook that fires afterwards — so whether
-the hook ever observes that first navigation is a function of framework init
-order, not of this code.
+**For "analytics shows nothing", ask for the browser's console state FIRST**
+(`typeof window.gtag`, `window.google_tag_manager`, the Network status of
+`gtag/js`, console errors). Reasoning from source cannot see a browser
+extension. This cost four wrong turns once; the answer was a tracker blocker in
+the owner's own browser.
 
-When it doesn't fire, **nothing is sent at all**: no page_view, no network
-request to `/g/collect`, no Realtime, no DebugView. GA looks entirely dead
-while the tag is loaded and correctly configured. Any visitor who lands and
-leaves without an in-site navigation is invisible — which is most ad traffic.
+---
 
-This masqueraded as an environment problem because staging appeared to work:
-review sessions there involved clicking through pages, and every one of those
-client-side navigations does fire the hook.
-
-The arrangement now: gtag sends the landing page_view itself; the router hook
-sends each client-side navigation; the hook drops its own first call, and only
-when still on the landing URL, so the two cannot double-count. Both halves of
-that condition matter — dropping unconditionally loses a real pageview in the
-case where the hook never sees the initial navigation.
-
-The `afterTitleSettles` rAF loop stays: it fixes a different bug (GA4 filing
-client-side navigations under the previous page's title) and does not apply to
-the first load, where the prerendered HTML already carries the right `<title>`.
-
-**Postscript — that was not the reported bug.** The owner's "GA doesn't work"
-was a tracker blocker in their own browser, diagnosed only after four wrong
-turns. The lesson is procedural: for "analytics shows nothing", ask for the
-browser's console state FIRST (`typeof window.gtag`,
-`window.google_tag_manager`, the Network status of `gtag/js`, console errors).
-Reasoning from source cannot see an extension. The `send_page_view` change
-above is still correct, but it fixed nothing the owner was experiencing.
-
-### 2026-07-30 — Tracker blockers, and GA4 Measurement Protocol
-
-**Blockers do not fail loudly.** uBlock Origin, AdGuard and Brave Shields do
-NOT block `googletagmanager.com/gtag/js` — they answer it with a neutered
-**200** carrying a no-op `gtag`. So `typeof window.gtag === 'function'` stays
-true, the Network tab shows a successful request, every client-side event
-silently evaporates, and nothing in the page can tell. The real gtag.js is
-~490KB; a stub is ~1KB.
-
-**`window.google_tag_manager` is the only honest check** — only the real
-library defines it. `typeof window.gtag` proves nothing. This is what
-`isGaBlocked()` in `utils/ga.ts` tests.
-
-**Server-side conversion recovery.** 15–30% of visitors run a blocker, more on
-paid traffic than organic, so client-only measurement understates exactly the
-conversions ad spend is optimised against. Those visitors still reach the Apps
-Script backend — the calculator, newsletter and checkout POST first-party,
-which no blocker touches. So conversions are re-sent from there via the GA4
-Measurement Protocol:
-
-- `gaSendServerEvent_()` in `scripts/apps-script.gs`, wired into
-  `handleCalcSubmit` (`submit_calc`), `handleSubscribe` (`lead`) and the
-  payment callback (`purchase`, via `gaSendPurchase_`).
-- **Only fires when the client reports `gaBlocked: true`.** A visitor whose
-  gtag.js loaded normally already sent the event from the browser; sending
-  both would double-count. `utils/ga.ts` `gaTransport()` supplies the flag
-  plus GA's own `_ga` / `_ga_<streamId>` identifiers for session stitching.
-- Blocked visitors have no `_ga` cookie (gtag.js never ran to write one), so
-  `client_id` falls back to the `uva-sid` cookie. The conversion counts, under
-  a synthetic user that cannot be joined to a web session. That is the
-  intended trade — a counted conversion beats a lost one.
-- `isGaBlocked()` has a **3-second grace period**: gtag.js is async, so a page
-  one second old may legitimately not have it yet. Claiming "blocked" then
-  would double-count. An undercount is recoverable; a double count silently
-  corrupts the funnel.
-- Gated on `env === 'prod'`, and skipped when `analyticsConsent === false`.
-  For orders the env lives *inside* `gaMeta` (the checkout payload has no
-  top-level `env`), with **no default** — an order row predating the field
-  must not be assumed production.
-- Every send is wrapped so analytics can never fail an order, a sign-up or a
-  calculator submission.
-
-**`purchase` is not a fallback — the browser can never send it.** Payment
-confirmation arrives as a server-to-server callback while the visitor is still
-on the payment provider's domain, and many never return to `/aitah`. The
-`orders` tab gained a **`gaMeta`** column (16) holding the checkout's transport
-data; the callback reads it back. Column *appended*, never inserted —
-`setOrderStatus_` and `handlePaymentCallback` address columns positionally.
-Idempotency comes free from the existing `PAID` guard: a duplicate callback
-returns before reaching the GA send.
-
-**Script Properties needed** (alongside the MK_* ones):
-`GA_MEASUREMENT_ID`, `GA_API_SECRET` (GA4 Admin → Data Streams → your stream →
-Measurement Protocol API secrets). Absent either, every call is a silent no-op.
-Verify with the `gaDebugPing()` admin helper — it hits GA's
-`/debug/mp/collect`, which validates without recording. An empty
-`validationMessages` array means the setup is good. A real MP send always
-returns 204 even for a payload GA discards, so the debug endpoint is the only
-one that tells you anything.
-
-**Ordinary pageviews stay under-reported and that is fine.** Only conversions
-are recovered. When GA and the sheet disagree on volume, the sheet is right.
+*Update this file whenever a significant architectural decision is made. Prefer
+rewriting the affected section over appending an update log — a "superseded"
+block still gets read as current.*

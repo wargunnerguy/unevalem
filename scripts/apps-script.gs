@@ -21,6 +21,8 @@ var SHEET_MAP = {
   quizzes:        'quizzes',
   quiz_questions: 'quiz_questions',
   quiz_results:   'quiz_results',
+  calculators:    'calculators',
+  calc_questions: 'calc_questions',
   post_stats:     'post_stats',
   sources:        'sources',
   pains:          'pains',
@@ -940,6 +942,65 @@ function importSources() {
   tab.getRange(1, 1, 1, 3).setValues([['slug', 'title', 'url']])
   tab.getRange(2, 1, rows.length, 3).setValues(rows)
   Logger.log('Imported ' + rows.length + ' source rows into the sources tab')
+}
+
+/**
+ * Seeds the `calculators` and `calc_questions` tabs from
+ * scripts/calculators-import.tsv in the repo — the questions exactly as they
+ * were when they lived in utils/copy.ts. Run this ONCE, when moving the
+ * calculator into Sheets; after that the sheet is the source of truth and
+ * re-running would overwrite whatever has been edited since.
+ *
+ * The `answerKey` column and the value half of each option (`Label|value`) are
+ * the contract with the recommendation engine. Edit the labels and the question
+ * text freely; changing a value or an answerKey fails the next build with a
+ * message naming the offending row, which is deliberate — a silent mismatch
+ * would leave the engine ignoring that answer for everyone.
+ */
+function importCalculators() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet()
+  if (ss.getSheetByName('calculators') || ss.getSheetByName('calc_questions')) {
+    Logger.log('ABORTED: calculators/calc_questions already exist. Delete them by hand ' +
+      'first if you really mean to reseed — this would overwrite your edits.')
+    return
+  }
+
+  var tsv = UrlFetchApp.fetch(REPO_RAW + '/scripts/calculators-import.tsv').getContentText()
+  var metaRows = []
+  var questionRows = []
+  var section = ''
+
+  var lines = tsv.split('\n')
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].replace(/\r$/, '')
+    if (!line.trim()) continue
+    if (line.indexOf('### TAB: calculators') === 0)    { section = 'meta';      continue }
+    if (line.indexOf('### TAB: calc_questions') === 0) { section = 'questions'; continue }
+    if (line.indexOf('#') === 0) continue
+    var parts = line.split('\t')
+    if (section === 'meta')      metaRows.push([parts[0], parts[1], parts[2], parts[3], parts[4] === 'TRUE'])
+    if (section === 'questions') questionRows.push([parts[0], Number(parts[1]), parts[2], parts[3], parts[4]])
+  }
+
+  if (!metaRows.length || !questionRows.length) {
+    Logger.log('ABORTED: parsed ' + metaRows.length + ' calculators and ' +
+      questionRows.length + ' questions — expected both to be non-empty')
+    return
+  }
+
+  var meta = ss.insertSheet('calculators')
+  meta.appendRow(['id', 'icon', 'title', 'description', 'active'])
+  meta.getRange(2, 1, metaRows.length, 5).setValues(metaRows)
+
+  var qs = ss.insertSheet('calc_questions')
+  qs.appendRow(['calcId', 'order', 'answerKey', 'question', 'options'])
+  qs.getRange(2, 1, questionRows.length, 5).setValues(questionRows)
+  qs.setFrozenRows(1)
+  meta.setFrozenRows(1)
+
+  Logger.log('Seeded ' + metaRows.length + ' calculators and ' + questionRows.length + ' questions.')
+  Logger.log('Edit the `question` column and the label half of `options` freely. ' +
+    'Do NOT edit `answerKey` or the value after the "|" — the build will reject it.')
 }
 
 /**

@@ -1,0 +1,32 @@
+### TAB: calculators  (id, icon, title, description, active)
+pillow	🛏️	Padi	Leia täpselt sulle sobiv padi	TRUE
+blanket	🌙	Tekk	Leia täpselt sulle sobiv tekk	TRUE
+mattress	💤	Madrats	Leia täpselt sulle sobiv madrats	TRUE
+
+### TAB: calc_questions  (calcId, order, answerKey, question, options)
+## options encoding: Label|value;Label|value   — VALUES MUST NOT BE EDITED,
+## they are what the recommendation engine branches on. Labels are free text.
+pillow	1	neckPain	Kas ärkad hommikul kaela- või õlavaluga?	Jah, sageli|often;Mõnikord|sometimes;Ei, valusid pole|never
+pillow	2	position	Mis asendis sa enamasti magad?	Küljel|side;Selili|back;Kõhuli|stomach;Vahelduvalt|combo
+pillow	3	bodyType	Milline on sinu kehaehitus?	Sale, kitsamate õlgadega|slim;Keskmine|medium;Tugevam, laiemate õlgadega|broad
+pillow	4	age	Kui vana sa oled?	18–30|young;31–45|adult;46–60|middle;60+|senior
+pillow	5	complaint	Mis häirib sinu und kõige rohkem?	Raske uinuda|cant-sleep;Ärkan öösel üles|wake-at-night;Ärkan väsinuna|wake-tired;Pole erilisi probleeme|none
+pillow	6	pillowCount	Mitu patja kasutad korraga?	Ühte patja|one;Kahte või rohkem|two-plus
+pillow	7	allergies	Kas sul on mõni allergia või tundlikkus?	Tolmulestade suhtes|dust-mites;Sünteetiliste materjalide suhtes|synthetic;Muu allergia või tundlikkus|other;Teadaolevalt ei ole|none
+pillow	8	pillowAge	Kui vana on sinu praegune padi?	Uus (alla 1 aasta)|new;1–3 aastat vana|1-3y;Üle 3 aasta vana|3y+
+blanket	1	sweating	Kas higistad öösel või ärkad kuumalt?	Jah, sageli|often;Mõnikord|sometimes;Harva|rarely
+blanket	2	temp	Kas sul on öösiti pigem külm või palav?	Mul on öösiti tihti külm|cold;Enamasti parasjagu|normal;Mul on öösiti tihti palav|hot
+blanket	3	age	Kui vana sa oled?	18–30|young;31–45|adult;46–60|middle;60+|senior
+blanket	4	blanketWeight	Millist teki kaalu eelistad?	Kerget — peaaegu et ei tunne seda|light;Keskmist — tavalist soojust|medium;Rasket ja sooja|heavy
+blanket	5	partner	Kas magad üksi või koos partneriga?	Üksi|solo;Koos — jagame tekki|shared;Koos — eraldi tekid|separate
+blanket	6	roomTemp	Kui soe on sinu magamistuba tavaliselt?	Jahe (alla 18 °C)|cool;Keskmine (18–21 °C)|moderate;Soe (üle 21 °C)|warm
+blanket	7	allergies	Kas sul on mõni allergia või tundlikkus?	Tolmulestade suhtes|dust-mites;Sünteetiliste materjalide suhtes|synthetic;Muu allergia või tundlikkus|other;Teadaolevalt ei ole|none
+blanket	8	problemSeason	Mis aastaajal on sul kõige rohkem uneprobleeme?	Talvel — on liiga külm|winter;Suvel — on liiga palav|summer;Ühtemoodi aastaringselt|year-round
+mattress	1	sleepQuality	Kuidas hindad oma praegust unekvaliteeti?	Halb — ärkan väsinuna|poor;Keskpärane — võiks parem olla|fair;Hea — ärkan puhanuna|good
+mattress	2	position	Mis asendis sa enamasti magad?	Küljel|side;Selili|back;Kõhuli|stomach;Vahelduvalt|combo
+mattress	3	bodyType	Milline on sinu kehakaal?	Kerge (alla 65 kg)|slim;Keskmine (65–90 kg)|medium;Raskem (üle 90 kg)|broad
+mattress	4	backPain	Kas ärkad hommikul seljavaluga?	Jah, sageli|often;Mõnikord|sometimes;Ei|never
+mattress	5	age	Kui vana sa oled?	18–30|young;31–45|adult;46–60|middle;60+|senior
+mattress	6	partner	Kas magad üksi või koos partneriga?	Üksi|solo;Koos|shared
+mattress	7	mattressAge	Kui vana on sinu praegune madrats?	Uus (alla aasta)|new;1–3 aastat|1-3y;3–5 aastat|3-5y;Üle 5 aasta|5y+
+mattress	8	currentMattress	Millist madratsit kasutad praegu?	Vedrumadratsit|spring;Vahtmadratsit|foam;Hübriidmadratsit|hybrid;Ei tea täpselt|unknown
