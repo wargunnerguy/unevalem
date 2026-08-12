@@ -26,7 +26,10 @@ const calcVersion = computed(() => {
 })
 
 
-const { step, answers, result, analyzing, selectOption, submitQuiz, restore, finishAnalysis, goBack, reset } = useCalculator()
+const {
+  step, answers, result, analyzing, isSkipped,
+  selectOption, submitQuiz, restore, finishAnalysis, goBack, reset, nextStepFrom,
+} = useCalculator()
 const { products } = useProducts()
 const { submitCalcResult, resetSubmitted } = useAnalytics()
 // gaEvent is auto-imported from composables/useAnalytics
@@ -34,6 +37,10 @@ const {
   siteProfile, activeCalcType, completedCount, allDone,
   syncActiveCalcType, getNextAfter, storeCompletion, getPrefilledAnswers,
 } = useCalcSession()
+
+// Step keys for an arbitrary calc type — reset() needs the keys of the calc it
+// is switching TO, which is not always the currently active one.
+const keysFor = (type: CalcType) => calculator.configs[type].stepKeys as readonly string[]
 
 // True while restoring a saved result, so the storeCompletion/analytics watch
 // below doesn't re-fire on the synthetic jump to the result step.
@@ -62,7 +69,10 @@ function initFromProfile() {
   // sweating already answered, not on the pillow result they saw last week.
   if (props.calcType) {
     activeCalcType.value = props.calcType
-    reset({ ...getPrefilledAnswers(props.calcType), ...props.prefill })
+    reset(
+      { ...getPrefilledAnswers(props.calcType), ...props.prefill },
+      keysFor(props.calcType),
+    )
     didInit = true
     return
   }
@@ -70,7 +80,9 @@ function initFromProfile() {
   if (!latest) {
     const prevType = activeCalcType.value
     syncActiveCalcType()
-    if (activeCalcType.value !== prevType) reset(getPrefilledAnswers(activeCalcType.value))
+    if (activeCalcType.value !== prevType) {
+      reset(getPrefilledAnswers(activeCalcType.value), keysFor(activeCalcType.value))
+    }
     didInit = true
     return
   }
@@ -94,6 +106,21 @@ const totalSteps = computed(() => calcConfig.value.steps.length)
 
 const currentStepData = computed(() => calcConfig.value.steps[step.value - 1])
 
+// ── Progress counts only the steps this visitor is actually asked ───────────
+// `step` stays the true index into stepKeys (the engine and the copy arrays are
+// keyed on it); these two drive everything the visitor sees, so a flow with
+// four skipped steps reads "1 / 4" rather than "5 / 8".
+const askedSteps = computed(() => {
+  const out: number[] = []
+  stepKeys.value.forEach((key, i) => { if (!isSkipped(key)) out.push(i + 1) })
+  return out
+})
+const askedTotal = computed(() => askedSteps.value.length)
+const askedPos = computed(() => {
+  const at = askedSteps.value.indexOf(step.value)
+  return at === -1 ? 0 : at + 1
+})
+
 const currentAnswer = computed<string | undefined>(() => {
   if (step.value >= 1 && step.value <= totalSteps.value) {
     const key = stepKeys.value[step.value - 1]
@@ -102,7 +129,7 @@ const currentAnswer = computed<string | undefined>(() => {
   return undefined
 })
 
-const timeLeft = computed(() => calculator.timeLeft(step.value, totalSteps.value))
+const timeLeft = computed(() => calculator.timeLeft(askedPos.value, askedTotal.value))
 
 // The next calc type to offer after this one completes
 const nextCalcType = computed(() => getNextAfter(activeCalcType.value))
@@ -130,10 +157,12 @@ const transitionName = computed(() => goingForward.value ? 'slide-left' : 'slide
 
 function handleSelect(value: string) {
   const key = stepKeys.value[step.value - 1]
-  const isLastStep = step.value === totalSteps.value
-  if (step.value === 1) gaEvent('calc_started', { calc_type: activeCalcType.value })
+  // Last *asked* step, not last step: with skipping, the final question the
+  // visitor sees is often not stepKeys[length - 1].
+  const isLastStep = nextStepFrom(step.value, stepKeys.value) > totalSteps.value
+  if (askedPos.value === 1) gaEvent('calc_started', { calc_type: activeCalcType.value })
   gaEvent('calc_step_completed', { calc_type: activeCalcType.value, step: step.value })
-  selectOption(key as keyof typeof answers.value, value, totalSteps.value)
+  selectOption(key as keyof typeof answers.value, value, stepKeys.value)
   if (isLastStep) {
     setTimeout(() => submitQuiz(products.value ?? [], activeCalcType.value), 350)
   }
@@ -144,7 +173,12 @@ function startNextCalc() {
   if (!next) return
   const prefill = getPrefilledAnswers(next)
   activeCalcType.value = next
-  reset(prefill)
+  reset(prefill, keysFor(next))
+  // Everything this calc asks was already answered elsewhere — go straight to
+  // the result rather than showing an empty step.
+  if (step.value > keysFor(next).length) {
+    submitQuiz(products.value ?? [], next)
+  }
 }
 
 // ── Analysis stages ───────────────────────────────────────────────────────
@@ -278,7 +312,7 @@ function getProductName(type: CalcType): string {
             class="flex items-center gap-0.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded"
             :class="isCalcDone(type) ? 'text-success hover:text-midnight' : 'text-gray-300 hover:text-muted'"
             :aria-label="`Lülitu ${calculator.session.doneLabel[type]} kalkulaatorile`"
-            @click="() => { const prefill = getPrefilledAnswers(type); activeCalcType = type; reset(prefill) }"
+            @click="() => { const prefill = getPrefilledAnswers(type); activeCalcType = type; reset(prefill, keysFor(type)) }"
           >
             <span v-if="isCalcDone(type)" aria-hidden="true">✓ </span>
             {{ calculator.configs[type].icon }} {{ calculator.session.doneLabel[type] }}
@@ -293,11 +327,11 @@ function getProductName(type: CalcType): string {
         class="flex items-center gap-3 px-5 pb-0 pt-2"
       >
         <button
-          v-if="step > 1"
+          v-if="askedPos > 1"
           type="button"
           class="shrink-0 flex items-center gap-1 text-sm text-muted hover:text-midnight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded px-1 py-0.5"
-          :aria-label="`Mine samm ${step - 1} juurde`"
-          @click="goBack(totalSteps)"
+          :aria-label="`Mine samm ${askedPos - 1} juurde`"
+          @click="goBack(stepKeys)"
         >
           <span aria-hidden="true">←</span>
           <span>{{ common.back }}</span>
@@ -307,19 +341,19 @@ function getProductName(type: CalcType): string {
         <div
           class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden"
           role="progressbar"
-          :aria-valuenow="step"
+          :aria-valuenow="askedPos"
           aria-valuemin="1"
-          :aria-valuemax="totalSteps"
-          :aria-label="calculator.progressLabel(step, totalSteps)"
+          :aria-valuemax="askedTotal"
+          :aria-label="calculator.progressLabel(askedPos, askedTotal)"
         >
           <div
             class="h-full bg-midnight rounded-full transition-all duration-300"
-            :style="{ width: (step / totalSteps * 100) + '%' }"
+            :style="{ width: (askedTotal ? askedPos / askedTotal * 100 : 0) + '%' }"
           />
         </div>
 
         <div class="shrink-0 text-right" aria-hidden="true">
-          <span class="block text-xs text-midnight/60 tabular-nums">{{ step }} / {{ totalSteps }}</span>
+          <span class="block text-xs text-midnight/60 tabular-nums">{{ askedPos }} / {{ askedTotal }}</span>
           <span v-if="timeLeft" class="block text-[10px] text-midnight/40 leading-none mt-0.5">{{ timeLeft }}</span>
         </div>
       </div>

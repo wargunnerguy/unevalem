@@ -13,9 +13,12 @@ const props = withDefaults(defineProps<{
   /** 'inline' on light backgrounds, 'dark' in the footer. */
   variant?: 'inline' | 'dark'
   heading?: string
+  /** 'center' for the footer, where the whole column is centred. */
+  align?: 'left' | 'center'
 }>(), {
   variant: 'inline',
   heading: '',
+  align: 'left',
 })
 
 const { sessionId } = useABTest()
@@ -24,17 +27,17 @@ const { analyticsGranted, adsGranted } = useConsent()
 const config = useRuntimeConfig()
 
 const email = ref('')
-const consent = ref(false)
 const state = ref<'idle' | 'sending' | 'done' | 'error'>('idle')
 const errorMsg = ref('')
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
 const canSubmit = computed(
-  () => EMAIL_RE.test(email.value.trim()) && consent.value && state.value !== 'sending',
+  () => EMAIL_RE.test(email.value.trim()) && state.value !== 'sending',
 )
 
 const isDark = computed(() => props.variant === 'dark')
+const isCentered = computed(() => props.align === 'center')
 const fieldId = computed(() => `lead-${props.source.replace(/[^a-z0-9]+/gi, '-')}`)
 
 async function submit() {
@@ -44,9 +47,7 @@ async function submit() {
     state.value = 'error'
     return
   }
-  // Belt and braces: the checkbox is also required to enable the button, but a
-  // submission without consent must never reach the sheet.
-  if (!consent.value || state.value === 'sending') return
+  if (state.value === 'sending') return
 
   state.value = 'sending'
   errorMsg.value = ''
@@ -69,9 +70,10 @@ async function submit() {
         email: value,
         source: props.source,
         consent: true,
-        // Stored verbatim, with a version, so the exact wording someone agreed
-        // to is reconstructable later.
-        consentText: `${lead.consentLabel} [v${lead.consentVersion}]`,
+        // The whole visible context, stored verbatim with a version: this is
+        // the record of what the subscriber actually saw when they pressed
+        // Telli. Keep it in sync with the template if that copy changes.
+        consentText: `${props.heading || lead.headingGeneric} — ${lead.promise} [v${lead.consentVersion}]`,
         sessionId: sessionId.value,
         env: isProdSite(config.public.siteUrl as string) ? 'prod' : 'test',
         ...attrPayload(),
@@ -100,12 +102,12 @@ async function submit() {
       {{ lead.confirm }}
     </p>
 
-    <form v-else class="space-y-3" @submit.prevent="submit">
+    <form v-else class="space-y-3" :class="isCentered && 'text-center'" @submit.prevent="submit">
       <div>
         <p class="font-heading text-base mb-1" :class="isDark ? 'text-foam' : 'text-midnight'">
           {{ heading || lead.headingGeneric }}
         </p>
-        <p class="text-xs leading-snug" :class="isDark ? 'text-muted' : 'text-muted'">
+        <p class="text-xs leading-snug text-muted">
           {{ lead.promise }}
         </p>
       </div>
@@ -133,20 +135,9 @@ async function submit() {
         </button>
       </div>
 
-      <!-- Unticked by default and required. Never pre-check this. -->
-      <label class="flex items-start gap-2 text-[11px] leading-snug cursor-pointer" :class="isDark ? 'text-muted' : 'text-muted'">
-        <input
-          v-model="consent"
-          type="checkbox"
-          class="mt-0.5 shrink-0 rounded border-lavender/50 focus:ring-2 focus:ring-lavender"
-        />
-        <span>
-          {{ lead.consentLabel }}
-          <NuxtLink to="/privaatsus" class="underline underline-offset-2 hover:opacity-80">
-            {{ lead.privacyLink }}
-          </NuxtLink>
-        </span>
-      </label>
+      <!-- No consent sentence and no privacy link here: `promise` above the
+           button already states what arrives and how often, and the policy is
+           linked from the footer nav on every page. See copy.ts. -->
 
       <p v-if="state === 'error'" class="text-xs text-red-500">{{ errorMsg || lead.error }}</p>
     </form>

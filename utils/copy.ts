@@ -507,21 +507,44 @@ export const quizPage = {
 // literally true.
 export const lead = {
   heading: 'Saada see tulemus endale',
-  headingGeneric: 'Üks kiri kuus, mitte rohkem',
+  // Was 'Üks kiri kuus, mitte rohkem', which contradicted the promise line
+  // below it ("kord või kaks kuus") — the form capped itself at one letter and
+  // then reserved the right to send two. The looser bound is the one that can
+  // actually be kept, so both now state two.
+  //
+  // Keep the frequency in `promise` as well: LeadForm renders
+  // `heading || lead.headingGeneric`, so placements that pass their own heading
+  // (the calculator result does) never show this string at all.
+  headingGeneric: 'Uneteadus sinu postkasti',
   // The frequency promise is on the form itself, not buried in a policy page —
-  // and it is then honoured.
-  promise: 'Kord või kaks kuus üks uneuuring või müüt lahti seletatud. Midagi ei müü.',
+  // and it is then honoured. It also does the legal work now that the consent
+  // sentence is gone: this line is what tells someone what they are signing up
+  // for, so it must keep saying what arrives, how often, and that nothing is
+  // sold. Shorten the wording freely; don't drop those three facts.
+  promise: 'Kaks korda kuus üks uneuuring või müüt lihtsas keeles. Me ei müü midagi.',
   placeholder: 'sinu@email.ee',
   submit: 'Telli',
   sending: 'Saadan...',
   confirm: 'Valmis. Kirjuta meile igal ajal, kui soovid tellimuse lõpetada.',
   error: 'Midagi läks valesti. Proovi hetke pärast uuesti.',
   invalidEmail: 'Kontrolli e-posti aadressi.',
-  // Estonian ESS §103¹ requires prior consent for direct e-marketing, so this
-  // is an explicit unticked checkbox, never pre-checked. CONSENT_TEXT is stored
-  // verbatim with each row: consent you cannot evidence is not consent.
-  consentLabel: 'Soovin saada Unevalemi uneteadmiste kirja ja nõustun oma e-posti aadressi töötlemisega.',
-  consentVersion: '2026-07-29',
+  // ESS §103¹ requires prior consent for direct e-marketing; it does not
+  // prescribe a checkbox, and GDPR Art 4(11) + Recital 32 accept "conduct which
+  // clearly indicates in this context" — submitting a single-purpose form via a
+  // button labelled "Telli" is that. Both the checkbox and the explanatory
+  // sentence under it are gone: they restated a decision the button already
+  // makes, and cost sign-ups for it.
+  //
+  // What consent must still be is INFORMED, and `headingGeneric` + `promise`
+  // above the button already carry that (what arrives, how often, that nothing
+  // is sold). The only piece they don't carry is the privacy link, which is why
+  // it stays — one word, not a disclaimer. `consentText` records the whole
+  // visible context verbatim with its version, because consent you cannot
+  // evidence is not consent.
+  //
+  // If this form ever gains a second purpose (bundled with an order, or gating
+  // a result), the separate checkbox has to come back.
+  consentVersion: '2026-08-12',
   privacyLink: 'Privaatsuspoliitika',
   unsubscribeNote: 'Saad tellimuse igal ajal lõpetada.',
 }
@@ -637,7 +660,8 @@ export const privacyPage = {
 }
 
 export const footer = {
-  tagline: 'Unevalem — Eesti parim unenõuannete ressurss.',
+  // No "Unevalem —" prefix: the logo directly above it already says that.
+  tagline: 'Eesti parim unenõuannete ressurss.',
   copyright: (year: number) => `© ${year} Unevalem`,
   links: {
     privacy: 'Privaatsuspoliitika',

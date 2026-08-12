@@ -1,6 +1,20 @@
 import type { UserProfile, CalculatorResult, CalcType } from '~/types'
 import { isProdSite } from '~/utils/site'
 import { gaTransport } from '~/utils/ga'
+import { calculator } from '~/utils/copy'
+
+/**
+ * The answer fields a given calculator actually asks about, keyed by name so
+ * the Apps Script's header mapping puts each in its own column.
+ *
+ * `stepKeys` is the single source of truth for which questions a calculator
+ * has, so adding or removing a step needs no change here.
+ */
+function answersForCalc(answers: Partial<UserProfile>, calcType: CalcType): Record<string, string> {
+  const keys = calculator.configs[calcType].stepKeys as readonly string[]
+  const source = answers as Record<string, string | undefined>
+  return Object.fromEntries(keys.map(key => [key, source[key] ?? '']))
+}
 
 // GA4 custom event, no-op when gtag is absent (GA disabled or blocked).
 // Consent Mode v2 handles the cookie side: when analytics_storage is denied
@@ -53,24 +67,12 @@ export function useAnalytics() {
       // answers pre-filled — lets prefilled sessions be excluded when reading
       // the raw answer distribution.
       prefilledFrom,
-      position:        answers.position        ?? '',
-      bodyType:        answers.bodyType        ?? '',
-      neckPain:        answers.neckPain        ?? '',
-      sweating:        answers.sweating        ?? '',
-      temp:            answers.temp            ?? '',
-      blanketWeight:   answers.blanketWeight   ?? '',
-      partner:         answers.partner         ?? '',
-      allergies:       answers.allergies       ?? '',
-      pillowAge:       answers.pillowAge       ?? '',
-      backPain:        answers.backPain        ?? '',
-      mattressAge:     answers.mattressAge     ?? '',
-      complaint:       answers.complaint       ?? '',
-      age:             answers.age             ?? '',
-      pillowCount:     answers.pillowCount     ?? '',
-      sleepQuality:    answers.sleepQuality    ?? '',
-      currentMattress: answers.currentMattress ?? '',
-      roomTemp:        answers.roomTemp        ?? '',
-      problemSeason:   answers.problemSeason   ?? '',
+      // Only the answers THIS calculator asks for. Sending all eighteen every
+      // time gave each *_responses tab ten permanently empty columns —
+      // handleCalcSubmit creates a column for any key it sees, so an always-''
+      // field is an always-blank column. Deleting them in the sheet without
+      // this change would only bring them back on the next submission.
+      ...answersForCalc(answers, calcType),
       rec0:          result.recommendations[0]?.id ?? '',
       currentScore:  result.currentScore,
       improvedScore: result.improvedScore,

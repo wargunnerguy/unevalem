@@ -19,59 +19,65 @@ onMounted(() => {
 
 <template>
   <footer class="bg-midnight text-foam mt-auto">
-    <div class="max-w-5xl mx-auto px-4 py-8">
+    <!-- One centred column at every breakpoint. The old brand-left / links-right
+         split degraded badly below sm: the six links wrapped into a ragged
+         block against a left-aligned brand, which is what read as "thrown
+         together". A single centred stack is the same layout everywhere, so
+         there is no breakpoint where it falls apart. -->
+    <div class="max-w-5xl mx-auto px-4 py-10 sm:py-12 text-center">
 
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <!-- Brand -->
-        <div>
-          <span class="font-heading text-xl text-foam">{{ nav.logo }}</span>
-          <p class="text-sm text-muted mt-1 max-w-xs">{{ footer.tagline }}</p>
-        </div>
-
-        <!-- Links -->
-        <nav aria-label="Jaluse navigatsioon">
-          <ul class="flex flex-wrap items-center gap-4 text-sm text-muted">
-            <li>
-              <NuxtLink to="/artiklid" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
-                {{ nav.articles }}
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink to="/unetest" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
-                {{ nav.quiz }}
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink to="/tellimus" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
-                {{ footer.links.orderStatus }}
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink to="/meist" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
-                {{ footer.links.about }}
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink to="/muugitingimused" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
-                {{ footer.links.terms }}
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink to="/privaatsus" class="hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
-                {{ footer.links.privacy }}
-              </NuxtLink>
-            </li>
-          </ul>
-        </nav>
+      <!-- Brand -->
+      <div>
+        <span class="font-heading text-xl text-foam">{{ nav.logo }}</span>
+        <p class="text-sm text-muted mt-1">{{ footer.tagline }}</p>
       </div>
+
+      <!-- Links -->
+      <nav aria-label="Jaluse navigatsioon" class="mt-6">
+        <ul class="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-muted">
+          <li>
+            <NuxtLink to="/artiklid" class="inline-block py-1.5 sm:py-0 hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              {{ nav.articles }}
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/unetest" class="inline-block py-1.5 sm:py-0 hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              {{ nav.quiz }}
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/tellimus" class="inline-block py-1.5 sm:py-0 hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              {{ footer.links.orderStatus }}
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/meist" class="inline-block py-1.5 sm:py-0 hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              {{ footer.links.about }}
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/muugitingimused" class="inline-block py-1.5 sm:py-0 hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              {{ footer.links.terms }}
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/privaatsus" class="inline-block py-1.5 sm:py-0 hover:text-foam transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
+              {{ footer.links.privacy }}
+            </NuxtLink>
+          </li>
+        </ul>
+      </nav>
 
       <!-- The quiet, permanent sign-up surface: out of the way, easy to find,
            never in anyone's face. -->
-      <div class="mt-6 max-w-md">
-        <LeadForm source="footer" variant="dark" />
+      <div class="mt-8 max-w-md mx-auto">
+        <LeadForm source="footer" variant="dark" align="center" />
       </div>
 
-      <div class="text-xs text-muted/60 mt-6 border-t border-dusk pt-4 space-y-1">
+      <!-- Legal. Constrained and centred: `footer.legal` is a long ·-separated
+           string that wrapped into two lopsided left-aligned lines, which is
+           what looked forced. max-w-md gives it a predictable break. -->
+      <div class="text-xs text-muted/60 mt-10 border-t border-dusk pt-6 max-w-md mx-auto space-y-1.5 leading-relaxed">
         <p>{{ footer.legal }}</p>
         <ClientOnly>
           <p v-if="phone">

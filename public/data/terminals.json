@@ -50,6 +50,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96465",
+    "name": "Alliku pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96118",
     "name": "Antsla Coop Konsumi pakiautomaat",
     "carrier": "omniva"
@@ -140,6 +145,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96449",
+    "name": "Hargla Kultuurimaja pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96424",
     "name": "Harju-Risti Meie kaupluse pakiautomaat",
     "carrier": "omniva"
@@ -152,6 +162,11 @@
   {
     "id": "96395",
     "name": "Harkujärve Meie kaupluse pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96447",
+    "name": "Himmaste pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -267,6 +282,11 @@
   {
     "id": "96110",
     "name": "Karksi-Nuia Coop Konsumi pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96446",
+    "name": "Kauksi pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -400,6 +420,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96450",
+    "name": "Kooraste pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96096",
     "name": "Kose Grossi pakiautomaat",
     "carrier": "omniva"
@@ -412,6 +437,11 @@
   {
     "id": "96160",
     "name": "Kostivere Meie kaupluse pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96456",
+    "name": "Krootuse pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -500,6 +530,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96444",
+    "name": "Laagri Kaselaane tn pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96381",
     "name": "Laagri Veskitammi Maxima X pakiautomaat",
     "carrier": "omniva"
@@ -540,6 +575,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96458",
+    "name": "Leevi pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96274",
     "name": "Leisi pakiautomaat",
     "carrier": "omniva"
@@ -552,6 +592,11 @@
   {
     "id": "96119",
     "name": "Lihula Coop Konsumi pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96454",
+    "name": "Liikva pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -825,6 +870,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96455",
+    "name": "Peri pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96150",
     "name": "Puhja Coop Konsumi pakiautomaat",
     "carrier": "omniva"
@@ -837,6 +887,11 @@
   {
     "id": "96429",
     "name": "Puurmani Coop Konsumi pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96463",
+    "name": "Põlgaste pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -940,6 +995,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96468",
+    "name": "Rabarebase aedlinn pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96268",
     "name": "Rakke pakiautomaat",
     "carrier": "omniva"
@@ -980,6 +1040,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96451",
+    "name": "Rannamõisa Merepiiga tee pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96359",
     "name": "Rannu Coop Kaupluse pakiautomaat",
     "carrier": "omniva"
@@ -992,6 +1057,11 @@
   {
     "id": "96043",
     "name": "Rapla Maxima X pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96448",
+    "name": "Rasina Külakeskuse pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -1130,6 +1200,16 @@
     "carrier": "omniva"
   },
   {
+    "id": "96442",
+    "name": "Suurupi Angervaksa tee pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96445",
+    "name": "Suurupi Kasevälja tee pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96346",
     "name": "Tabasalu Keskuse pakiautomaat",
     "carrier": "omniva"
@@ -1140,6 +1220,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96470",
+    "name": "Tabasalu Vindi tn pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96212",
     "name": "Tabivere Saadjärve Coop kaupluse pakiautomaat",
     "carrier": "omniva"
@@ -1147,6 +1232,11 @@
   {
     "id": "96262",
     "name": "Taebla Bussijaama pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96464",
+    "name": "Taevaskoja pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -1380,6 +1470,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96457",
+    "name": "Tallinna Pille tn pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96205",
     "name": "Tallinna Pirita Keskuse pakiautomaat",
     "carrier": "omniva"
@@ -1555,6 +1650,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96452",
+    "name": "Tallinna Volta kvartali pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96103",
     "name": "Tallinna Õismäe Maxima XX pakiautomaat",
     "carrier": "omniva"
@@ -1572,6 +1672,11 @@
   {
     "id": "96252",
     "name": "Tammiste Coop Konsumi pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96466",
+    "name": "Tammneeme pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -1685,6 +1790,26 @@
     "carrier": "omniva"
   },
   {
+    "id": "96459",
+    "name": "Tartu Raadiraja 10 pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96460",
+    "name": "Tartu Raadiraja 12 pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96461",
+    "name": "Tartu Raadiraja 14 pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96462",
+    "name": "Tartu Raadiraja 16 pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96087",
     "name": "Tartu Rebase Rimi pakiautomaat",
     "carrier": "omniva"
@@ -1755,6 +1880,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96467",
+    "name": "Tiskre Taverni tee pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96299",
     "name": "Toila Meie kaupluse pakiautomaat",
     "carrier": "omniva"
@@ -1815,6 +1945,11 @@
     "carrier": "omniva"
   },
   {
+    "id": "96469",
+    "name": "Türisalu pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
     "id": "96333",
     "name": "Uhtna kaupluse pakiautomaat",
     "carrier": "omniva"
@@ -1852,6 +1987,11 @@
   {
     "id": "96227",
     "name": "Valga Siili Coop Konsumi pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96443",
+    "name": "Valgjärve pakiautomaat",
     "carrier": "omniva"
   },
   {
@@ -2022,6 +2162,11 @@
   {
     "id": "96325",
     "name": "Vääna-Jõesuu kauplus Maksis pakiautomaat",
+    "carrier": "omniva"
+  },
+  {
+    "id": "96453",
+    "name": "Vääna-Jõesuu Oblika tee pakiautomaat",
     "carrier": "omniva"
   },
   {

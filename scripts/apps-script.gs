@@ -989,3 +989,110 @@ function setupShop() {
       '(Project Settings → Script properties) before testing checkout')
   }
 }
+
+// ── Calculator response column cleanup ──────────────────────────────────────
+//
+// Each *_responses tab used to receive all eighteen answer fields regardless of
+// which calculator wrote the row, because the client sent every key with '' for
+// the ones that calculator never asks. handleCalcSubmit creates a column for
+// any key it sees, so an always-empty field became an always-blank column —
+// ten per tab.
+//
+// The client now sends only the active calculator's stepKeys, so those columns
+// are dead and can go. ORDER MATTERS: deploy the site first. Deleting while the
+// old code is still live only makes the next submission recreate them.
+//
+// Only *_responses tabs are ever touched. `orders` is addressed positionally by
+// setOrderStatus_ and handlePaymentCallback — deleting a column there would
+// silently corrupt every subsequent order — and `subscribers`, `waitlist` and
+// the content tabs are none of this function's business.
+
+var CALC_RESPONSE_TABS = ['pillow_responses', 'blanket_responses', 'mattress_responses']
+
+/**
+ * Columns that are legitimately blank most of the time and must survive the
+ * sweep. Attribution fields only populate for visitors who arrived tagged, so
+ * a young sheet can show them empty across every row without them being dead.
+ */
+var CALC_KEEP_COLUMNS = [
+  'completedAt', 'sessionId', 'env', 'calcType', 'prefilledFrom',
+  'rec0', 'currentScore', 'improvedScore',
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term',
+  'last_utm_source', 'last_utm_medium', 'last_utm_campaign',
+  'last_utm_content', 'last_utm_term',
+  'fbclid', 'gclid', 'ttclid', 'firstTouchAt',
+  'gaBlocked', 'gaClientId', 'gaSessionId', 'analyticsConsent', 'adsConsent'
+]
+
+/**
+ * DRY RUN — reports which columns would be deleted, changes nothing.
+ * Run this first, read the log, then run deleteEmptyCalcColumns().
+ */
+function reportEmptyCalcColumns() {
+  scanCalcColumns_(false)
+}
+
+/**
+ * Deletes the columns reportEmptyCalcColumns() lists. Re-runnable: a second run
+ * finds nothing. If a column comes back after this, the client is still sending
+ * that key — fix the site, don't re-run.
+ */
+function deleteEmptyCalcColumns() {
+  scanCalcColumns_(true)
+}
+
+function scanCalcColumns_(destructive) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet()
+  var totalRemoved = 0
+
+  for (var t = 0; t < CALC_RESPONSE_TABS.length; t++) {
+    var name = CALC_RESPONSE_TABS[t]
+    var tab = ss.getSheetByName(name)
+    if (!tab) { Logger.log(name + ': not present, skipped'); continue }
+
+    var lastRow = tab.getLastRow()
+    var lastCol = tab.getLastColumn()
+    if (lastCol === 0) { Logger.log(name + ': empty tab, skipped'); continue }
+    if (lastRow < 2) {
+      Logger.log(name + ': header only, no data rows — nothing can be judged empty yet, skipped')
+      continue
+    }
+
+    var headers = tab.getRange(1, 1, 1, lastCol).getValues()[0]
+    var data = tab.getRange(2, 1, lastRow - 1, lastCol).getValues()
+
+    // Collect first, delete after: deleting shifts every column to its right.
+    var doomed = []
+    for (var c = 0; c < lastCol; c++) {
+      var header = String(headers[c]).trim()
+      if (!header) continue
+      if (CALC_KEEP_COLUMNS.indexOf(header) !== -1) continue
+
+      var hasValue = false
+      for (var r = 0; r < data.length; r++) {
+        var cell = data[r][c]
+        if (cell !== '' && cell !== null && cell !== undefined) { hasValue = true; break }
+      }
+      if (!hasValue) doomed.push({ index: c + 1, header: header })
+    }
+
+    if (!doomed.length) {
+      Logger.log(name + ': nothing to remove (' + (lastRow - 1) + ' rows checked)')
+      continue
+    }
+
+    var names = doomed.map(function (d) { return d.header })
+    Logger.log(name + ': ' + doomed.length + ' empty column(s) across ' +
+      (lastRow - 1) + ' rows → ' + names.join(', '))
+
+    if (destructive) {
+      // Right to left, so each deletion leaves the remaining indices valid.
+      for (var d = doomed.length - 1; d >= 0; d--) tab.deleteColumn(doomed[d].index)
+      totalRemoved += doomed.length
+    }
+  }
+
+  Logger.log(destructive
+    ? 'Removed ' + totalRemoved + ' column(s). Re-run reportEmptyCalcColumns() to confirm none return.'
+    : 'DRY RUN — nothing was changed. Run deleteEmptyCalcColumns() to apply.')
+}

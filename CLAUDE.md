@@ -880,29 +880,14 @@ no-ops unless ads are granted AND `NUXT_PUBLIC_META_PIXEL_ID` is set; it
 mirrors GA events via a `unevalem:ga-event` window event. **Optimise Meta
 toward `Lead`, not `Purchase`, while nothing is purchasable.**
 
-**Staging no longer pollutes production analytics.** Plausible domain, og:image
-and the sitemap host all derive from env; the staging generate step now gets
-`SHEETS_API_URL` (without it every sheet POST silently no-op'd), an empty GA id
-and its own Plausible domain.
+**Non-production builds no longer pollute production analytics.** Plausible
+domain, og:image and the sitemap host all derive from env, so a build with
+`NUXT_PUBLIC_SITE_URL` set to a non-production host reports as non-production.
+(Written for the staging workflow, which is now retired — the same env plumbing
+is what makes the local review recipe below safe.)
 
 **Campaign playbook: `docs/kampaaniad.md`.** Ad angles, the weekly posting
 rhythm, and the rule that every number in an ad traces to a `sources` row.
-
-### 2026-07-17 — Staging environment (branching rules)
-
-> **Superseded 2026-07-30 — see "Staging retired" below.** Kept for context on
-> why `dev` exists and why staging shared the production backend.
-
-- **`dev` branch → test.unevalem.ee** (staging, via deploy-staging.yml →
-  pushes built site to wargunnerguy/unevalem-test repo's gh-pages, whose
-  Pages serves the subdomain). Staging robots.txt disallows everything.
-- **`main` branch → unevalem.ee** (production, deploy.yml as before).
-- **Rule: feature work goes to `dev` first**; merge dev → main only when
-  verified on staging. Hotfixes may go straight to main when urgent.
-- Staging shares the PRODUCTION backend (same Apps Script, sheet, orders
-  tab, MK credentials). Harmless while MK_ENV=test; BEFORE switching MK to
-  live, revisit this — staging test purchases would otherwise create real
-  payment transactions.
 
 ### 2026-07-30 — Staging retired, review happens locally
 
@@ -923,9 +908,21 @@ What changed:
 - The `test` CNAME at Elkdata must be deleted by the domain owner — that is
   the step that actually retires the hostname.
 
-**`dev` still exists and is still the integration branch.** Feature work
-merges to `dev`, gets verified with a local production build, then `dev`
-merges to `main`. The only thing that changed is where verification happens.
+**There are exactly two environments: local, and unevalem.ee.** Develop against
+`npm run dev`, verify with a local production build (recipe below), then merge to
+`main` and push — `deploy.yml` publishes it. That is the whole flow.
+
+**Branch model (2026-08-12): `feat/*` branches → `main`, nothing in between.**
+Feature work still gets its own branch — that is deliberate, so a feature can be
+parked, reviewed or dropped as a unit — but it merges straight to `main` once it
+checks out on a local build. The `dev` integration tier is gone: `dev` and
+`feat/funnel-readiness` were fully merged and were deleted (local + origin) on
+2026-08-12. Do not propose landing work on `dev`, and do not treat any branch as
+a staging tier — only `main` deploys.
+
+The 2026-07-17 staging/branching rules this replaced are deleted from this file
+rather than marked superseded, because a "superseded" block kept being read as
+current.
 
 **How to review a build locally** (bash / Git Bash):
 ```bash
