@@ -84,24 +84,24 @@ const revisitSummary = computed(() => {
   <div>
 
     <!-- ─── HERO ─── -->
-    <section class="bg-midnight sleep-pattern px-4 pt-8 pb-10">
+    <section class="hero-band sleep-pattern px-4 pt-8 pb-10">
 
       <!-- Revisit banner — shown only on client after hydration -->
       <ClientOnly>
         <Transition name="toast">
           <div
             v-if="completedCount > 0 && showRevisit"
-            class="max-w-xl mx-auto mb-5 bg-dusk/70 rounded-xl px-4 py-3 flex items-start justify-between gap-3"
+            class="max-w-xl mx-auto mb-5 bg-dusk rounded-xl px-4 py-3 flex items-start justify-between gap-3"
           >
             <div class="text-sm text-foam leading-snug">
               <span class="font-medium text-gold">Tere jälle!</span>
               <span v-if="completedCount < 3"> Jätka oma une profiili täitmist — </span>
               <span v-else> Sinu une profiil on täielik — </span>
-              <span class="text-muted text-xs">{{ revisitSummary.join(' · ') }}</span>
+              <span class="text-moonlight/75 text-xs">{{ revisitSummary.join(' · ') }}</span>
             </div>
             <button
               type="button"
-              class="shrink-0 text-muted hover:text-foam transition-colors text-sm leading-none mt-0.5"
+              class="shrink-0 text-moonlight/75 hover:text-foam transition-colors text-sm leading-none mt-0.5"
               aria-label="Sulge"
               @click="showRevisit = false"
             >
@@ -116,13 +116,13 @@ const revisitSummary = computed(() => {
         <ClientOnly>
           <Transition name="slide-left" mode="out-in">
             <div :key="activeCalcType">
-              <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight mb-2">
+              <h1 class="hero-title font-heading text-3xl sm:text-4xl leading-tight mb-2">
                 {{ calculator.heroTitle[activeCalcType] }}
               </h1>
             </div>
           </Transition>
           <template #fallback>
-            <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight mb-2">
+            <h1 class="hero-title font-heading text-3xl sm:text-4xl leading-tight mb-2">
               {{ calculator.heroTitle.pillow }}
             </h1>
           </template>
@@ -136,17 +136,20 @@ const revisitSummary = computed(() => {
     <!-- Removed in the 2026-07-21 declutter, restored 2026-07-30: the page read
          as too stripped without it, and these three claims are qualitative and
          true (unlike the "60+ uneuuringut" badge, which stays deleted). -->
-    <section class="bg-dusk sleep-pattern px-4 py-6">
+    <section class="value-band sleep-pattern px-4 py-6">
       <div class="max-w-xl mx-auto flex justify-center gap-6 sm:gap-10">
         <div
           v-for="claim in homepage.valueClaims"
           :key="claim.title"
           class="text-center"
         >
-          <p class="font-heading text-gold text-lg sm:text-xl font-bold leading-none">
+          <p class="value-band-ink font-heading text-lg sm:text-xl font-bold leading-none">
             {{ claim.title }}
           </p>
-          <p class="text-lavender/70 text-xs mt-1.5 leading-snug max-w-[140px]">
+          <!-- Was text-lavender/70, which sat at 2.2:1 on the band — the accent
+               teal is a fill colour, not a text colour, on the darker panels.
+               Solid rather than 75%: the band itself is lighter now. -->
+          <p class="value-band-sub text-xs mt-1.5 leading-snug max-w-[140px]">
             {{ claim.text }}
           </p>
         </div>
@@ -156,13 +159,13 @@ const revisitSummary = computed(() => {
     <!-- ─── DAILY TIP ─── -->
     <section class="px-4 py-8">
       <div class="max-w-xl mx-auto">
-        <div class="flex gap-3 items-start p-4 rounded-xl border border-lavender/25 bg-foam shadow-sm">
+        <div class="tip-card flex gap-3 items-start p-4 rounded-xl shadow-sm">
           <span class="text-xl shrink-0 mt-0.5" aria-hidden="true">🌙</span>
           <div>
-            <p class="text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
+            <p class="tip-card-label text-xs font-semibold uppercase tracking-wider mb-1.5">
               {{ homepage.dailyTipHeading }}
             </p>
-            <p class="text-sm text-midnight leading-relaxed">{{ dailyTip }}</p>
+            <p class="tip-card-ink text-sm leading-relaxed">{{ dailyTip }}</p>
           </div>
         </div>
       </div>

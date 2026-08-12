@@ -168,9 +168,9 @@ async function submit() {
 
 <template>
   <div class="min-h-screen">
-    <div class="bg-midnight sleep-pattern px-4 py-10">
+    <div class="hero-band sleep-pattern px-4 py-10">
       <div class="max-w-2xl mx-auto">
-        <h1 class="font-heading text-4xl text-foam leading-tight">{{ shop.checkout.heading }}</h1>
+        <h1 class="hero-title font-heading text-4xl leading-tight">{{ shop.checkout.heading }}</h1>
       </div>
     </div>
 

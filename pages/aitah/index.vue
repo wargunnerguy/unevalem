@@ -134,13 +134,13 @@ onUnmounted(stopPolling)
 
 <template>
   <div class="min-h-screen">
-    <div class="bg-midnight sleep-pattern px-4 py-12">
+    <div class="hero-band sleep-pattern px-4 py-12">
       <div class="max-w-xl mx-auto text-center">
-        <h1 class="font-heading text-3xl sm:text-4xl text-foam leading-tight">
+        <h1 class="hero-title font-heading text-3xl sm:text-4xl leading-tight">
           {{ shop.thanks.heading }}
         </h1>
-        <p v-if="orderRef" class="mt-3 text-sm text-lavender/70">
-          {{ shop.thanks.orderRefLabel }}: <span class="font-mono text-lavender">{{ displayOrderId }}</span>
+        <p v-if="orderRef" class="hero-sub mt-3 text-sm">
+          {{ shop.thanks.orderRefLabel }}: <span class="hero-title font-mono">{{ displayOrderId }}</span>
         </p>
       </div>
     </div>

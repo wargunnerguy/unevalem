@@ -110,10 +110,10 @@ const sections: CategorySection[] = [
   <div class="min-h-screen">
 
     <!-- Header -->
-    <div class="bg-midnight sleep-pattern px-4 py-10">
+    <div class="hero-band sleep-pattern px-4 py-10">
       <div class="max-w-4xl mx-auto">
-        <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight">Pood</h1>
-        <p class="mt-2 text-lavender text-base">
+        <h1 class="hero-title font-heading text-4xl md:text-5xl leading-tight">Pood</h1>
+        <p class="hero-sub mt-2 text-base">
           Tööriistad heaks uneks — padjad, tekid ja muu,
           mis aitavad sul paremini magada. Valik kasvab.
         </p>

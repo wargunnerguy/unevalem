@@ -8,13 +8,13 @@ const { count, open } = useCart()
 </script>
 
 <template>
-  <header class="bg-foam border-b border-gray-100 sticky top-0 z-40">
+  <header class="app-header border-b sticky top-0 z-40">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
       <!-- Logo -->
       <NuxtLink to="/" class="shrink-0 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender rounded">
         <img src="/unevalem_logo.png" alt="" aria-hidden="true" class="h-8 w-auto" />
-        <span class="font-heading text-2xl text-midnight leading-none">{{ nav.logo }}</span>
+        <span class="app-header-ink font-heading text-2xl leading-none">{{ nav.logo }}</span>
       </NuxtLink>
 
       <div class="flex items-center gap-1 sm:gap-2">
@@ -29,10 +29,8 @@ const { count, open } = useCart()
             ]" :key="link.to">
               <NuxtLink
                 :to="link.to"
-                class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
-                :class="isActive(link.to)
-                  ? 'bg-midnight text-gold'
-                  : 'text-muted hover:text-midnight hover:bg-moonlight'"
+                class="px-3 py-1.5 rounded-lg text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+                :class="isActive(link.to) ? 'app-header-active' : 'app-header-link'"
               >
                 {{ link.label }}
               </NuxtLink>
@@ -44,7 +42,7 @@ const { count, open } = useCart()
         <ClientOnly>
           <button
             type="button"
-            class="relative p-2 rounded-lg text-muted hover:text-midnight hover:bg-moonlight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
+            class="app-header-link relative p-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-lavender"
             :aria-label="shop.cart.ariaOpen"
             @click="open"
           >

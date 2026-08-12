@@ -39,10 +39,10 @@ async function submit() {
 
 <template>
   <div class="min-h-screen">
-    <div class="bg-midnight sleep-pattern px-4 py-10">
+    <div class="hero-band sleep-pattern px-4 py-10">
       <div class="max-w-xl mx-auto">
-        <h1 class="font-heading text-4xl text-foam leading-tight">{{ shop.lookup.heading }}</h1>
-        <p class="mt-2 text-lavender/70 text-sm">{{ shop.lookup.intro }}</p>
+        <h1 class="hero-title font-heading text-4xl leading-tight">{{ shop.lookup.heading }}</h1>
+        <p class="hero-sub mt-2 text-sm">{{ shop.lookup.intro }}</p>
       </div>
     </div>
 

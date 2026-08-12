@@ -15,9 +15,9 @@ useHead({
 
 <template>
   <div class="min-h-screen">
-    <div class="bg-midnight sleep-pattern px-4 py-10">
+    <div class="hero-band sleep-pattern px-4 py-10">
       <div class="max-w-2xl mx-auto">
-        <h1 class="font-heading text-4xl md:text-5xl text-foam leading-tight">{{ termsPage.heading }}</h1>
+        <h1 class="hero-title font-heading text-4xl md:text-5xl leading-tight">{{ termsPage.heading }}</h1>
       </div>
     </div>
 

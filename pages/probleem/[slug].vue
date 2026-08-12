@@ -73,15 +73,15 @@ useHead(
       <!-- Hero. Deliberately NOT wrapped in <ClientOnly>: this headline must
            match the ad word for word at first paint. A flip from a fallback
            would break message match on exactly the traffic that was paid for. -->
-      <section class="bg-midnight sleep-pattern px-4 pt-10 pb-8">
+      <section class="hero-band sleep-pattern px-4 pt-10 pb-8">
         <div class="max-w-2xl mx-auto">
-          <p v-if="pain.eyebrow" class="text-xs font-semibold text-lavender uppercase tracking-wider mb-3">
+          <p v-if="pain.eyebrow" class="hero-sub text-xs font-semibold uppercase tracking-wider mb-3">
             {{ pain.eyebrow }}
           </p>
-          <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl text-foam leading-tight mb-4">
+          <h1 class="hero-title font-heading text-3xl sm:text-4xl md:text-5xl leading-tight mb-4">
             {{ pain.headline }}
           </h1>
-          <p v-if="pain.subhead" class="text-lavender text-base sm:text-lg leading-relaxed">
+          <p v-if="pain.subhead" class="hero-sub text-base sm:text-lg leading-relaxed">
             {{ pain.subhead }}
           </p>
         </div>
@@ -96,12 +96,12 @@ useHead(
 
       <!-- Hand-off. Embedded, not linked: paid traffic that needs a second page
            load bleeds out before it arrives. -->
-      <section v-if="calcType" id="kalkulaator" class="bg-midnight sleep-pattern px-4 py-10">
+      <section v-if="calcType" id="kalkulaator" class="hero-band sleep-pattern px-4 py-10">
         <div class="max-w-xl mx-auto text-center mb-6">
-          <h2 class="font-heading text-2xl sm:text-3xl text-foam leading-tight mb-2">
+          <h2 class="hero-title font-heading text-2xl sm:text-3xl leading-tight mb-2">
             {{ pain.ctaLabel }}
           </h2>
-          <p class="text-sm text-lavender">{{ painPage.calcIntro }}</p>
+          <p class="hero-sub text-sm">{{ painPage.calcIntro }}</p>
         </div>
         <SleepCalculator
           :calc-type="calcType"
