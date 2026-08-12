@@ -220,14 +220,28 @@ if (!BASE_URL) {
 // Fetch one sheet — retries transient failures; returns null only after all
 // attempts fail (sheet missing from the allowlist, tab absent, network down).
 // ---------------------------------------------------------------------------
-const FETCH_ATTEMPTS = 3
-const RETRY_DELAY_MS = 3_000
+// One Apps Script deployment serves every tab, and it does not handle a burst.
+// These used to be issued as one Promise.all of twelve concurrent requests
+// (nine sheets plus the three quiz tabs); the deployment throttled, the retries
+// collided with each other, and the daily cron failed outright roughly as often
+// as it succeeded — run 31566481215 on 2026-08-12 died with pains, post_stats,
+// inventory and quizzes all exhausting their attempts at once.
+//
+// Requests are now issued one at a time (see fetchSheetsInOrder), so these
+// retries only ever contend with the outside world rather than with each other.
+const FETCH_ATTEMPTS = 4
+const RETRY_BASE_MS = 2_000
+
+/** Exponential backoff with jitter, so repeated runs don't retry in lockstep. */
+function backoffMs(attempt: number): number {
+  return RETRY_BASE_MS * 2 ** (attempt - 1) + Math.floor(Math.random() * 750)
+}
 
 async function tryFetchSheet(sheet: string): Promise<unknown[] | null> {
   const url = `${BASE_URL}?sheet=${sheet}`
   for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt++) {
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(15_000) })
+      const res = await fetch(url, { signal: AbortSignal.timeout(20_000) })
       if (res.ok) {
         const body = (await res.json()) as unknown
         // A JSON {error} object means the sheet genuinely isn't served —
@@ -235,13 +249,17 @@ async function tryFetchSheet(sheet: string): Promise<unknown[] | null> {
         if (Array.isArray(body)) return body
         return null
       }
+      // 429/503 are exactly what throttling looks like; everything else that
+      // isn't ok is worth one more go too.
+      if (attempt < FETCH_ATTEMPTS) {
+        console.warn(`  … ${sheet}: HTTP ${res.status} on attempt ${attempt}, retrying`)
+      }
     } catch {
-      // transient network/timeout — fall through to retry
+      if (attempt < FETCH_ATTEMPTS) {
+        console.warn(`  … ${sheet}: attempt ${attempt} failed, retrying`)
+      }
     }
-    if (attempt < FETCH_ATTEMPTS) {
-      console.warn(`  … ${sheet}: attempt ${attempt} failed, retrying`)
-      await new Promise(r => setTimeout(r, RETRY_DELAY_MS))
-    }
+    if (attempt < FETCH_ATTEMPTS) await new Promise(r => setTimeout(r, backoffMs(attempt)))
   }
   return null
 }
@@ -263,11 +281,10 @@ async function fetchSheet(sheet: string): Promise<unknown[]> {
 // Quizzes live across three tabs and are assembled into nested objects here.
 // All three are required — a partial quiz must not ship.
 async function fetchQuizzes(): Promise<unknown[]> {
-  const [meta, questions, results] = await Promise.all([
-    fetchSheet('quizzes'),
-    fetchSheet('quiz_questions'),
-    fetchSheet('quiz_results'),
-  ])
+  // Sequential, like every other sheet fetch — see the note on FETCH_ATTEMPTS.
+  const meta      = await fetchSheet('quizzes')
+  const questions = await fetchSheet('quiz_questions')
+  const results   = await fetchSheet('quiz_results')
   const assembled = assembleQuizzes(
     meta      as Record<string, unknown>[],
     questions as Record<string, unknown>[],
@@ -340,18 +357,24 @@ async function main(): Promise<void> {
   console.log('[fetch-content] Fetching from Apps Script…')
   mkdirSync(DATA_DIR, { recursive: true })
 
-  const [posts, notifications, stats, inventory, tipsRaw, quizzes, postStats, sourcesRaw, painsRaw] = await Promise.all([
-    fetchSheet('posts'),
-    fetchSheet('notifications'),
-    fetchSheet('stats'),
-    fetchSheet('inventory'),
-    fetchSheet('tips'),
-    fetchQuizzes(),
-    tryFetchSheet('post_stats'),   // optional; absent until the sheet exists
-    tryFetchSheet('sources'),      // optional; posts fall back to column M
-    tryFetchSheet('pains'),        // optional; campaign landing pages
-    fetchTerminals(),              // writes terminals.json itself; non-fatal
-  ])
+  // Omniva is a different host with no shared rate limit, so it starts now and
+  // is awaited at the end — it overlaps the Apps Script work for free.
+  const terminalsDone = fetchTerminals()   // writes terminals.json itself; non-fatal
+
+  // Apps Script tabs, strictly one at a time. Twelve of these in parallel is
+  // what made the daily build unreliable; the whole sequence costs perhaps ten
+  // seconds more, which is nothing against a build that fails outright.
+  const posts         = await fetchSheet('posts')
+  const notifications = await fetchSheet('notifications')
+  const stats         = await fetchSheet('stats')
+  const inventory     = await fetchSheet('inventory')
+  const tipsRaw       = await fetchSheet('tips')
+  const quizzes       = await fetchQuizzes()
+  const postStats     = await tryFetchSheet('post_stats')  // optional; absent until the sheet exists
+  const sourcesRaw    = await tryFetchSheet('sources')     // optional; posts fall back to column M
+  const painsRaw      = await tryFetchSheet('pains')       // optional; campaign landing pages
+
+  await terminalsDone
 
   validateFields('posts',         posts,         REQUIRED.posts)
   validateFields('notifications', notifications, REQUIRED.notifications)
