@@ -1,7 +1,7 @@
 import { useStorage } from '@vueuse/core'
 import type { CartItem, Product } from '~/types'
 
-// Cart state, persisted in localStorage. Only ids + quantities are stored —
+// Cart state, persisted in localStorage. Only ids + quantities are stored -
 // prices always come from the current products.json (and are re-verified
 // server-side by the Apps Script when the order is created).
 export function useCart() {

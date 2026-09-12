@@ -1,6 +1,6 @@
 /**
  * One-shot exporter: turns the calculator definitions currently hardcoded in
- * `utils/copy.ts` into the two artefacts needed to move them into Sheets —
+ * `utils/copy.ts` into the two artefacts needed to move them into Sheets -
  *
  *   public/data/calculators.example.json  the committed fallback, used when the
  *                                         sheet tabs do not exist yet and in
@@ -9,7 +9,7 @@
  *                                         and `calc_questions` tabs
  *
  * Run with `npx tsx scripts/export-calculators.ts`. Re-runnable, but pointless
- * after the sheet becomes the source of truth — at that point copy.ts no longer
+ * after the sheet becomes the source of truth - at that point copy.ts no longer
  * holds the questions and this script has nothing to read. Kept in the repo as
  * the record of how the migration was done.
  */
@@ -56,7 +56,7 @@ for (const c of calculators) {
 }
 lines.push('')
 lines.push('### TAB: calc_questions  (calcId, order, answerKey, question, options)')
-lines.push('## options encoding: Label|value;Label|value   — VALUES MUST NOT BE EDITED,')
+lines.push('## options encoding: Label|value;Label|value   - VALUES MUST NOT BE EDITED,')
 lines.push('## they are what the recommendation engine branches on. Labels are free text.')
 for (const c of calculators) {
   for (const q of c.questions) {

@@ -1,4 +1,4 @@
-// All Estonian UI strings. Never hardcode copy in .vue files — import from here.
+// All Estonian UI strings. Never hardcode copy in .vue files - import from here.
 
 export const nav = {
   home: 'Avaleht',
@@ -28,7 +28,7 @@ export const common = {
 }
 
 export const contact = {
-  // Personal phone — kept OUT of the static HTML on purpose (light scraper
+  // Personal phone - kept OUT of the static HTML on purpose (light scraper
   // defence). Stored base64-encoded; the footer assembles it only in the
   // browser (onMounted), so plain-HTML scrapes, curl and the sitemap never
   // contain it, while real visitors and reviewers see it normally.
@@ -62,7 +62,7 @@ export const calculator = {
     return ''
   },
 
-  // The three calculators — their questions, options and labels — moved to the
+  // The three calculators - their questions, options and labels - moved to the
   // `calculators` and `calc_questions` sheet tabs on 2026-08-12, so the wording
   // can be edited without a developer. They are assembled at build time into
   // public/data/calculators.json and read through useCalculators().
@@ -71,7 +71,7 @@ export const calculator = {
   // Those are the contract with utils/calculator.ts and are listed in
   // utils/calc-schema.ts, which the build validates the sheet against.
   //
-  // Only the calculator CHROME lives here now — the strings below plus
+  // Only the calculator CHROME lives here now - the strings below plus
   // heroTitle, progressLabel, timeLeft and session.*.
 
   session: {
@@ -112,15 +112,15 @@ export const calculator = {
     ctaButton: 'Vaata kõiki tooteid →',
     mustHaveBadge: 'Oluline',
     niceToHaveBadge: 'Kasulik',
-    // Shown when the engine matched no product for this calc type — a valid
+    // Shown when the engine matched no product for this calc type - a valid
     // outcome, not an error. Per-type because the old hardcoded string spoke
     // only of mattresses and was shown on the pillow and blanket flows too.
     noProductsYet: {
-      pillow:   'Sinu profiiliga sobivat patja meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue padjata — ja kui otsustad osta, tead nüüd, mida otsida.',
-      blanket:  'Sinu profiiliga sobivat tekki meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue tekita — ja kui otsustad osta, tead nüüd, mida otsida.',
-      mattress: 'Sinu profiiliga sobivat madratsit meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue madratsita — ja kui otsustad osta, tead nüüd, mida otsida.',
+      pillow:   'Sinu profiiliga sobivat patja meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue padjata - ja kui otsustad osta, tead nüüd, mida otsida.',
+      blanket:  'Sinu profiiliga sobivat tekki meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue tekita - ja kui otsustad osta, tead nüüd, mida otsida.',
+      mattress: 'Sinu profiiliga sobivat madratsit meil praegu poes ei ole. Ülalolevad nõuanded kehtivad ka ilma uue madratsita - ja kui otsustad osta, tead nüüd, mida otsida.',
     } as Record<string, string>,
-    noUrgentNeedMessage: 'Sul pole praegu kiireloomulist vajadust — aga saad alati edasi täiustada.',
+    noUrgentNeedMessage: 'Sul pole praegu kiireloomulist vajadust - aga saad alati edasi täiustada.',
   },
 }
 
@@ -129,7 +129,7 @@ export const shop = {
   match: {
     bestBadge: 'Parim valik sulle',
     goodBadge: (pct: number) => `Sobivus sinu profiiliga ${pct}%`,
-    note: 'Sobivus näitab, kui hästi toote omadused kattuvad sinu unetesti vastustega — see ei ole lubadus une kvaliteedi kohta.',
+    note: 'Sobivus näitab, kui hästi toote omadused kattuvad sinu unetesti vastustega - see ei ole lubadus une kvaliteedi kohta.',
   },
 
   addToCart: 'Lisa korvi',
@@ -137,7 +137,7 @@ export const shop = {
   notifyPlaceholder: 'sinu@email.ee',
   notifySubmit: 'Anna teada',
   notifyConfirm: 'Kirjas! Anname teada, kui toode on saadaval.',
-  notifyError: 'Midagi läks valesti — proovi hetke pärast uuesti.',
+  notifyError: 'Midagi läks valesti - proovi hetke pärast uuesti.',
   // GDPR: waitlist stores only the address + product, nothing else.
   notifyGdpr: 'Kasutame sinu e-posti ainult selle toote saadavusteate saatmiseks.',
   notifyGdprLink: 'Privaatsuspoliitika',
@@ -173,10 +173,10 @@ export const shop = {
     termsRequired: 'Palun nõustu müügitingimustega, et jätkata.',
     submit: 'Jätka maksmisega →',
     submitting: 'Saadan tellimust…',
-    error: 'Tellimuse loomine ebaõnnestus — proovi uuesti või kirjuta meile.',
-    emptyCart: 'Sinu ostukorv on tühi — vali kõigepealt tooted.',
+    error: 'Tellimuse loomine ebaõnnestus - proovi uuesti või kirjuta meile.',
+    emptyCart: 'Sinu ostukorv on tühi - vali kõigepealt tooted.',
     required: 'Täida kõik kohustuslikud väljad.',
-    cancelledNotice: 'Makse katkestati või ebaõnnestus. Sinu ostukorv on alles — saad proovida uuesti.',
+    cancelledNotice: 'Makse katkestati või ebaõnnestus. Sinu ostukorv on alles - saad proovida uuesti.',
   },
 
   thanks: {
@@ -187,9 +187,9 @@ export const shop = {
     deliveryLabel: 'Tarne',
     emailNote: 'Saatsime tellimuse kinnituse ka sinu e-postile.',
     paid: 'Makse on kinnitatud. Saadame sulle e-postiga tellimuse kinnituse.',
-    pending: 'Ootame maksekinnitust — see võtab tavaliselt mõne sekundi. Leht uueneb automaatselt.',
+    pending: 'Ootame maksekinnitust - see võtab tavaliselt mõne sekundi. Leht uueneb automaatselt.',
     failed: 'Makse ei õnnestunud või katkestati. Kui see on eksitus, proovi uuesti või kirjuta meile.',
-    delivery: 'Tarne: 2–5 tööpäeva jooksul pärast makse kinnitust.',
+    delivery: 'Tarne: 2-5 tööpäeva jooksul pärast makse kinnitust.',
     orderRefLabel: 'Tellimuse number',
     backHome: 'Tagasi avalehele →',
     tabPending: 'Ootame maksekinnitust… | Unevalem',
@@ -205,11 +205,11 @@ export const shop = {
     submit: 'Vaata staatust',
     checking: 'Kontrollin…',
     notFound: 'Sellist tellimust ei leidnud. Kontrolli numbrit ja e-posti.',
-    error: 'Päring ebaõnnestus — proovi hetke pärast uuesti.',
+    error: 'Päring ebaõnnestus - proovi hetke pärast uuesti.',
     statuses: {
       PENDING: 'Ootab makset',
-      PAID: 'Makstud — paneme paki peagi teele',
-      SHIPPED: 'Teele pandud — pakiautomaadi koodi saad SMS-iga',
+      PAID: 'Makstud - paneme paki peagi teele',
+      SHIPPED: 'Teele pandud - pakiautomaadi koodi saad SMS-iga',
       CANCELLED: 'Tühistatud',
       EXPIRED: 'Aegunud (makset ei laekunud)',
       FAILED: 'Makse ebaõnnestus',
@@ -227,7 +227,7 @@ export const disclosure = {
 
 export const blogCategories = {
   all: 'Kõik',
-  // Not a real category column value — a cross-cutting filter over posts whose
+  // Not a real category column value - a cross-cutting filter over posts whose
   // title carried the "MÜÜT: " prefix. Myth-busting is the most shareable
   // format the site has, and this gives ads and social posts one browsable
   // cluster to point at.
@@ -240,7 +240,7 @@ export const blogCategories = {
 
 export const blogPage = {
   heading: 'Uneblog',
-  metaTitle: 'Uneblog – unenõuanded ja teadus | Unevalem',
+  metaTitle: 'Uneblog - unenõuanded ja teadus | Unevalem',
   metaDescription: 'Loe artikleid une teadusest, praktilisi nõuandeid ja tooteinfot. Kõik, mida pead teadma parema une jaoks.',
   relatedHeading: 'Seotud artiklid',
   diveDeeperHeading: 'Uuri lähemalt',
@@ -256,13 +256,13 @@ export const blogPage = {
 }
 
 export const homepage = {
-  metaTitle: 'Unevalem – Leia oma personaalne unelahendus',
+  metaTitle: 'Unevalem - Leia oma personaalne unelahendus',
   metaDescription: 'Vasta 5 küsimusele ja saad personaalse soovituse parema une jaoks. Eesti parim unenõuannete ressurss.',
   dailyTipHeading: 'Päeva unenipp',
   featuredPostsHeading: 'Populaarseimad artiklid',
   personalizedNote: 'Sinu vastuste põhjal',
 
-  // Value claims strip: three honest reasons to trust the site — replaces the
+  // Value claims strip: three honest reasons to trust the site - replaces the
   // old fabricated visitor/reader counters. Static copy, nothing from Sheets.
   valueClaims: [
     { title: 'Teaduspõhine', text: 'Soovitused põhinevad rahvusvahelistel uneuuringutel' },
@@ -273,7 +273,7 @@ export const homepage = {
 
 export const quizPage = {
   heading: 'Unetest',
-  metaTitle: 'Unetest – mis tüüpi magaja sa oled? | Unevalem',
+  metaTitle: 'Unetest - mis tüüpi magaja sa oled? | Unevalem',
   metaDescription: 'Testi oma uneteadmisi ja avasta oma unetüüp. Interaktiivsed unetestid parema une nimel.',
   backToQuizzes: 'Tagasi viktoriinide juurde',
   shareResult: 'Minu unetüüp',
@@ -293,7 +293,7 @@ export const quizPage = {
 export const lead = {
   heading: 'Saada see tulemus endale',
   // Was 'Üks kiri kuus, mitte rohkem', which contradicted the promise line
-  // below it ("kord või kaks kuus") — the form capped itself at one letter and
+  // below it ("kord või kaks kuus") - the form capped itself at one letter and
   // then reserved the right to send two. The looser bound is the one that can
   // actually be kept, so both now state two.
   //
@@ -301,7 +301,7 @@ export const lead = {
   // `heading || lead.headingGeneric`, so placements that pass their own heading
   // (the calculator result does) never show this string at all.
   headingGeneric: 'Uneteadus sinu postkasti',
-  // The frequency promise is on the form itself, not buried in a policy page —
+  // The frequency promise is on the form itself, not buried in a policy page -
   // and it is then honoured. It also does the legal work now that the consent
   // sentence is gone: this line is what tells someone what they are signing up
   // for, so it must keep saying what arrives, how often, and that nothing is
@@ -315,7 +315,7 @@ export const lead = {
   invalidEmail: 'Kontrolli e-posti aadressi.',
   // ESS §103¹ requires prior consent for direct e-marketing; it does not
   // prescribe a checkbox, and GDPR Art 4(11) + Recital 32 accept "conduct which
-  // clearly indicates in this context" — submitting a single-purpose form via a
+  // clearly indicates in this context" - submitting a single-purpose form via a
   // button labelled "Telli" is that. Both the checkbox and the explanatory
   // sentence under it are gone: they restated a decision the button already
   // makes, and cost sign-ups for it.
@@ -323,7 +323,7 @@ export const lead = {
   // What consent must still be is INFORMED, and `headingGeneric` + `promise`
   // above the button already carry that (what arrives, how often, that nothing
   // is sold). The only piece they don't carry is the privacy link, which is why
-  // it stays — one word, not a disclaimer. `consentText` records the whole
+  // it stays - one word, not a disclaimer. `consentText` records the whole
   // visible context verbatim with its version, because consent you cannot
   // evidence is not consent.
   //
@@ -336,21 +336,21 @@ export const lead = {
 
 // Campaign landing page CHROME ONLY. Every editorial string on /probleem/*
 // (eyebrow, headline, body, CTA label) comes from the `pains` sheet tab so the
-// owner can add an ad angle without a developer — same split as quizPage.*.
+// owner can add an ad angle without a developer - same split as quizPage.*.
 export const painPage = {
   loading: 'Laen...',
   notFound: 'Sellist lehte ei ole.',
   backHome: '← Unevalemi avalehele',
   relatedHeading: 'Loe edasi',
   // Sits directly above the embedded calculator.
-  calcIntro: 'Vasta 8 küsimusele — vastus on kohe siin, e-posti me ei küsi.',
+  calcIntro: 'Vasta 8 küsimusele - vastus on kohe siin, e-posti me ei küsi.',
   freeNote: 'Tasuta. E-posti ei küsi.',
 }
 
 export const socialProof = {
   // Keyed by the notifications tab's `type` column. The sheet has held both the
   // documented purchase/view/quiz values and generic success/info ones, and an
-  // unknown key rendered `undefined` in the toast — hence the total lookup at
+  // unknown key rendered `undefined` in the toast - hence the total lookup at
   // the call site (`typeIcons[type] ?? ''`). The component is unmounted in
   // app.vue until real order data exists; this stays correct for that day.
   typeIcons: {
@@ -380,20 +380,20 @@ export const privacyPage = {
   sections: [
     {
       heading: 'Milliseid andmeid kogume',
-      body: 'Lehe hariduslik osa — artiklid, kalkulaator ja testid — ei nõua sisselogimist ega isikuandmeid ning on kasutatav ilma midagi meile jagamata. Isikuandmeid vajame ainult kahel juhul: kui tellid uudiskirja või kui vormistad e-poes tellimuse. Muul juhul kogume vaid anonüümset kasutusstatistikat ja sinu kalkulaatori vastuseid.',
+      body: 'Lehe hariduslik osa - artiklid, kalkulaator ja testid - ei nõua sisselogimist ega isikuandmeid ning on kasutatav ilma midagi meile jagamata. Isikuandmeid vajame ainult kahel juhul: kui tellid uudiskirja või kui vormistad e-poes tellimuse. Muul juhul kogume vaid anonüümset kasutusstatistikat ja sinu kalkulaatori vastuseid.',
       items: [
-        'Kalkulaatori vastused (nt magamisasend, temperatuurieelistus) — hoitakse sinu seadmes küpsistes ja saadetakse meile üksnes anonüümselt koondstatistikana.',
-        'Anonüümne külastusstatistika — milliseid lehti vaadatakse ja kust külastajad tulevad.',
-        'Kampaaniaandmed — kui jõuad meieni reklaami kaudu, salvestame sinu seadmesse kampaania nime, et teada, milline reklaam töötab. See ei sisalda midagi, mis sind isikuna tuvastaks.',
+        'Kalkulaatori vastused (nt magamisasend, temperatuurieelistus) - hoitakse sinu seadmes küpsistes ja saadetakse meile üksnes anonüümselt koondstatistikana.',
+        'Anonüümne külastusstatistika - milliseid lehti vaadatakse ja kust külastajad tulevad.',
+        'Kampaaniaandmed - kui jõuad meieni reklaami kaudu, salvestame sinu seadmesse kampaania nime, et teada, milline reklaam töötab. See ei sisalda midagi, mis sind isikuna tuvastaks.',
       ],
     },
     {
       heading: 'Uudiskiri',
-      body: 'Kui tellid uneteadmiste kirja, töötleme sinu e-posti aadressi nõusoleku alusel (isikuandmete kaitse üldmääruse art 6 lg 1 p a). Nõusolek on vabatahtlik ja seda küsime alati eraldi märkeruuduga — ühtegi testi ega kalkulaatori tulemust me e-posti taha ei peida.',
+      body: 'Kui tellid uneteadmiste kirja, töötleme sinu e-posti aadressi nõusoleku alusel (isikuandmete kaitse üldmääruse art 6 lg 1 p a). Nõusolek on vabatahtlik ja seda küsime alati eraldi märkeruuduga - ühtegi testi ega kalkulaatori tulemust me e-posti taha ei peida.',
       items: [
         'Salvestame e-posti aadressi, tellimise aja ja koha (nt milliselt lehelt tellisid) ning nõusoleku täpse sõnastuse.',
         'Saadame kirja kord või kaks kuus. Aadressi ei müü ega jaga me kolmandatele isikutele.',
-        'Saad nõusoleku igal ajal tagasi võtta, kirjutades aadressil unevalem@gmail.com — eemaldame aadressi loendist ja kinnitame seda sulle.',
+        'Saad nõusoleku igal ajal tagasi võtta, kirjutades aadressil unevalem@gmail.com - eemaldame aadressi loendist ja kinnitame seda sulle.',
         'Aadressi säilitame kuni tellimuse lõpetamiseni.',
       ],
     },
@@ -401,9 +401,9 @@ export const privacyPage = {
       heading: 'Ostud, maksed ja tarne',
       body: 'Kui vormistad e-poes tellimuse, kogub ja töötleb Costlio OÜ tellimuse täitmiseks järgmisi andmeid:',
       items: [
-        'Nimi, e-posti aadress ja telefoninumber — tellimuse kinnitamiseks ja sinuga ühenduse võtmiseks.',
-        'Valitud pakiautomaat ja võimalik tellimuse märkus — kauba kohaletoimetamiseks.',
-        'Makse teostab Maksekeskus AS (registrikood 12268475), kes on makseandmete iseseisev vastutav töötleja. Sinu kaardi- ja pangaandmeid me ise ei näe ega salvesta — need liiguvad üksnes Maksekeskuse turvalises maksekeskkonnas.',
+        'Nimi, e-posti aadress ja telefoninumber - tellimuse kinnitamiseks ja sinuga ühenduse võtmiseks.',
+        'Valitud pakiautomaat ja võimalik tellimuse märkus - kauba kohaletoimetamiseks.',
+        'Makse teostab Maksekeskus AS (registrikood 12268475), kes on makseandmete iseseisev vastutav töötleja. Sinu kaardi- ja pangaandmeid me ise ei näe ega salvesta - need liiguvad üksnes Maksekeskuse turvalises maksekeskkonnas.',
         'Kohaletoimetamiseks edastame nime ja pakiautomaadi valiku tarneteenuse pakkujale Omniva.',
       ],
     },
@@ -415,22 +415,22 @@ export const privacyPage = {
       heading: 'Küpsised',
       body: 'Küpsis on väike tekstifail sinu seadmes. Kasutame kahte tüüpi küpsiseid:',
       items: [
-        'Vajalikud küpsised — salvestavad sinu kalkulaatori edenemise, eelistused (nt tume/hele režiim) ja küpsisevaliku. Need töötavad alati ega vaja nõusolekut.',
-        'Analüütika küpsised — Google Analytics kasutab neid külastuste mõõtmiseks. Kuni sa pole valikut teinud, töötab Google Analytics küpsisteta režiimis.',
-        'Reklaamiküpsised — mõõdavad, kas meie reklaam jõudis kohale. Neid seatakse ainult siis, kui vajutad „Nõustun kõigega". Vaikimisi on need välja lülitatud.',
+        'Vajalikud küpsised - salvestavad sinu kalkulaatori edenemise, eelistused (nt tume/hele režiim) ja küpsisevaliku. Need töötavad alati ega vaja nõusolekut.',
+        'Analüütika küpsised - Google Analytics kasutab neid külastuste mõõtmiseks. Kuni sa pole valikut teinud, töötab Google Analytics küpsisteta režiimis.',
+        'Reklaamiküpsised - mõõdavad, kas meie reklaam jõudis kohale. Neid seatakse ainult siis, kui vajutad „Nõustun kõigega". Vaikimisi on need välja lülitatud.',
       ],
     },
     {
       heading: 'Nõusolek ja selle muutmine',
-      body: 'Küpsiseteates on kolm valikut ja keeldumine on täpselt sama lihtne kui nõustumine. „Ainult vajalikud" lülitab välja nii statistika kui reklaamiküpsised. „Ainult statistika" lubab külastusstatistika, aga mitte reklaamimõõtmist. „Nõustun kõigega" lubab mõlemad. Reklaamiküpsiseid me kunagi vaikimisi sisse ei lülita. Oma valikut saad igal ajal muuta, kustutades brauseris selle lehe küpsised — seejärel küsime uuesti.',
+      body: 'Küpsiseteates on kolm valikut ja keeldumine on täpselt sama lihtne kui nõustumine. „Ainult vajalikud" lülitab välja nii statistika kui reklaamiküpsised. „Ainult statistika" lubab külastusstatistika, aga mitte reklaamimõõtmist. „Nõustun kõigega" lubab mõlemad. Reklaamiküpsiseid me kunagi vaikimisi sisse ei lülita. Oma valikut saad igal ajal muuta, kustutades brauseris selle lehe küpsised - seejärel küsime uuesti.',
     },
     {
       heading: 'Kolmandad osapooled',
       body: 'Kasutame järgmisi teenuseid:',
       items: [
-        'Google Analytics (Google Ireland Ltd.) — veebiliikluse analüüs. IP-aadressid anonümiseeritakse.',
-        'Plausible Analytics — privaatsussõbralik, küpsisevaba analüütika, mis ei jälgi üksikkasutajaid.',
-        'Meta Pixel (Meta Platforms Ireland Ltd.) — mõõdab meie Facebooki ja Instagrami reklaamide tulemuslikkust. Laeb ainult siis, kui oled reklaamiküpsistega nõustunud.',
+        'Google Analytics (Google Ireland Ltd.) - veebiliikluse analüüs. IP-aadressid anonümiseeritakse.',
+        'Plausible Analytics - privaatsussõbralik, küpsisevaba analüütika, mis ei jälgi üksikkasutajaid.',
+        'Meta Pixel (Meta Platforms Ireland Ltd.) - mõõdab meie Facebooki ja Instagrami reklaamide tulemuslikkust. Laeb ainult siis, kui oled reklaamiküpsistega nõustunud.',
       ],
     },
     {
@@ -445,7 +445,7 @@ export const privacyPage = {
 }
 
 export const footer = {
-  // No "Unevalem —" prefix: the logo directly above it already says that.
+  // No "Unevalem -" prefix: the logo directly above it already says that.
   tagline: 'Eesti parim unenõuannete ressurss.',
   copyright: (year: number) => `© ${year} Unevalem`,
   links: {
@@ -457,10 +457,10 @@ export const footer = {
   },
   // Legal identity line (registrikood from e-Äriregister, 2026-07-17).
   // Costlio OÜ is NOT VAT-registered: never render "sisaldab käibemaksu",
-  // "km-ga" or any VAT wording anywhere on the site — prices are final as-is.
-  // unevalem@gmail.com: domain has MX (Elkdata) — make sure the mailbox/forward
+  // "km-ga" or any VAT wording anywhere on the site - prices are final as-is.
+  // unevalem@gmail.com: domain has MX (Elkdata) - make sure the mailbox/forward
   // actually exists before the first sale.
-  legal: 'Unevalem — Costlio OÜ · registrikood 14562345 · e-post unevalem@gmail.com',
+  legal: 'Unevalem - Costlio OÜ · registrikood 14562345 · e-post unevalem@gmail.com',
 }
 
 export const aboutPage = {
@@ -471,17 +471,17 @@ export const aboutPage = {
     {
       id: 'kes',
       heading: 'Kes me oleme',
-      body: 'Unevalem on Eesti unehariduse leht, mida teeb väike Eesti ettevõte Costlio OÜ. Meid ajendas lihtne tähelepanek: eestikeelset, teaduspõhist ja ausalt kirjutatud uneinfot on veebis üllatavalt vähe — küll aga leidub palju müügijuttu, mis esitleb end nõuandena. Tahtsime teha lehe, mida ise oleksime uneprobleemide korral lugeda tahtnud.',
+      body: 'Unevalem on Eesti unehariduse leht, mida teeb väike Eesti ettevõte Costlio OÜ. Meid ajendas lihtne tähelepanek: eestikeelset, teaduspõhist ja ausalt kirjutatud uneinfot on veebis üllatavalt vähe - küll aga leidub palju müügijuttu, mis esitleb end nõuandena. Tahtsime teha lehe, mida ise oleksime uneprobleemide korral lugeda tahtnud.',
     },
     {
       id: 'miks',
       heading: 'Miks Unevalem on olemas',
-      body: 'Meie põhimõte on lihtne: kõigepealt harime, alles siis müüme. Iga artikkel toetub avaldatud uneuuringutele ja iga artikli lõpus on viide algallikale, et saaksid ise järele kontrollida. Kui õpid siit midagi kasulikku ja ostad padja hoopis mujalt — ka see on meie jaoks hea tulemus. Usaldus on ainus asi, mida unenõuannete leht päriselt omab.',
+      body: 'Meie põhimõte on lihtne: kõigepealt harime, alles siis müüme. Iga artikkel toetub avaldatud uneuuringutele ja iga artikli lõpus on viide algallikale, et saaksid ise järele kontrollida. Kui õpid siit midagi kasulikku ja ostad padja hoopis mujalt - ka see on meie jaoks hea tulemus. Usaldus on ainus asi, mida unenõuannete leht päriselt omab.',
     },
     {
       id: 'rahastus',
       heading: 'Kuidas Unevalem end rahastab',
-      body: 'Unevalem müüb osa soovitatud toodetest ise — see on meie ainus tuluallikas. Reklaame me ei näita ja andmeid me ei müü.\n\nEt see ei muudaks meie soovitusi kallutatuks, kehtivad kolm reeglit. Esiteks: kalkulaatori ja artiklite soovitused sünnivad sinu vastuste ja uneuuringute, mitte müügihuvi põhjal. Teiseks: iga soovituse juures on selgelt märgitud, kas tegu on meie enda tootega („Unevalemi toode") või välise poe omaga („Väline pood"). Kolmandaks: kui sinu vastustest selgub, et sul pole midagi vaja osta, ütleb kalkulaator sedagi — otse ja ilma „aga äkki siiski" müüginurgata.',
+      body: 'Unevalem müüb osa soovitatud toodetest ise - see on meie ainus tuluallikas. Reklaame me ei näita ja andmeid me ei müü.\n\nEt see ei muudaks meie soovitusi kallutatuks, kehtivad kolm reeglit. Esiteks: kalkulaatori ja artiklite soovitused sünnivad sinu vastuste ja uneuuringute, mitte müügihuvi põhjal. Teiseks: iga soovituse juures on selgelt märgitud, kas tegu on meie enda tootega („Unevalemi toode") või välise poe omaga („Väline pood"). Kolmandaks: kui sinu vastustest selgub, et sul pole midagi vaja osta, ütleb kalkulaator sedagi - otse ja ilma „aga äkki siiski" müüginurgata.',
     },
   ],
 }
@@ -490,7 +490,7 @@ export const termsPage = {
   metaTitle: 'Müügitingimused | Unevalem',
   metaDescription: 'Unevalemi e-poe müügitingimused: tellimine, maksmine, tarne, taganemisõigus ja pretensioonid.',
   heading: 'Müügitingimused',
-  // Standard VÕS-based e-shop terms. Not lawyer-reviewed — worth a once-over
+  // Standard VÕS-based e-shop terms. Not lawyer-reviewed - worth a once-over
   // by a professional before serious volume. No VAT wording (not registered).
   sections: [
     {
@@ -507,7 +507,7 @@ export const termsPage = {
     },
     {
       heading: '4. Tarne',
-      body: 'Kaubad saadetakse ostja valitud pakiautomaati 2–5 tööpäeva jooksul pärast makse kinnitust. Kättetoimetamist vahendab tarneteenuse pakkuja Omniva (Omniva pakiautomaadid üle Eesti). Pakiautomaadi saabumiskoodi saad SMS-iga. Kui tellimus hilineb, anname sellest e-posti teel teada.',
+      body: 'Kaubad saadetakse ostja valitud pakiautomaati 2-5 tööpäeva jooksul pärast makse kinnitust. Kättetoimetamist vahendab tarneteenuse pakkuja Omniva (Omniva pakiautomaadid üle Eesti). Pakiautomaadi saabumiskoodi saad SMS-iga. Kui tellimus hilineb, anname sellest e-posti teel teada.',
     },
     {
       heading: '5. Taganemisõigus',
@@ -519,7 +519,7 @@ export const termsPage = {
     },
     {
       heading: '7. Vaidluste lahendamine',
-      body: 'Küsimused ja mured lahendame eelkõige läbirääkimiste teel — kirjuta unevalem@gmail.com. Kui kokkulepet ei sünni, on ostjal õigus pöörduda Tarbijakaitse ja Tehnilise Järelevalve Ameti tarbijavaidluste komisjoni (ttja.ee) või Euroopa Liidu ODR-platvormi (ec.europa.eu/odr) poole.',
+      body: 'Küsimused ja mured lahendame eelkõige läbirääkimiste teel - kirjuta unevalem@gmail.com. Kui kokkulepet ei sünni, on ostjal õigus pöörduda Tarbijakaitse ja Tehnilise Järelevalve Ameti tarbijavaidluste komisjoni (ttja.ee) või Euroopa Liidu ODR-platvormi (ec.europa.eu/odr) poole.',
     },
     {
       heading: '8. Isikuandmed',

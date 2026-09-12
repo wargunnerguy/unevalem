@@ -3,7 +3,7 @@ import type { CalcType, Stat, UserProfile } from '~/types'
 import { calculator, common } from '~/utils/copy'
 
 // Embedded on a campaign landing page, the calculator must open on the flow the
-// ad promised with the answer the ad already established pre-filled — not on
+// ad promised with the answer the ad already established pre-filled - not on
 // whatever the visitor's session would otherwise resume. Unset on the homepage,
 // where the session decides.
 const props = withDefaults(defineProps<{
@@ -44,12 +44,12 @@ const {
 // the payload ships in the HTML and there is no loading flash on the hero.
 const { configFor } = useCalculators()
 
-// Step keys for an arbitrary calc type — reset() needs the keys of the calc it
+// Step keys for an arbitrary calc type - reset() needs the keys of the calc it
 // is switching TO, which is not always the currently active one.
 const keysFor = (type: CalcType): readonly string[] =>
   configFor(type)?.questions.map(q => q.answerKey) ?? []
 
-/** Prefill lookup now needs the keys passed in — see useCalcSession. */
+/** Prefill lookup now needs the keys passed in - see useCalcSession. */
 const prefillFor = (type: CalcType) => getPrefilledAnswers(type, keysFor(type))
 
 // True while restoring a saved result, so the storeCompletion/analytics watch
@@ -68,7 +68,7 @@ const latestCompletion = computed(() => {
 
 // On load: if the visitor already finished a calc, restore that result screen
 // (so a refresh keeps it). Otherwise resume the funnel at the first uncompleted
-// calc. Restoring needs the product list, which may still be loading — the
+// calc. Restoring needs the product list, which may still be loading - the
 // products watcher retries once it arrives.
 function initFromProfile() {
   if (didInit) return
@@ -184,7 +184,7 @@ function startNextCalc() {
   const prefill = prefillFor(next)
   activeCalcType.value = next
   reset(prefill, keysFor(next))
-  // Everything this calc asks was already answered elsewhere — go straight to
+  // Everything this calc asks was already answered elsewhere - go straight to
   // the result rather than showing an empty step.
   if (step.value > keysFor(next).length) {
     submitQuiz(products.value ?? [], next)
@@ -302,7 +302,7 @@ function getProductName(type: CalcType): string {
   <div class="w-full max-w-xl mx-auto">
     <div class="bg-foam rounded-2xl shadow-lg overflow-hidden">
 
-      <!-- Calc journey breadcrumb — each type is clickable to switch.
+      <!-- Calc journey breadcrumb - each type is clickable to switch.
            Always visible (restored 2026-07-30): it was gated on completedCount
            in the 2026-07-21 declutter, which meant a first-time visitor never
            learned that a blanket and a mattress calculator exist at all. -->
@@ -331,7 +331,7 @@ function getProductName(type: CalcType): string {
         </template>
       </div>
 
-      <!-- Progress header (steps 1–5 only) -->
+      <!-- Progress header (steps 1-5 only) -->
       <div
         v-if="step <= totalSteps && !analyzing"
         class="flex items-center gap-3 px-5 pb-0 pt-2"

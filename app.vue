@@ -26,7 +26,7 @@ useHead({
            the sheet has ever held was invented (purchases that never happened,
            ratings nobody gave), which contradicts the honesty overhaul in
            CLAUDE.md and is a per-se unfair commercial practice under the
-           Omnibus-amended EU Directive 2005/29/EC Annex I — dormant without
+           Omnibus-amended EU Directive 2005/29/EC Annex I - dormant without
            traffic, active the moment ads run. The component and its composable
            stay in the tree: remount this line once real orders exist and the
            Apps Script can feed it truthfully. Never with hand-written rows. -->

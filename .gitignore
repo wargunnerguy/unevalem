@@ -11,7 +11,7 @@ node_modules/
 .env.*
 !.env.example
 
-# Generated data (real, from Sheets — not committed)
+# Generated data (real, from Sheets - not committed)
 public/data/posts.json
 public/data/notifications.json
 public/data/stats.json

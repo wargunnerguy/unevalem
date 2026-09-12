@@ -2,7 +2,7 @@ import type { Post, UserProfile } from '~/types'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Post affinity: relevance scoring that surfaces the posts most useful to a
-// visitor based on their calculator answers and last quiz result. Pure — no Vue
+// visitor based on their calculator answers and last quiz result. Pure - no Vue
 // deps (mirrors utils/calculator.ts) so it stays testable and framework-free.
 //
 // The maps below translate calc/quiz *signals* into interest keywords that are
@@ -51,7 +51,7 @@ const CALC_SIGNAL_TAGS: Record<string, string[]> = {
   'age:young':   ['uneaeg'],
 }
 
-// Keyed by `${quizId}:${resultKey}`. Minimal for now — extend as quizzes are
+// Keyed by `${quizId}:${resultKey}`. Minimal for now - extend as quizzes are
 // reworked to be product-relevant. Unknown keys simply add nothing.
 const QUIZ_RESULT_TAGS: Record<string, string[]> = {
   'chronotype:owl':          ['ärkamine', 'unetsüklid', 'rituaal'],
@@ -97,7 +97,7 @@ export function affinityScore(post: Post, interest: Set<string>): number {
   return score
 }
 
-/** Day-of-year (1–366), the rotation seed — matches the daily-tip formula. */
+/** Day-of-year (1-366), the rotation seed - matches the daily-tip formula. */
 export function dayOfYear(now: Date = new Date()): number {
   return Math.floor(
     (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86_400_000,
@@ -114,7 +114,7 @@ function hashId(id: string | number): number {
 
 /**
  * Deterministic pseudo-random value in [0, 1) from a post id + seed. Kept
- * strictly below 1 so it only ever breaks ties between equally-scored posts —
+ * strictly below 1 so it only ever breaks ties between equally-scored posts -
  * never overriding affinity, featured, or unread weighting. A fresh seed per
  * page load reshuffles tied posts so the list never feels frozen.
  */

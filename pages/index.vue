@@ -65,7 +65,7 @@ const isMounted = useMounted()
 const displayPosts = computed(() => (isMounted.value ? featuredPosts.value : basePosts.value))
 const showPersonalizedNote = computed(() => isMounted.value && completedCount.value > 0)
 
-// Session — for revisit banner (client-only to avoid hydration mismatch)
+// Session - for revisit banner (client-only to avoid hydration mismatch)
 const { siteProfile, completedCount, activeCalcType } = useCalcSession()
 
 const showRevisit = ref(true)
@@ -86,7 +86,7 @@ const revisitSummary = computed(() => {
     <!-- ─── HERO ─── -->
     <section class="hero-band sleep-pattern px-4 pt-8 pb-10">
 
-      <!-- Revisit banner — shown only on client after hydration -->
+      <!-- Revisit banner - shown only on client after hydration -->
       <ClientOnly>
         <Transition name="toast">
           <div
@@ -95,8 +95,8 @@ const revisitSummary = computed(() => {
           >
             <div class="text-sm text-foam leading-snug">
               <span class="font-medium text-gold">Tere jälle!</span>
-              <span v-if="completedCount < 3"> Jätka oma une profiili täitmist — </span>
-              <span v-else> Sinu une profiil on täielik — </span>
+              <span v-if="completedCount < 3"> Jätka oma une profiili täitmist - </span>
+              <span v-else> Sinu une profiil on täielik - </span>
               <span class="text-moonlight/75 text-xs">{{ revisitSummary.join(' · ') }}</span>
             </div>
             <button
@@ -111,7 +111,7 @@ const revisitSummary = computed(() => {
         </Transition>
       </ClientOnly>
 
-      <!-- Hero heading — updates as active calc type changes -->
+      <!-- Hero heading - updates as active calc type changes -->
       <div class="max-w-xl mx-auto text-center mb-6">
         <ClientOnly>
           <Transition name="slide-left" mode="out-in">
@@ -146,7 +146,7 @@ const revisitSummary = computed(() => {
           <p class="value-band-ink font-heading text-lg sm:text-xl font-bold leading-none">
             {{ claim.title }}
           </p>
-          <!-- Was text-lavender/70, which sat at 2.2:1 on the band — the accent
+          <!-- Was text-lavender/70, which sat at 2.2:1 on the band - the accent
                teal is a fill colour, not a text colour, on the darker panels.
                Solid rather than 75%: the band itself is lighter now. -->
           <p class="value-band-sub text-xs mt-1.5 leading-snug max-w-[140px]">
@@ -189,7 +189,7 @@ const revisitSummary = computed(() => {
           >
             <!-- Badge row: removed in the 2026-07-21 declutter, restored
                  2026-07-30. Mirrors PostCard.vue so a post looks the same
-                 wherever it appears — including the MÜÜT pill, which did not
+                 wherever it appears - including the MÜÜT pill, which did not
                  exist when this row was first written. -->
             <div class="flex items-center gap-2 mb-2">
               <span class="text-xs font-medium px-2 py-0.5 rounded-full border border-lavender/30 bg-foam text-midnight">

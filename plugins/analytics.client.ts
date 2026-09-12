@@ -14,7 +14,7 @@ export default defineNuxtPlugin(() => {
 
   window.dataLayer = window.dataLayer || []
   window.gtag = function gtag() {
-    // eslint-disable-next-line prefer-rest-params — GA requires the arguments object
+    // eslint-disable-next-line prefer-rest-params - GA requires the arguments object
     window.dataLayer.push(arguments)
   }
 
@@ -38,7 +38,7 @@ export default defineNuxtPlugin(() => {
   // Realtime, which only shows the last 30 minutes and needs live traffic.
   const debugMode = new URLSearchParams(window.location.search).has('ga_debug')
 
-  // send_page_view stays ON — do not disable it again.
+  // send_page_view stays ON - do not disable it again.
   //
   // It used to be off, on the assumption that the router hook below also covers
   // the initial route. It does not, reliably: afterEach is registered while
@@ -46,14 +46,14 @@ export default defineNuxtPlugin(() => {
   // `app:created` hook, so whether the hook ever observes that first navigation
   // depends on framework init order rather than on anything here. When it does
   // not, the landing page_view is never emitted and gtag sends no request at
-  // all — a visitor who lands and leaves without navigating is invisible, and
+  // all - a visitor who lands and leaves without navigating is invisible, and
   // GA looks completely dead. That was live on unevalem.ee.
   //
   // The title race that motivated the manual hook does not apply to the first
   // load: the prerendered HTML already carries the correct <title> before gtag
   // reads it. That bug only ever affected client-side navigation.
   //
-  // (No anonymize_ip — that is a Universal Analytics parameter; GA4 ignores it
+  // (No anonymize_ip - that is a Universal Analytics parameter; GA4 ignores it
   // and always anonymises.)
   window.gtag('js', new Date())
   window.gtag('config', gaId, debugMode ? { debug_mode: true } : {})
@@ -68,14 +68,14 @@ export default defineNuxtPlugin(() => {
   // ⚠️ This matters more than it looks. router.afterEach fires BEFORE Vue
   // renders the incoming page, and useHead applies the title later still, on
   // its own DOM flush after paint. gtag auto-collects page_title from
-  // document.title at send time — so sending immediately (or even after one
+  // document.title at send time - so sending immediately (or even after one
   // nextTick, which is too early; measured) filed every internal navigation
   // under the PREVIOUS page's title. GA4's "Pages and screens" report keys on
   // title by default, which made all in-site navigation look like the homepage.
   //
   // nextTick covers the render queue; the two rAFs carry us past the paint the
   // head flush rides on. Falls back to sending anyway if the title never
-  // changes — some pages legitimately share a title.
+  // changes - some pages legitimately share a title.
   function afterTitleSettles(previousTitle: string): Promise<void> {
     return nextTick().then(
       () =>
@@ -94,7 +94,7 @@ export default defineNuxtPlugin(() => {
   // client-side, so emit one on each route change.
   //
   // gtag has already sent the landing page_view itself. If afterEach *does* also
-  // fire for Nuxt's initial navigation we would double-count it — so the very
+  // fire for Nuxt's initial navigation we would double-count it - so the very
   // first hook call is dropped, and only when it is still on the landing URL.
   // Both conditions matter: dropping unconditionally would lose a real pageview
   // in the case where the hook never sees the initial navigation at all.

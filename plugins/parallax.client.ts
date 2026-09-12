@@ -1,13 +1,13 @@
 // Drives the 5-layer sleep-pattern texture (assets/css/main.css). Three motions
 // are summed per layer so the background reads as alive rather than pasted on:
 //
-//   • parallax — each layer is pushed up by a different fraction of the scroll,
+//   • parallax - each layer is pushed up by a different fraction of the scroll,
 //     so the icons pass the content at five depths (this was the original job);
-//   • wander   — a slow two-sine drift on both axes. No two layers share a
+//   • wander   - a slow two-sine drift on both axes. No two layers share a
 //     period and none of the periods are harmonics, so they never re-sync into
 //     a visible beat; the second, faster sine is what turns a smooth glide into
 //     a slight wiggle;
-//   • sway     — a sideways lean proportional to scroll speed that eases back to
+//   • sway     - a sideways lean proportional to scroll speed that eases back to
 //     rest a moment after scrolling stops, like air dragging on the layers.
 //
 // Amplitude scales with nearness: far icons barely stir, the front fog bank
@@ -18,7 +18,7 @@ interface Layer {
   key: string
   /** fraction of scroll distance this layer is displaced by */
   parallax: number
-  /** resting x offset — must match the fallback in main.css */
+  /** resting x offset - must match the fallback in main.css */
   baseX: number
   ampX: number
   ampY: number
@@ -40,7 +40,7 @@ const LAYERS: Layer[] = [
 
 const TAU = Math.PI * 2
 
-/** Big slow sine + a smaller 3.7×-faster one — glide with a wiggle on top. */
+/** Big slow sine + a smaller 3.7×-faster one - glide with a wiggle on top. */
 function wander(t: number, amp: number, period: number, phase: number) {
   return (
     Math.sin((TAU * t) / period + phase) * amp +
@@ -49,16 +49,16 @@ function wander(t: number, amp: number, period: number, phase: number) {
 }
 
 export default defineNuxtPlugin(() => {
-  // Respect users who asked for less motion — layers stay simply fixed.
+  // Respect users who asked for less motion - layers stay simply fixed.
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
   const root = document.documentElement
 
   // Quantising the writes is what makes a permanent rAF loop cheap: these are
   // five large, blurred, fixed-attachment bitmaps, so every changed value costs
-  // a repaint. The wander moves ~1–3 px/s, so rounding to half a pixel (a whole
+  // a repaint. The wander moves ~1-3 px/s, so rounding to half a pixel (a whole
   // one on phones, where the paint is comparatively dearer) drops the repaints
-  // to a handful a second and stops them entirely at the turn of each sine —
+  // to a handful a second and stops them entirely at the turn of each sine -
   // all of it invisible at this speed.
   const step = window.matchMedia('(pointer: coarse)').matches ? 1 : 0.5
   const written = new Map<string, number>()

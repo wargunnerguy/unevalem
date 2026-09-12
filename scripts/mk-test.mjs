@@ -5,7 +5,7 @@
 //   npm run mk:test
 //
 // Creates a 1.00 € transaction in the TEST environment (MK_ENV=live is
-// refused on purpose — this script must never touch the live API).
+// refused on purpose - this script must never touch the live API).
 import { readFileSync } from 'node:fs'
 
 const env = Object.fromEntries(
@@ -33,7 +33,7 @@ if (!shop.ok) {
   console.error(`GET /v1/shop → ${shop.status}: credentials rejected`)
   process.exit(1)
 }
-console.log(`✓ credentials OK — shop: ${(await shop.json()).name}`)
+console.log(`✓ credentials OK - shop: ${(await shop.json()).name}`)
 
 const reference = String(Date.now()).slice(-6) // short numeric, like real order numbers
 const res = await fetch(`${api}/v1/transactions`, {

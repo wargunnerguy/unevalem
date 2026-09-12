@@ -72,15 +72,15 @@
         "question": "Kui vana sa oled?",
         "options": [
           {
-            "label": "18–30",
+            "label": "18-30",
             "value": "young"
           },
           {
-            "label": "31–45",
+            "label": "31-45",
             "value": "adult"
           },
           {
-            "label": "46–60",
+            "label": "46-60",
             "value": "middle"
           },
           {
@@ -160,7 +160,7 @@
             "value": "new"
           },
           {
-            "label": "1–3 aastat vana",
+            "label": "1-3 aastat vana",
             "value": "1-3y"
           },
           {
@@ -221,15 +221,15 @@
         "question": "Kui vana sa oled?",
         "options": [
           {
-            "label": "18–30",
+            "label": "18-30",
             "value": "young"
           },
           {
-            "label": "31–45",
+            "label": "31-45",
             "value": "adult"
           },
           {
-            "label": "46–60",
+            "label": "46-60",
             "value": "middle"
           },
           {
@@ -244,11 +244,11 @@
         "question": "Millist teki kaalu eelistad?",
         "options": [
           {
-            "label": "Kerget — peaaegu et ei tunne seda",
+            "label": "Kerget - peaaegu et ei tunne seda",
             "value": "light"
           },
           {
-            "label": "Keskmist — tavalist soojust",
+            "label": "Keskmist - tavalist soojust",
             "value": "medium"
           },
           {
@@ -267,11 +267,11 @@
             "value": "solo"
           },
           {
-            "label": "Koos — jagame tekki",
+            "label": "Koos - jagame tekki",
             "value": "shared"
           },
           {
-            "label": "Koos — eraldi tekid",
+            "label": "Koos - eraldi tekid",
             "value": "separate"
           }
         ]
@@ -286,7 +286,7 @@
             "value": "cool"
           },
           {
-            "label": "Keskmine (18–21 °C)",
+            "label": "Keskmine (18-21 °C)",
             "value": "moderate"
           },
           {
@@ -324,11 +324,11 @@
         "question": "Mis aastaajal on sul kõige rohkem uneprobleeme?",
         "options": [
           {
-            "label": "Talvel — on liiga külm",
+            "label": "Talvel - on liiga külm",
             "value": "winter"
           },
           {
-            "label": "Suvel — on liiga palav",
+            "label": "Suvel - on liiga palav",
             "value": "summer"
           },
           {
@@ -351,15 +351,15 @@
         "question": "Kuidas hindad oma praegust unekvaliteeti?",
         "options": [
           {
-            "label": "Halb — ärkan väsinuna",
+            "label": "Halb - ärkan väsinuna",
             "value": "poor"
           },
           {
-            "label": "Keskpärane — võiks parem olla",
+            "label": "Keskpärane - võiks parem olla",
             "value": "fair"
           },
           {
-            "label": "Hea — ärkan puhanuna",
+            "label": "Hea - ärkan puhanuna",
             "value": "good"
           }
         ]
@@ -397,7 +397,7 @@
             "value": "slim"
           },
           {
-            "label": "Keskmine (65–90 kg)",
+            "label": "Keskmine (65-90 kg)",
             "value": "medium"
           },
           {
@@ -431,15 +431,15 @@
         "question": "Kui vana sa oled?",
         "options": [
           {
-            "label": "18–30",
+            "label": "18-30",
             "value": "young"
           },
           {
-            "label": "31–45",
+            "label": "31-45",
             "value": "adult"
           },
           {
-            "label": "46–60",
+            "label": "46-60",
             "value": "middle"
           },
           {
@@ -473,11 +473,11 @@
             "value": "new"
           },
           {
-            "label": "1–3 aastat",
+            "label": "1-3 aastat",
             "value": "1-3y"
           },
           {
-            "label": "3–5 aastat",
+            "label": "3-5 aastat",
             "value": "3-5y"
           },
           {

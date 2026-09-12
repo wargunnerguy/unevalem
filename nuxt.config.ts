@@ -8,7 +8,7 @@ import { resolve } from 'node:path'
 function articleRoutes(): string[] {
   const path = resolve(__dirname, 'public/data/posts.json')
   if (!existsSync(path)) {
-    console.warn('[nuxt.config] public/data/posts.json missing — article routes will rely on crawling')
+    console.warn('[nuxt.config] public/data/posts.json missing - article routes will rely on crawling')
     return []
   }
   try {
@@ -25,11 +25,11 @@ function articleRoutes(): string[] {
 
 // Campaign landing pages are linked from ads, not from the site, so the link
 // crawler can never discover them. Every active pain must be listed here or a
-// paid click lands on a 404 — the most expensive possible failure mode.
+// paid click lands on a 404 - the most expensive possible failure mode.
 function painRoutes(): string[] {
   const path = resolve(__dirname, 'public/data/pains.json')
   if (!existsSync(path)) {
-    console.warn('[nuxt.config] public/data/pains.json missing — no campaign pages will be prerendered')
+    console.warn('[nuxt.config] public/data/pains.json missing - no campaign pages will be prerendered')
     return []
   }
   try {
@@ -48,7 +48,7 @@ function painRoutes(): string[] {
 // Resolved once here so the head defaults, the runtimeConfig and the sitemap
 // all agree. A review build sets NUXT_PUBLIC_SITE_URL to its own host (e.g.
 // http://localhost:4000), which must not leak production URLs into og:image or
-// JSON-LD — nor be mistaken for production when tagging sheet rows.
+// JSON-LD - nor be mistaken for production when tagging sheet rows.
 const SITE_URL = process.env.NUXT_PUBLIC_SITE_URL ?? 'https://unevalem.ee'
 
 export default defineNuxtConfig({

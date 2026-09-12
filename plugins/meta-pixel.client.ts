@@ -1,7 +1,7 @@
 import type { ConsentState } from '~/composables/useConsent'
 
 // Meta Pixel, loaded ONLY after explicit advertising consent. There is no
-// server, so no Conversions API — browser-only coverage is accepted, and the
+// server, so no Conversions API - browser-only coverage is accepted, and the
 // Google Sheet remains the more complete attribution record.
 //
 // Optimise toward Lead, not Purchase, for the first campaign cycle: with

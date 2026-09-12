@@ -1,7 +1,7 @@
 import type { Product } from '~/types'
 
 // A recommendation links to an external shop when its storeUrl leaves
-// unevalem.ee. Placeholder ('#'), empty, and relative URLs are own products —
+// unevalem.ee. Placeholder ('#'), empty, and relative URLs are own products -
 // no separate sheet column needed.
 export function isExternalStore(url?: string): boolean {
   if (!url || url === '#') return false

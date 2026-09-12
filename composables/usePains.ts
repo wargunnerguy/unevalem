@@ -14,7 +14,7 @@ export function usePain(slug: string) {
   const { pains, pending, error } = usePains()
   const pain = computed<PainPage | null>(() => pains.value.find(p => p.slug === slug) ?? null)
   // `pains` is returned too so callers can tell "loaded, and this slug is gone"
-  // apart from "nothing loaded" — the two need very different handling.
+  // apart from "nothing loaded" - the two need very different handling.
   return { pain, pains, pending, error }
 }
 

@@ -6,7 +6,7 @@ import { blogPage, blogCategories, common } from '~/utils/copy'
 definePageMeta({
   // Keyed on the slug, NOT route.fullPath. With fullPath, any query string
   // (fbclid from a Facebook share, utm_* from an ad) produced a different key,
-  // which discarded the prerendered payload and made useFetch hit /api/posts —
+  // which discarded the prerendered payload and made useFetch hit /api/posts -
   // a route that does not exist on a static host. The fetch 404'd, `post`
   // resolved null, and the visitor was redirected to /artiklid. Every ad click
   // and every Facebook share landed on the listing instead of the article.
@@ -134,7 +134,7 @@ async function copyLink() {
     copied.value = true
     setTimeout(() => { copied.value = false }, 2000)
   } catch {
-    // clipboard API unavailable — silently ignore
+    // clipboard API unavailable - silently ignore
   }
 }
 

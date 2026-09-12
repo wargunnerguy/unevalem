@@ -188,7 +188,7 @@ function transformProduct(row: Record<string, unknown>): Record<string, unknown>
 // Fallback: no credentials → copy example files and exit cleanly
 // ---------------------------------------------------------------------------
 if (!BASE_URL) {
-  console.warn('[fetch-content] SHEETS_API_URL not set — falling back to example data')
+  console.warn('[fetch-content] SHEETS_API_URL not set - falling back to example data')
   mkdirSync(DATA_DIR, { recursive: true })
   let ok = 0
   for (const name of ['posts', 'stats', 'products', 'tips', 'quizzes', 'calculators', 'terminals', 'pains']) {
@@ -199,10 +199,10 @@ if (!BASE_URL) {
       console.log(`  copied ${name}.example.json → ${name}.json`)
       ok++
     } else {
-      console.warn(`  missing ${name}.example.json — skipping`)
+      console.warn(`  missing ${name}.example.json - skipping`)
     }
   }
-  // notifications: plain copy (no time field — the toast fabricates a fresh
+  // notifications: plain copy (no time field - the toast fabricates a fresh
   // "X ago" at render time, so there's nothing to convert)
   const notifSrc = join(DATA_DIR, 'notifications.example.json')
   const notifDst = join(DATA_DIR, 'notifications.json')
@@ -211,21 +211,21 @@ if (!BASE_URL) {
     console.log('  copied notifications.example.json → notifications.json')
     ok++
   } else {
-    console.warn('  missing notifications.example.json — skipping')
+    console.warn('  missing notifications.example.json - skipping')
   }
   console.log(`[fetch-content] done (${ok}/9 example files processed)`)
   process.exit(0)
 }
 
 // ---------------------------------------------------------------------------
-// Fetch one sheet — retries transient failures; returns null only after all
+// Fetch one sheet - retries transient failures; returns null only after all
 // attempts fail (sheet missing from the allowlist, tab absent, network down).
 // ---------------------------------------------------------------------------
 // One Apps Script deployment serves every tab, and it does not handle a burst.
 // These used to be issued as one Promise.all of twelve concurrent requests
 // (nine sheets plus the three quiz tabs); the deployment throttled, the retries
 // collided with each other, and the daily cron failed outright roughly as often
-// as it succeeded — run 31566481215 on 2026-08-12 died with pains, post_stats,
+// as it succeeded - run 31566481215 on 2026-08-12 died with pains, post_stats,
 // inventory and quizzes all exhausting their attempts at once.
 //
 // Requests are now issued one at a time (see fetchSheetsInOrder), so these
@@ -245,7 +245,7 @@ async function tryFetchSheet(sheet: string): Promise<unknown[] | null> {
       const res = await fetch(url, { signal: AbortSignal.timeout(20_000) })
       if (res.ok) {
         const body = (await res.json()) as unknown
-        // A JSON {error} object means the sheet genuinely isn't served —
+        // A JSON {error} object means the sheet genuinely isn't served -
         // retrying won't change that.
         if (Array.isArray(body)) return body
         return null
@@ -267,13 +267,13 @@ async function tryFetchSheet(sheet: string): Promise<unknown[] | null> {
 
 // Required sheet: with SHEETS_API_URL configured, a failure here must kill the
 // build. Example data exists only for the no-credentials dev path (which exits
-// before this runs) — it must NEVER ship to production. This happened once:
+// before this runs) - it must NEVER ship to production. This happened once:
 // a single posts fetch timeout in CI silently deployed the 5 dummy example
 // articles to unevalem.ee (run 29510944443, 2026-07-16).
 async function fetchSheet(sheet: string): Promise<unknown[]> {
   const data = await tryFetchSheet(sheet)
   if (data === null) {
-    throw new Error(`required sheet "${sheet}" unavailable after ${FETCH_ATTEMPTS} attempts — refusing to build without real content`)
+    throw new Error(`required sheet "${sheet}" unavailable after ${FETCH_ATTEMPTS} attempts - refusing to build without real content`)
   }
   console.log(`  ✓ ${sheet} (${data.length} rows)`)
   return data
@@ -286,7 +286,7 @@ async function fetchSheet(sheet: string): Promise<unknown[]> {
 // value are the contract with utils/calculator.ts (see utils/calc-schema.ts):
 // the engine branches on them, useCalcSession matches them when prefilling a
 // later calculator, and they name the columns in each *_responses tab. A typo
-// in one of them throws nowhere at runtime — the engine would just stop
+// in one of them throws nowhere at runtime - the engine would just stop
 // recognising the answer and score everyone as though they had skipped the
 // question. So every row is validated here and a mismatch fails the build,
 // which is the only place the mistake is still cheap.
@@ -299,7 +299,7 @@ function parseCalcOptions(v: unknown, answerKey: string, where: string): { label
     const cleanLabel = (label ?? '').trim()
     const cleanValue = (value ?? '').trim()
     if (!cleanLabel || !cleanValue) {
-      throw new Error(`${where}: malformed option "${part}" — expected "Label|value"`)
+      throw new Error(`${where}: malformed option "${part}" - expected "Label|value"`)
     }
     if (isAnswerKey(answerKey) && !isAnswerValue(answerKey, cleanValue)) {
       throw new Error(
@@ -320,7 +320,7 @@ function assembleCalculators(
     .map(m => {
       const id = String(m.id ?? '').trim()
       if (!(CALC_TYPES as readonly string[]).includes(id)) {
-        throw new Error(`calculators tab: unknown calculator id "${id}" — expected one of ${CALC_TYPES.join(', ')}`)
+        throw new Error(`calculators tab: unknown calculator id "${id}" - expected one of ${CALC_TYPES.join(', ')}`)
       }
 
       const qs = questions
@@ -330,7 +330,7 @@ function assembleCalculators(
           const answerKey = String(q.answerKey ?? '').trim()
           const where = `calc_questions row for ${id} #${i + 1}`
           if (!isAnswerKey(answerKey)) {
-            throw new Error(`${where}: unknown answerKey "${answerKey}" — see utils/calc-schema.ts`)
+            throw new Error(`${where}: unknown answerKey "${answerKey}" - see utils/calc-schema.ts`)
           }
           const options = parseCalcOptions(q.options, answerKey, where)
           if (options.length < 2) throw new Error(`${where}: needs at least two options`)
@@ -342,7 +342,7 @@ function assembleCalculators(
           }
         })
 
-      if (!qs.length) throw new Error(`calculator "${id}" has no questions — refusing to ship an empty calculator`)
+      if (!qs.length) throw new Error(`calculator "${id}" has no questions - refusing to ship an empty calculator`)
 
       // Asking the same thing twice inside one calculator would make the skip
       // logic drop the second copy, leaving a step that can never be reached.
@@ -361,7 +361,7 @@ function assembleCalculators(
 
   for (const type of CALC_TYPES) {
     if (!assembled.some(c => c.id === type)) {
-      throw new Error(`calculators tab is missing "${type}" (or it is not active) — the funnel offers all three`)
+      throw new Error(`calculators tab is missing "${type}" (or it is not active) - the funnel offers all three`)
     }
   }
   return assembled
@@ -371,17 +371,25 @@ function assembleCalculators(
  * Optional while the sheet tabs are being created: with neither tab present the
  * committed example file is used, which is exactly the definitions that used to
  * live in utils/copy.ts. Once `calculators` exists, it becomes authoritative and
- * any problem in it fails the build rather than silently falling back — a bad
+ * any problem in it fails the build rather than silently falling back - a bad
  * edit must not be papered over with stale questions.
  */
 async function fetchCalculators(): Promise<unknown[]> {
   const meta = await tryFetchSheet('calculators')
-  if (meta === null) {
+
+  // Absent, or present but with no rows yet. An empty tab means "created, not
+  // seeded" - someone part way through setting this up - and must NOT fail the
+  // build, because half a migration is a normal state to be in for an
+  // afternoon. A tab WITH rows that are wrong is a different thing and still
+  // fails loudly below.
+  if (meta === null || meta.length === 0) {
     const example = join(DATA_DIR, 'calculators.example.json')
     if (!existsSync(example)) {
-      throw new Error('no `calculators` tab and no calculators.example.json — nothing to build the calculator from')
+      throw new Error('no `calculators` rows and no calculators.example.json - nothing to build the calculator from')
     }
-    console.log('  · calculators tab absent — using calculators.example.json')
+    console.log(meta === null
+      ? '  · calculators tab absent - using calculators.example.json'
+      : '  · calculators tab is empty - using calculators.example.json (run importCalculators() to seed it)')
     return JSON.parse(readFileSync(example, 'utf-8')) as unknown[]
   }
 
@@ -396,9 +404,9 @@ async function fetchCalculators(): Promise<unknown[]> {
 }
 
 // Quizzes live across three tabs and are assembled into nested objects here.
-// All three are required — a partial quiz must not ship.
+// All three are required - a partial quiz must not ship.
 async function fetchQuizzes(): Promise<unknown[]> {
-  // Sequential, like every other sheet fetch — see the note on FETCH_ATTEMPTS.
+  // Sequential, like every other sheet fetch - see the note on FETCH_ATTEMPTS.
   const meta      = await fetchSheet('quizzes')
   const questions = await fetchSheet('quiz_questions')
   const results   = await fetchSheet('quiz_results')
@@ -419,7 +427,7 @@ function validateFields(sheet: string, rows: unknown[], fields: readonly string[
     const row = rows[i] as Record<string, unknown>
     for (const field of fields) {
       if (!(field in row)) {
-        console.warn(`  ⚠ ${sheet}[${i}] missing field "${field}" — row skipped`)
+        console.warn(`  ⚠ ${sheet}[${i}] missing field "${field}" - row skipped`)
       }
     }
   }
@@ -458,11 +466,11 @@ async function fetchTerminals(): Promise<void> {
     console.log(`  ✓ terminals (${omniva.length} Omniva)`)
   } catch (err) {
     if (existsSync(dst)) {
-      console.warn(`  ⚠ terminals fetch failed (${(err as Error).message}) — keeping existing terminals.json`)
+      console.warn(`  ⚠ terminals fetch failed (${(err as Error).message}) - keeping existing terminals.json`)
     } else {
       const example = join(DATA_DIR, 'terminals.example.json')
       if (existsSync(example)) copyFileSync(example, dst)
-      console.warn(`  ⚠ terminals fetch failed (${(err as Error).message}) — using example data`)
+      console.warn(`  ⚠ terminals fetch failed (${(err as Error).message}) - using example data`)
     }
   }
 }
@@ -475,7 +483,7 @@ async function main(): Promise<void> {
   mkdirSync(DATA_DIR, { recursive: true })
 
   // Omniva is a different host with no shared rate limit, so it starts now and
-  // is awaited at the end — it overlaps the Apps Script work for free.
+  // is awaited at the end - it overlaps the Apps Script work for free.
   const terminalsDone = fetchTerminals()   // writes terminals.json itself; non-fatal
 
   // Apps Script tabs, strictly one at a time. Twelve of these in parallel is
@@ -508,7 +516,7 @@ async function main(): Promise<void> {
   }
 
   // Human-review gate: AI-drafted articles must be read and corrected by a
-  // person before going live. The posts tab's `proofread` column marks that —
+  // person before going live. The posts tab's `proofread` column marks that -
   // any non-empty value except FALSE counts as approved, so a checkbox (TRUE),
   // initials ("RV") or a date all work. The gate only arms once the column
   // exists in the sheet; until then it warns, so deploying this code before
@@ -516,7 +524,7 @@ async function main(): Promise<void> {
   const postRows = posts as Record<string, unknown>[]
   const hasProofreadColumn = postRows.some(r => 'proofread' in r)
   if (!hasProofreadColumn && postRows.length) {
-    console.warn('  ⚠ posts sheet has no "proofread" column — human-review gate INACTIVE, all published posts go live')
+    console.warn('  ⚠ posts sheet has no "proofread" column - human-review gate INACTIVE, all published posts go live')
   }
   const isProofread = (row: Record<string, unknown>): boolean => {
     if (!hasProofreadColumn) return true
@@ -535,7 +543,7 @@ async function main(): Promise<void> {
       return false
     }
     if (!isProofread(row)) {
-      console.log(`  · skipping post "${slug}" — not proofread by a human yet`)
+      console.log(`  · skipping post "${slug}" - not proofread by a human yet`)
       return false
     }
     return true
@@ -556,12 +564,12 @@ async function main(): Promise<void> {
   const transformedProducts = (inventory as Record<string, unknown>[]).map(transformProduct)
   const tips = (tipsRaw as Record<string, unknown>[]).filter(r => parseBool(r.active))
 
-  // Only rows with a slug are usable — a blank slug would prerender to a route
+  // Only rows with a slug are usable - a blank slug would prerender to a route
   // that ads then link to and that 404s. Drop them loudly rather than silently.
   const pains = ((painsRaw ?? []) as Record<string, unknown>[])
     .filter((row) => {
       if (String(row.slug ?? '').trim()) return true
-      console.warn('  ⚠ pains row skipped — no slug')
+      console.warn('  ⚠ pains row skipped - no slug')
       return false
     })
     .map(transformPain)
@@ -573,12 +581,12 @@ async function main(): Promise<void> {
   writeFileSync(join(DATA_DIR, 'tips.json'),          JSON.stringify(tips, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'quizzes.json'),       JSON.stringify(quizzes, null, 2), 'utf-8')
   writeFileSync(join(DATA_DIR, 'calculators.json'),   JSON.stringify(calculators, null, 2), 'utf-8')
-  // Always written, even as [] — nuxt.config reads this file to build the
+  // Always written, even as [] - nuxt.config reads this file to build the
   // prerender route list and warns when it is missing.
   writeFileSync(join(DATA_DIR, 'pains.json'),         JSON.stringify(pains, null, 2), 'utf-8')
 
   console.log(
-    `[fetch-content] done — ${transformedPosts.length} posts · ` +
+    `[fetch-content] done - ${transformedPosts.length} posts · ` +
     `${notifications.length} notifications · ${stats.length} stats · ` +
     `${transformedProducts.length} products · ${tips.length} tips · ` +
     `${quizzes.length} quizzes · ${calculators.length} calculators · ${pains.length} pains`,

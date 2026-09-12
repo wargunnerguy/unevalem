@@ -143,7 +143,7 @@ export interface Stat {
 }
 
 // A campaign landing page, one row per ad angle in the `pains` sheet tab.
-// The headline must mirror the ad's wording verbatim — message match is the
+// The headline must mirror the ad's wording verbatim - message match is the
 // whole point of the page existing. Everything editorial comes from the sheet
 // so a new angle needs no developer; only chrome lives in copy.ts.
 export interface PainPage {
@@ -156,7 +156,7 @@ export interface PainPage {
   // `quiz:<id>` links to the quiz, `lead` shows only the email form.
   ctaType:          string
   ctaLabel:         string
-  // "key:value;key:value" — answers pre-filled into the embedded calculator.
+  // "key:value;key:value" - answers pre-filled into the embedded calculator.
   prefill:          string
   relatedSlugs:     string[]
   ogImage:          string
@@ -196,7 +196,7 @@ export interface Tip {
 
 export interface CalcOption {
   label: string
-  /** One of ANSWER_VALUES[answerKey] — never free text. */
+  /** One of ANSWER_VALUES[answerKey] - never free text. */
   value: string
 }
 

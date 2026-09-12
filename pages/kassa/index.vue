@@ -76,7 +76,7 @@ const terminalOptions = computed(() =>
 const state = ref<'idle' | 'submitting' | 'error'>('idle')
 const errorMsg = ref('')
 
-// Terms consent — deliberately NOT persisted (kept out of the useStorage form)
+// Terms consent - deliberately NOT persisted (kept out of the useStorage form)
 // so the buyer actively ticks it each time. Maksekeskus requires an explicit
 // opt-in before payment.
 const agreeTerms = ref(false)
@@ -109,7 +109,7 @@ async function submit() {
   const url = useRuntimeConfig().public.sheetsApiUrl as string
   const terminal = terminalOptions.value.find(t => t.id === form.value.terminalId)
 
-  // Only ids + quantities go up — the Apps Script looks prices up from the
+  // Only ids + quantities go up - the Apps Script looks prices up from the
   // inventory sheet itself, so a tampered client can't set its own prices.
   const payload = {
     action: 'create_order',
@@ -281,7 +281,7 @@ async function submit() {
                 required
                 class="w-full rounded-lg border border-lavender/40 bg-foam px-3 py-2.5 text-sm text-midnight focus:outline-none focus:ring-2 focus:ring-lavender"
               >
-                <option value="" disabled>—</option>
+                <option value="" disabled>-</option>
                 <option v-for="t in terminalOptions" :key="t.id" :value="t.id">{{ t.name }}</option>
               </select>
             </template>

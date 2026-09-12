@@ -64,7 +64,7 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
       </div>
     </div>
 
-    <!-- Sleep profile explanation — the advice comes before any product -->
+    <!-- Sleep profile explanation - the advice comes before any product -->
     <div v-if="result.profileSummary">
       <h3 class="font-heading text-lg text-midnight mb-2">{{ calculator.result.profileHeading }}</h3>
       <p class="text-sm text-midnight leading-relaxed">{{ result.profileSummary }}</p>
@@ -92,7 +92,7 @@ onMounted(() => { setTimeout(() => { mounted.value = true }, 50) })
       <LeadForm :source="`calc-result:${calcType}`" :heading="lead.heading" />
     </div>
 
-    <!-- Matching products — compact, last, no hard-sell -->
+    <!-- Matching products - compact, last, no hard-sell -->
     <div v-if="mainRec" class="border-t border-lavender/25 pt-5">
       <h3 class="font-heading text-lg text-midnight mb-1">{{ calculator.result.productsHeading }}</h3>
       <p class="text-xs text-muted mb-3">{{ calculator.result.productsIntro }}</p>

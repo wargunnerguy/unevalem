@@ -6,7 +6,7 @@
  * what `utils/calculator.ts` branches on, what `useCalcSession` matches when it
  * prefills a later calculator, and what names the columns in each
  * `<calcType>_responses` tab. A typo in one of those in the sheet would not
- * throw anywhere — the engine would simply stop recognising the answer, quietly
+ * throw anywhere - the engine would simply stop recognising the answer, quietly
  * scoring everyone as though they had not answered, and the response column
  * would fill with a value nothing reads.
  *
@@ -15,7 +15,7 @@
  * silent breakage into a loud one before it can ship.
  *
  * The union types in `types/index.ts` are erased at runtime and cannot do this
- * job. When a type there changes, change it here too — the paired test in
+ * job. When a type there changes, change it here too - the paired test in
  * `scripts/check-influence.ts` will catch a drift between this map and the
  * options the calculators actually offer.
  */

@@ -11,7 +11,7 @@ function makeId(): string {
 }
 
 export function useABTest() {
-  // Anonymous session ID — random, no PII, persists 30 days
+  // Anonymous session ID - random, no PII, persists 30 days
   const sessionId = useCookie<string>('uva-sid', {
     default: makeId,
     maxAge: 60 * 60 * 24 * 30,

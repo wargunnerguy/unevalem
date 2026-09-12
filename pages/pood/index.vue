@@ -5,9 +5,9 @@ import { disclosure, shop } from '~/utils/copy'
 const { siteUrl } = useRuntimeConfig().public
 
 useHead({
-  title: 'Pood — padjad, tekid ja voodipesu | Unevalem',
+  title: 'Pood - padjad, tekid ja voodipesu | Unevalem',
   meta: [
-    { name: 'description', content: 'Unevalemi pood: tööriistad heaks uneks — padjad, tekid ja voodipesu, mis aitavad sul paremini magada.' },
+    { name: 'description', content: 'Unevalemi pood: tööriistad heaks uneks - padjad, tekid ja voodipesu, mis aitavad sul paremini magada.' },
     { property: 'og:title', content: 'Unevalem Pood' },
     { property: 'og:url', content: `${siteUrl}/pood` },
   ],
@@ -21,7 +21,7 @@ const waitlistOpen = ref<string | null>(null)
 
 // ── Profile fit ────────────────────────────────────────────────────────────
 // After the sleep test, products get a fit percentage (attribute overlap
-// with the user's answers — see productMatchPercent for why it's phrased as
+// with the user's answers - see productMatchPercent for why it's phrased as
 // fit, never as a sleep-improvement promise). Cookie-dependent, so it only
 // applies after mount to avoid hydration mismatches.
 const { siteProfile } = useCalcSession()
@@ -56,7 +56,7 @@ const bestMatchId = computed(() => {
 
 const hasAnyMatch = computed(() => matchById.value.size > 0)
 
-// Product structured data — deliberately NO aggregateRating (we have no
+// Product structured data - deliberately NO aggregateRating (we have no
 // reviews; fabricating them would be a Google penalty and dishonest).
 useHead(computed(() => ({
   script: (products.value ?? []).length
@@ -95,10 +95,10 @@ interface CategorySection {
 }
 
 // Material-neutral copy: the range spans bamboo, wool, silk, cotton,
-// synthetics and more — and it changes, so categories don't name materials.
+// synthetics and more - and it changes, so categories don't name materials.
 const sections: CategorySection[] = [
   { key: 'pillow',     heading: 'Padjad',     description: 'Padjad erinevate magamisasendite ja kehaehituste jaoks.' },
-  { key: 'blanket',    heading: 'Tekid',      description: 'Tekid igale magajale — kergetest suvetekkidest soojade talvetekideni.' },
+  { key: 'blanket',    heading: 'Tekid',      description: 'Tekid igale magajale - kergetest suvetekkidest soojade talvetekideni.' },
   { key: 'pillowcase', heading: 'Padjapüürid', description: 'Hingavad padjapüürid, mis on õrnad nahale.' },
   { key: 'duvetcover', heading: 'Tekikotid',  description: 'Tekikotid, mis toetavad teki termoregulatsiooni.' },
   { key: 'mattress',   heading: 'Madratsid',  description: 'Kvaliteetsed madratsid.', comingSoon: true },
@@ -114,7 +114,7 @@ const sections: CategorySection[] = [
       <div class="max-w-4xl mx-auto">
         <h1 class="hero-title font-heading text-4xl md:text-5xl leading-tight">Pood</h1>
         <p class="hero-sub mt-2 text-base">
-          Tööriistad heaks uneks — padjad, tekid ja muu,
+          Tööriistad heaks uneks - padjad, tekid ja muu,
           mis aitavad sul paremini magada. Valik kasvab.
         </p>
       </div>
@@ -192,7 +192,7 @@ const sections: CategorySection[] = [
 
                   <p class="text-sm text-muted leading-relaxed flex-1 mb-3">{{ product.description }}</p>
 
-                  <!-- Key specs (dimensions / weight / material) — shown when the
+                  <!-- Key specs (dimensions / weight / material) - shown when the
                        inventory sheet's specs column is filled -->
                   <p
                     v-if="product.specs"
@@ -254,7 +254,7 @@ const sections: CategorySection[] = [
         </section>
       </div>
 
-      <!-- Transparency note — out of the way at the page's end -->
+      <!-- Transparency note - out of the way at the page's end -->
       <p class="mt-12 text-[11px] text-muted/80 leading-snug max-w-2xl">
         {{ disclosure.short }}
         <NuxtLink to="/meist" class="underline underline-offset-2 hover:text-midnight">{{ disclosure.linkLabel }}</NuxtLink>

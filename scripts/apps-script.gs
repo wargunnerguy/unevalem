@@ -1,5 +1,5 @@
 /**
- * Unevalem Apps Script Web App — the only backend.
+ * Unevalem Apps Script Web App - the only backend.
  *
  * THIS FILE IS A MIRROR, NOT THE RUNNING CODE. The live version lives in the
  * Unevalem Google account (spreadsheet → Extensions → Apps Script). Edit here,
@@ -11,7 +11,7 @@
  */
 
 // Tabs exposed over GET. A tab absent here returns an error even if it exists
-// in the spreadsheet — this list is the allowlist.
+// in the spreadsheet - this list is the allowlist.
 var SHEET_MAP = {
   posts:          'posts',
   notifications:  'notifications',
@@ -41,7 +41,7 @@ var OWNER_EMAIL = 'unevalem@gmail.com'
 var SITE_URL = 'https://unevalem.ee'
 // Estimated delivery shown in the customer confirmation email. Must match the
 // promise in müügitingimused (§4) and on /aitah.
-var DELIVERY_DAYS = '2–5'
+var DELIVERY_DAYS = '2-5'
 
 function doGet(e) {
   // Order status for the /aitah page: server-verified state only, no PII.
@@ -151,7 +151,7 @@ function handlePostView(ss, payload) {
  * column in the sheet by hand would have misaligned every subsequent row.
  *
  * Now each payload key finds its own column by name, and an unknown key appends
- * a new header cell first — same self-migrating shape as the orderNumber column
+ * a new header cell first - same self-migrating shape as the orderNumber column
  * in handleCreateOrder. Adding a field client-side needs no change here.
  */
 
@@ -249,13 +249,13 @@ function handleCalcSubmit(ss, payload) {
 // SHOP: waitlist, orders, payment
 //
 // The `orders` and `waitlist` tabs hold PII and are deliberately NOT in
-// SHEET_MAP — they must never be readable over GET.
+// SHEET_MAP - they must never be readable over GET.
 //
 // Payment provider credentials live in Script Properties (File → Project
 // properties → Script properties), NOT in this file:
-//   MK_SHOP_ID     — Maksekeskus shop UUID
-//   MK_SECRET_KEY  — Maksekeskus secret key (used for both API auth and MAC)
-//   MK_ENV         — 'test' or 'live' (start with test!)
+//   MK_SHOP_ID     - Maksekeskus shop UUID
+//   MK_SECRET_KEY  - Maksekeskus secret key (used for both API auth and MAC)
+//   MK_ENV         - 'test' or 'live' (start with test!)
 // Test credentials & docs: https://developer.makecommerce.net/
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -277,7 +277,7 @@ function handleWaitlist(ss, payload) {
  * Newsletter sign-up → subscribers tab.
  *
  * ⚠️ The `subscribers` tab holds personal data and is deliberately NOT in
- * SHEET_MAP — same rule as `orders` and `waitlist`. Never add it: doing so
+ * SHEET_MAP - same rule as `orders` and `waitlist`. Never add it: doing so
  * would publish the whole mailing list over an unauthenticated GET.
  *
  * Consent is stored as the exact wording shown, with a timestamp. Estonian
@@ -350,7 +350,7 @@ function handleSubscribe(ss, payload) {
 }
 
 /**
- * Create an order. The client sends ONLY item ids + quantities — prices are
+ * Create an order. The client sends ONLY item ids + quantities - prices are
  * looked up from the inventory sheet here, so a tampered client cannot set
  * its own prices. Unknown, inactive or unavailable products reject the order.
  */
@@ -473,7 +473,7 @@ function handleCreateOrder(ss, payload) {
 /**
  * /aitah polls this: order status + a safe summary (items, total, delivery).
  * The ref is an unguessable UUID and acts as the access token. Name, email
- * and phone are deliberately NOT returned — those live only in the
+ * and phone are deliberately NOT returned - those live only in the
  * confirmation email.
  */
 function handleOrderStatus(e) {
@@ -506,7 +506,7 @@ function handleOrderStatus(e) {
 
 /**
  * Buyer self-service status (/tellimus page). Requires BOTH the short order
- * number and the exact buyer email — numbers alone are sequential and
+ * number and the exact buyer email - numbers alone are sequential and
  * guessable, so they unlock nothing by themselves. Returns only the status.
  * The shop owner marks fulfilment by changing a row's status to SHIPPED.
  */
@@ -556,17 +556,17 @@ function createPayment_(orderRef, orderNumber, total, email) {
       amount: total.toFixed(2),
       currency: 'EUR',
       // The reference is what the buyer sees on the payment page / bank
-      // statement (with the shop name) — keep it the short human number.
+      // statement (with the shop name) - keep it the short human number.
       // The unguessable UUID rides along in merchant_data for lookups.
       reference: String(orderNumber),
       merchant_data: orderRef,
       transaction_url: {
         // Success: /aitah verifies the order server-side before thanking.
         return_url:        { url: SITE_URL + '/aitah?ref=' + orderRef, method: 'GET' },
-        // Cancel: back to checkout with a notice — the cart is still intact.
+        // Cancel: back to checkout with a notice - the cart is still intact.
         cancel_url:        { url: SITE_URL + '/kassa?makse=katkes', method: 'GET' },
         // Authoritative server-to-server result, independent of the user's
-        // journey — must hit this web app (the only backend we have).
+        // journey - must hit this web app (the only backend we have).
         notification_url: { url: selfUrl, method: 'POST' },
       },
     },
@@ -646,13 +646,13 @@ function handlePaymentCallback(ss, jsonStr, mac) {
 
       var current = String(data[i][2])
       if (status === 'COMPLETED') {
-        if (current === 'PAID') return json({ ok: true }) // duplicate — ignore
+        if (current === 'PAID') return json({ ok: true }) // duplicate - ignore
         orders.getRange(i + 1, 3).setValue('PAID')
         orders.getRange(i + 1, 13).setValue(txId)
         orders.getRange(i + 1, 14).setValue(new Date().toISOString())
         sendOrderEmails_(data[i], orderRef)
         // After the state change and the emails: a GA failure must never cost
-        // an order confirmation. The PAID guard above makes this idempotent —
+        // an order confirmation. The PAID guard above makes this idempotent -
         // a duplicate callback returns before reaching here, so a retry from
         // the payment provider cannot double-count the purchase.
         gaSendPurchase_(data[i], txId)
@@ -697,7 +697,7 @@ function gaSendPurchase_(orderRow, txId) {
       }
     } catch (e) { /* items are a nice-to-have; the purchase still counts */ }
 
-    // env lives inside gaMeta for orders — the checkout payload has no
+    // env lives inside gaMeta for orders - the checkout payload has no
     // top-level env field the way the calculator and newsletter ones do. No
     // default: an order row written before this field existed must not be
     // assumed to be production, or a local checkout test would report a real
@@ -742,32 +742,32 @@ function sendOrderEmails_(orderRow, orderRef) {
   var lines = []
   try {
     JSON.parse(itemsJson).forEach(function (l) {
-      lines.push('  ' + l.name + ' × ' + l.qty + ' — ' + (l.price * l.qty).toFixed(2) + ' €')
+      lines.push('  ' + l.name + ' × ' + l.qty + ' - ' + (l.price * l.qty).toFixed(2) + ' €')
     })
   } catch (err) { lines.push('  ' + itemsJson) }
 
   try {
     MailApp.sendEmail(OWNER_EMAIL,
-      '💰 Uus tellimus nr ' + orderNo + ' — ' + total + ' €',
+      '💰 Uus tellimus nr ' + orderNo + ' - ' + total + ' €',
       'Uus makstud tellimus:\n\n' + lines.join('\n') +
       '\n\nKokku: ' + total + ' €' +
       '\n\nKlient: ' + name + '\nE-post: ' + email + '\nTelefon: ' + phone +
-      '\nTarne: ' + shipMethod + ' — ' + terminalName +
+      '\nTarne: ' + shipMethod + ' - ' + terminalName +
       '\n\nTellimuse nr: ' + orderNo + '\nSisemine viide: ' + orderRef)
   } catch (err) { /* owner alert must not block the callback ack */ }
 
   try {
     MailApp.sendEmail(email,
-      'Sinu tellimus nr ' + orderNo + ' on kinnitatud — Unevalem',
+      'Sinu tellimus nr ' + orderNo + ' on kinnitatud - Unevalem',
       'Tere, ' + name + '!\n\n' +
-      'Aitäh tellimuse eest — makse on kinnitatud.\n\n' +
+      'Aitäh tellimuse eest - makse on kinnitatud.\n\n' +
       'Sinu tellimus:\n' + lines.join('\n') +
       '\nKokku: ' + total + ' €\n\n' +
       'Tarne: ' + terminalName + ' (' + shipMethod + ')\n' +
-      'Saadame paki teele ' + DELIVERY_DAYS + ' tööpäeva jooksul — pakiautomaadi koodi saad SMS-iga.\n\n' +
+      'Saadame paki teele ' + DELIVERY_DAYS + ' tööpäeva jooksul - pakiautomaadi koodi saad SMS-iga.\n\n' +
       'Tellimuse number: ' + orderNo + '\n\n' +
       'Küsimuste korral vasta sellele kirjale.\n\n' +
-      'Head und!\nUnevalem — Costlio OÜ')
+      'Head und!\nUnevalem - Costlio OÜ')
   } catch (err) { /* ditto */ }
 }
 
@@ -779,12 +779,12 @@ function bytesToHex_(bytes) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GA4 MEASUREMENT PROTOCOL — server-side conversion recovery
+// GA4 MEASUREMENT PROTOCOL - server-side conversion recovery
 //
 // Tracker blockers (uBlock Origin, AdGuard, Brave Shields, filtering DNS) do
-// not block googletagmanager.com — they answer it with a neutered 200 stub. So
+// not block googletagmanager.com - they answer it with a neutered 200 stub. So
 // `window.gtag` still exists as a no-op and every client-side event silently
-// disappears. That is 15–30% of visitors, and a higher share of paid traffic
+// disappears. That is 15-30% of visitors, and a higher share of paid traffic
 // than organic, so ad optimisation and conversion counts are both distorted.
 //
 // These visitors still reach this backend: the calculator, newsletter and
@@ -796,8 +796,8 @@ function bytesToHex_(bytes) {
 // must not be counted twice.
 //
 // Script Properties (File → Project properties → Script properties):
-//   GA_MEASUREMENT_ID — e.g. G-D921C30JEQ
-//   GA_API_SECRET     — GA4 Admin → Data Streams → your stream →
+//   GA_MEASUREMENT_ID - e.g. G-D921C30JEQ
+//   GA_API_SECRET     - GA4 Admin → Data Streams → your stream →
 //                       Measurement Protocol API secrets → Create
 // Absent either one, every call below is a silent no-op.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -817,7 +817,7 @@ function gaConfig_() {
  * Re-send one conversion to GA4. Never throws: analytics must not be able to
  * fail an order, a sign-up or a calculator submission.
  *
- * `meta` carries what the client observed — gaBlocked, gaClientId,
+ * `meta` carries what the client observed - gaBlocked, gaClientId,
  * gaSessionId, analyticsConsent, adsConsent, env, sessionId. For orders it is
  * the `gaMeta` object stored on the row at checkout; for the other paths the
  * payload itself carries those fields.
@@ -827,17 +827,17 @@ function gaSendServerEvent_(meta, eventName, params) {
     if (!meta) return
     // Review builds (localhost) must not pollute the property.
     if (String(meta.env || '') !== 'prod') return
-    // The browser sent this already — re-sending would double-count.
+    // The browser sent this already - re-sending would double-count.
     if (meta.gaBlocked !== true) return
     // An explicit analytics opt-out applies to server-side sends too. Undefined
-    // means the field predates this feature, not that consent was refused —
+    // means the field predates this feature, not that consent was refused -
     // analytics is opt-out on this site, so absence is treated as granted.
     if (meta.analyticsConsent === false) return
 
     var cfg = gaConfig_()
     if (!cfg.measurementId || !cfg.apiSecret) return
 
-    // A blocked visitor has no _ga cookie — gtag.js never ran to write one — so
+    // A blocked visitor has no _ga cookie - gtag.js never ran to write one - so
     // this is nearly always the uva-sid fallback. That means the conversion is
     // counted under a synthetic user that cannot be joined to a web session.
     // A counted conversion under a synthetic user beats a lost one.
@@ -874,7 +874,7 @@ function gaMpUrl_(base, cfg) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ONE-TIME ADMIN HELPERS — run manually from the Apps Script editor
+// ONE-TIME ADMIN HELPERS - run manually from the Apps Script editor
 // (select the function in the toolbar dropdown → Run). Not reachable over
 // the web app; they exist so sheet setup doesn't require hand-pasting.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -885,7 +885,7 @@ var REPO_RAW = 'https://raw.githubusercontent.com/wargunnerguy/unevalem/main'
  * Verifies the Measurement Protocol setup without waiting for a real
  * conversion. Run it from the editor and read the log.
  *
- * Sends to GA4's /debug/mp/collect, which VALIDATES ONLY — it never records an
+ * Sends to GA4's /debug/mp/collect, which VALIDATES ONLY - it never records an
  * event, so this cannot pollute reports. An empty validationMessages array
  * means the payload and credentials are good; anything else names the problem.
  *
@@ -920,14 +920,14 @@ function gaDebugPing() {
     muteHttpExceptions: true,
   })
   // A real MP send always answers 204 with an empty body, even for a payload
-  // GA will silently discard — which is exactly why the validation call above
+  // GA will silently discard - which is exactly why the validation call above
   // is the one that tells you anything.
   Logger.log('live send status: ' + live.getResponseCode() + ' (204 expected)')
 }
 
 /**
  * Imports scripts/sources-import.tsv from the repo into the `sources` tab
- * (slug | title | url). Replaces the tab's contents — safe to re-run.
+ * (slug | title | url). Replaces the tab's contents - safe to re-run.
  */
 function importSources() {
   var tsv = UrlFetchApp.fetch(REPO_RAW + '/scripts/sources-import.tsv').getContentText()
@@ -946,7 +946,7 @@ function importSources() {
 
 /**
  * Seeds the `calculators` and `calc_questions` tabs from
- * scripts/calculators-import.tsv in the repo — the questions exactly as they
+ * scripts/calculators-import.tsv in the repo - the questions exactly as they
  * were when they lived in utils/copy.ts. Run this ONCE, when moving the
  * calculator into Sheets; after that the sheet is the source of truth and
  * re-running would overwrite whatever has been edited since.
@@ -954,14 +954,14 @@ function importSources() {
  * The `answerKey` column and the value half of each option (`Label|value`) are
  * the contract with the recommendation engine. Edit the labels and the question
  * text freely; changing a value or an answerKey fails the next build with a
- * message naming the offending row, which is deliberate — a silent mismatch
+ * message naming the offending row, which is deliberate - a silent mismatch
  * would leave the engine ignoring that answer for everyone.
  */
 function importCalculators() {
   var ss = SpreadsheetApp.getActiveSpreadsheet()
   if (ss.getSheetByName('calculators') || ss.getSheetByName('calc_questions')) {
     Logger.log('ABORTED: calculators/calc_questions already exist. Delete them by hand ' +
-      'first if you really mean to reseed — this would overwrite your edits.')
+      'first if you really mean to reseed - this would overwrite your edits.')
     return
   }
 
@@ -984,7 +984,7 @@ function importCalculators() {
 
   if (!metaRows.length || !questionRows.length) {
     Logger.log('ABORTED: parsed ' + metaRows.length + ' calculators and ' +
-      questionRows.length + ' questions — expected both to be non-empty')
+      questionRows.length + ' questions - expected both to be non-empty')
     return
   }
 
@@ -1000,7 +1000,7 @@ function importCalculators() {
 
   Logger.log('Seeded ' + metaRows.length + ' calculators and ' + questionRows.length + ' questions.')
   Logger.log('Edit the `question` column and the label half of `options` freely. ' +
-    'Do NOT edit `answerKey` or the value after the "|" — the build will reject it.')
+    'Do NOT edit `answerKey` or the value after the "|" - the build will reject it.')
 }
 
 /**
@@ -1017,7 +1017,7 @@ function setupShop() {
     var headers = inv.getRange(1, 1, 1, inv.getLastColumn()).getValues()[0]
     if (headers.indexOf('available') === -1) {
       inv.getRange(1, inv.getLastColumn() + 1).setValue('available')
-      Logger.log('inventory: added "available" column — tick TRUE per product to enable purchase')
+      Logger.log('inventory: added "available" column - tick TRUE per product to enable purchase')
     } else {
       Logger.log('inventory: "available" column already present')
     }
@@ -1056,7 +1056,7 @@ function setupShop() {
 // Each *_responses tab used to receive all eighteen answer fields regardless of
 // which calculator wrote the row, because the client sent every key with '' for
 // the ones that calculator never asks. handleCalcSubmit creates a column for
-// any key it sees, so an always-empty field became an always-blank column —
+// any key it sees, so an always-empty field became an always-blank column -
 // ten per tab.
 //
 // The client now sends only the active calculator's stepKeys, so those columns
@@ -1064,8 +1064,8 @@ function setupShop() {
 // old code is still live only makes the next submission recreate them.
 //
 // Only *_responses tabs are ever touched. `orders` is addressed positionally by
-// setOrderStatus_ and handlePaymentCallback — deleting a column there would
-// silently corrupt every subsequent order — and `subscribers`, `waitlist` and
+// setOrderStatus_ and handlePaymentCallback - deleting a column there would
+// silently corrupt every subsequent order - and `subscribers`, `waitlist` and
 // the content tabs are none of this function's business.
 
 var CALC_RESPONSE_TABS = ['pillow_responses', 'blanket_responses', 'mattress_responses']
@@ -1086,7 +1086,7 @@ var CALC_KEEP_COLUMNS = [
 ]
 
 /**
- * DRY RUN — reports which columns would be deleted, changes nothing.
+ * DRY RUN - reports which columns would be deleted, changes nothing.
  * Run this first, read the log, then run deleteEmptyCalcColumns().
  */
 function reportEmptyCalcColumns() {
@@ -1096,7 +1096,7 @@ function reportEmptyCalcColumns() {
 /**
  * Deletes the columns reportEmptyCalcColumns() lists. Re-runnable: a second run
  * finds nothing. If a column comes back after this, the client is still sending
- * that key — fix the site, don't re-run.
+ * that key - fix the site, don't re-run.
  */
 function deleteEmptyCalcColumns() {
   scanCalcColumns_(true)
@@ -1115,7 +1115,7 @@ function scanCalcColumns_(destructive) {
     var lastCol = tab.getLastColumn()
     if (lastCol === 0) { Logger.log(name + ': empty tab, skipped'); continue }
     if (lastRow < 2) {
-      Logger.log(name + ': header only, no data rows — nothing can be judged empty yet, skipped')
+      Logger.log(name + ': header only, no data rows - nothing can be judged empty yet, skipped')
       continue
     }
 
@@ -1155,5 +1155,5 @@ function scanCalcColumns_(destructive) {
 
   Logger.log(destructive
     ? 'Removed ' + totalRemoved + ' column(s). Re-run reportEmptyCalcColumns() to confirm none return.'
-    : 'DRY RUN — nothing was changed. Run deleteEmptyCalcColumns() to apply.')
+    : 'DRY RUN - nothing was changed. Run deleteEmptyCalcColumns() to apply.')
 }

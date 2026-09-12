@@ -1,6 +1,6 @@
 export function useTheme() {
   // Dark is the site default; a stored manual choice is the only thing that
-  // overrides it. (Was time-based auto-dark — replaced 2026-07-17.)
+  // overrides it. (Was time-based auto-dark - replaced 2026-07-17.)
   const isDark = useState<boolean>('theme-dark', () => true)
 
   function initTheme() {

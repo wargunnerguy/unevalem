@@ -21,7 +21,7 @@ function calcImprovement(score: number): number {
 
 // ── Age ─────────────────────────────────────────────────────────────────────
 // Age used to move the result only for `senior`, and even then only in
-// combination with something else — three of four answers were inert, which
+// combination with something else - three of four answers were inert, which
 // broke the rule that every step must visibly influence the result. It now
 // shifts the score in every calculator, adds a clause to the summary and
 // contributes a tip.
@@ -29,7 +29,7 @@ function calcImprovement(score: number): number {
 // The direction is the same one the sleep literature agrees on: sleep
 // fragments and slow-wave sleep declines from the thirties onward, cervical
 // and lumbar tissue stiffens, pressure sensitivity rises, and thermoregulation
-// weakens. The magnitudes here are deliberately small — age is a modifier, not
+// weakens. The magnitudes here are deliberately small - age is a modifier, not
 // a verdict, and it must never outweigh an actual reported symptom like neck
 // or back pain. Any of these numbers that ends up in public copy needs a
 // `sources` row first.
@@ -48,8 +48,8 @@ function ageScore(profile: UserProfile, calc: CalcType): number {
 // Summary clause per band, so the recap visibly reflects the answer.
 const AGE_FACT: Record<string, string> = {
   young:  'oled alla 30',
-  adult:  'oled 30.–45. eluaastates',
-  middle: 'oled 46–60 vahel',
+  adult:  'oled 30.-45. eluaastates',
+  middle: 'oled 46-60 vahel',
   senior: 'oled üle 60',
 }
 
@@ -59,22 +59,22 @@ function ageFact(profile: UserProfile): string | null {
 
 const AGE_TIPS: Record<CalcType, Record<string, string>> = {
   pillow: {
-    young:  'Alla 30-aastasena taastub kael halvast asendist kiiresti — see ei tähenda, et vale kõrgus hiljem kätte ei maksaks.',
+    young:  'Alla 30-aastasena taastub kael halvast asendist kiiresti - see ei tähenda, et vale kõrgus hiljem kätte ei maksaks.',
     adult:  'Kolmekümnendates hakkab lülivaheketaste veesisaldus vähenema ja kael andestab vale asendit vähem kui varem.',
-    middle: 'Pärast 45. eluaastat muutub kaelaosa jäigemaks ja hommikune kangus tavalisemaks — padja kõrgus loeb rohkem kui nooremana.',
-    senior: 'Vanusega muutuvad liigesed ja kael tundlikumaks — õige kõrgusega tugi on veelgi olulisem kui nooremana.',
+    middle: 'Pärast 45. eluaastat muutub kaelaosa jäigemaks ja hommikune kangus tavalisemaks - padja kõrgus loeb rohkem kui nooremana.',
+    senior: 'Vanusega muutuvad liigesed ja kael tundlikumaks - õige kõrgusega tugi on veelgi olulisem kui nooremana.',
   },
   blanket: {
-    young:  'Noorem keha reguleerib temperatuuri hästi — kui sul on ikka öösel palav, on põhjus pigem toas või tekis kui sinus.',
-    adult:  'Selles vanuses on öine temperatuur enamasti veel stabiilne — tekivalikul lähtu pigem toa temperatuurist kui vanusest.',
-    middle: 'Neljakümnendate lõpus muutub öine temperatuuritaju ebaühtlasemaks — hingav materjal tasandab kõikumisi.',
-    senior: 'Vanusega muutub keha temperatuuriregulatsioon nõrgemaks — soojust hoidev, aga hingav tekk on eriti oluline.',
+    young:  'Noorem keha reguleerib temperatuuri hästi - kui sul on ikka öösel palav, on põhjus pigem toas või tekis kui sinus.',
+    adult:  'Selles vanuses on öine temperatuur enamasti veel stabiilne - tekivalikul lähtu pigem toa temperatuurist kui vanusest.',
+    middle: 'Neljakümnendate lõpus muutub öine temperatuuritaju ebaühtlasemaks - hingav materjal tasandab kõikumisi.',
+    senior: 'Vanusega muutub keha temperatuuriregulatsioon nõrgemaks - soojust hoidev, aga hingav tekk on eriti oluline.',
   },
   mattress: {
-    young:  'Noor selg talub kehvemat madratsit kauem, kuid vigastused kogunevad vaikselt — hea tugi on ennetus, mitte ravi.',
-    adult:  'Kolmekümnendates ja neljakümnendates tekib enamik püsivaid seljaprobleeme — praegune madrats mõjutab järgmist kümmet aastat.',
-    middle: 'Pärast 45. eluaastat kaob madratsi toestus märgatavamalt — sama madrats tundub kõvem ja ebamugavam kui varem.',
-    senior: 'Vanemas eas suureneb survetundlikkus — pehmema pealiskihiga madrats vähendab öist keeramist ja tuimust.',
+    young:  'Noor selg talub kehvemat madratsit kauem, kuid vigastused kogunevad vaikselt - hea tugi on ennetus, mitte ravi.',
+    adult:  'Kolmekümnendates ja neljakümnendates tekib enamik püsivaid seljaprobleeme - praegune madrats mõjutab järgmist kümmet aastat.',
+    middle: 'Pärast 45. eluaastat kaob madratsi toestus märgatavamalt - sama madrats tundub kõvem ja ebamugavam kui varem.',
+    senior: 'Vanemas eas suureneb survetundlikkus - pehmema pealiskihiga madrats vähendab öist keeramist ja tuimust.',
   },
 }
 
@@ -99,7 +99,7 @@ function buildBlanketTags(profile: UserProfile): string[] {
   const tags: string[] = []
   // Warmth class weighs every heat signal: body (sweating/temp), the room
   // itself, and which season the sleeper struggles in. Overheating wins on
-  // conflict — a too-warm blanket disrupts sleep more than a too-cool one.
+  // conflict - a too-warm blanket disrupts sleep more than a too-cool one.
   const runsHot = profile.sweating === 'often' || profile.temp === 'hot'
     || profile.roomTemp === 'warm' || profile.problemSeason === 'summer'
   const runsCold = profile.temp === 'cold'
@@ -130,9 +130,9 @@ function buildMattressTags(profile: UserProfile): string[] {
 }
 
 function pillowReason(profile: UserProfile, goodShape: boolean): string {
-  if (goodShape) return 'Sinu praegune olukord on hea. Bambuspadi lisab hingavuse, loodusliku hüpoallergeensuse ja pikema kestvuse — mugavuse täiendus, mitte hädavajadus.'
-  if (profile.neckPain === 'often') return 'Sobiva kõrgusega padi toetab kaela õiges asendis — hommikune kaelavalu väheneb märgatavalt.'
-  if (profile.position === 'side' && profile.bodyType === 'broad') return 'Kõrge tugi täidab laiemate õlgadega magaja kaela ja pea vahe — hoiab lülisamba sirges.'
+  if (goodShape) return 'Sinu praegune olukord on hea. Bambuspadi lisab hingavuse, loodusliku hüpoallergeensuse ja pikema kestvuse - mugavuse täiendus, mitte hädavajadus.'
+  if (profile.neckPain === 'often') return 'Sobiva kõrgusega padi toetab kaela õiges asendis - hommikune kaelavalu väheneb märgatavalt.'
+  if (profile.position === 'side' && profile.bodyType === 'broad') return 'Kõrge tugi täidab laiemate õlgadega magaja kaela ja pea vahe - hoiab lülisamba sirges.'
   if (profile.position === 'side') return 'Kõrge tugi hoiab kaela ja lülisamba sirges joones külilimagamisel.'
   if (profile.position === 'stomach') return 'Madal profiil hoiab kaela ülevenimise ära ja vähendab survet lülisambale.'
   if (profile.position === 'back') return 'Keskmise kõrgusega padi toetab kaelaosa neutraalses asendis kogu öö.'
@@ -140,24 +140,24 @@ function pillowReason(profile: UserProfile, goodShape: boolean): string {
 }
 
 function blanketReason(profile: UserProfile, goodShape: boolean): string {
-  if (goodShape) return 'Sul pole praegu termoregulatsiooniga probleeme. Bambus pakub siiski kuni 3× paremat niiskusjuhtivust kui puuvill — märkad vahet soojematel öödel.'
-  if (profile.problemSeason === 'summer' && profile.sweating !== 'often') return 'Kerge ja hingav tekk lahendab just suvise ülekuumenemise — sinu kõige raskema uneaja.'
-  if (profile.sweating === 'often' || profile.temp === 'hot' || profile.roomTemp === 'warm') return 'Bambus juhib niiskust ja soojust eemale — ärkad kuivalt ja värskena isegi soojas toas.'
+  if (goodShape) return 'Sul pole praegu termoregulatsiooniga probleeme. Bambus pakub siiski kuni 3× paremat niiskusjuhtivust kui puuvill - märkad vahet soojematel öödel.'
+  if (profile.problemSeason === 'summer' && profile.sweating !== 'often') return 'Kerge ja hingav tekk lahendab just suvise ülekuumenemise - sinu kõige raskema uneaja.'
+  if (profile.sweating === 'often' || profile.temp === 'hot' || profile.roomTemp === 'warm') return 'Bambus juhib niiskust ja soojust eemale - ärkad kuivalt ja värskena isegi soojas toas.'
   if (profile.temp === 'cold' || profile.problemSeason === 'winter') return 'Tihedam täidis hoiab vajaliku soojuse ka jahedamates tingimustes kogu öö.'
   return 'Universaalne bambustekk reguleerib temperatuuri aastaringselt nii soojal kui jahedal ööl.'
 }
 
 function mattressReason(profile: UserProfile, goodShape: boolean): string {
-  if (goodShape) return 'Sinu madrats on praegu heas korras. Uus madrats on mugavuse upgrade, mitte asendus — tunned vahet juba esimesel ööl, kuid kiiremat vajadust pole.'
+  if (goodShape) return 'Sinu madrats on praegu heas korras. Uus madrats on mugavuse upgrade, mitte asendus - tunned vahet juba esimesel ööl, kuid kiiremat vajadust pole.'
   if (profile.backPain === 'often') return 'Ortopeediline tugi leevendab seljavalu, hoides lülisamba öö jooksul neutraalses asendis.'
-  if (profile.position === 'side') return 'Pehme tsoonimine vähendab survet õlgadele ja puusadele — ärkad ilma tuimusteta.'
+  if (profile.position === 'side') return 'Pehme tsoonimine vähendab survet õlgadele ja puusadele - ärkad ilma tuimusteta.'
   if (profile.position === 'stomach') return 'Kindel tugi hoiab puusad kõrgemal, vähendades lülisamba ülepinget kõhulimagamisel.'
   if (profile.bodyType === 'broad') return 'Tugevam kandevõime tagab korrektse toestuse kogu öö, hoolimata kehakaalust.'
   return 'Hea madrats kohandub sinu kehakujuga ja toetab lülisamba loomulikku kumerust.'
 }
 
-// 1–2 sentence Estonian recap of what the answers say about the sleeper and
-// what matters most for them — shown before any product on the result screen.
+// 1-2 sentence Estonian recap of what the answers say about the sleeper and
+// what matters most for them - shown before any product on the result screen.
 function buildProfileSummary(profile: UserProfile, calcType: CalcType): string {
   const position: Record<string, string> = {
     side:    'magad enamasti küljel',
@@ -246,7 +246,7 @@ const CATEGORY_CALC: Record<Product['category'], CalcType | null> = {
 /**
  * Profile-fit percentage for the shop: how many of the profile's required
  * product attributes this product's tags cover. This is a statement about
- * ATTRIBUTE OVERLAP with the user's answers — deliberately not a promise
+ * ATTRIBUTE OVERLAP with the user's answers - deliberately not a promise
  * about sleep outcomes, which nobody can measure or guarantee.
  * Returns null when the relevant calculator hasn't been completed.
  */
@@ -304,25 +304,25 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
       : []
 
     const tips: string[] = []
-    if (profile.neckPain === 'often' || profile.neckPain === 'sometimes') tips.push('Kaelavalude vastu: kontrolli, kas padi toetab kaela — pärast 2–3 aastat kaotab enamik padju oma kuju.')
-    if (profile.pillowAge === '3y+') tips.push('Sinu praegune padi on ilmselt oma elu ära elanud — üle 3 aasta vana padi ei toeta enam kaela korralikult.')
-    if (profile.pillowCount === 'two-plus') tips.push('Kahe padja peal magamine viitab enamasti sellele, et padi on liiga madal — kael paindub terve öö ja lihased ei saa lõdvestuda.')
+    if (profile.neckPain === 'often' || profile.neckPain === 'sometimes') tips.push('Kaelavalude vastu: kontrolli, kas padi toetab kaela - pärast 2-3 aastat kaotab enamik padju oma kuju.')
+    if (profile.pillowAge === '3y+') tips.push('Sinu praegune padi on ilmselt oma elu ära elanud - üle 3 aasta vana padi ei toeta enam kaela korralikult.')
+    if (profile.pillowCount === 'two-plus') tips.push('Kahe padja peal magamine viitab enamasti sellele, et padi on liiga madal - kael paindub terve öö ja lihased ei saa lõdvestuda.')
     // Shoulder width sets the gap the pillow has to fill. It reached the
     // product tags before but nothing the visitor could read, and "kitsad õlad"
     // got the same advice as "keskmine".
-    if (profile.bodyType === 'slim' && profile.position === 'side') tips.push('Kitsamate õlgadega külilimagajal on pea ja madratsi vahe väiksem — liiga kõrge padi surub kaela ülespoole sama palju kui liiga madal allapoole.')
-    else if (profile.bodyType === 'broad' && profile.position === 'side') tips.push('Laiemate õlgadega külilimagaja vajab tavapärasest kõrgemat patja — muidu vajub pea alla ja kael on terve öö nurgas.')
-    if (profile.complaint === 'cant-sleep') tips.push('Uinumisraskuste vastu padi ei aita — kindel õhturutiin ja ekraanivaba tund enne und töötavad paremini kui ükski toode.')
-    else if (profile.complaint === 'wake-at-night') tips.push('Öised ärkamised on sageli seotud magamiskeskkonnaga: pime, vaikne ja jahe (16–19 °C) tuba vähendab neid märgatavalt.')
-    else if (profile.complaint === 'wake-tired') tips.push('Kui ärkad väsinuna, jälgi une regulaarsust — kõikuv uneaeg väsitab rohkem kui lühike, kuid ühtlane uni.')
+    if (profile.bodyType === 'slim' && profile.position === 'side') tips.push('Kitsamate õlgadega külilimagajal on pea ja madratsi vahe väiksem - liiga kõrge padi surub kaela ülespoole sama palju kui liiga madal allapoole.')
+    else if (profile.bodyType === 'broad' && profile.position === 'side') tips.push('Laiemate õlgadega külilimagaja vajab tavapärasest kõrgemat patja - muidu vajub pea alla ja kael on terve öö nurgas.')
+    if (profile.complaint === 'cant-sleep') tips.push('Uinumisraskuste vastu padi ei aita - kindel õhturutiin ja ekraanivaba tund enne und töötavad paremini kui ükski toode.')
+    else if (profile.complaint === 'wake-at-night') tips.push('Öised ärkamised on sageli seotud magamiskeskkonnaga: pime, vaikne ja jahe (16-19 °C) tuba vähendab neid märgatavalt.')
+    else if (profile.complaint === 'wake-tired') tips.push('Kui ärkad väsinuna, jälgi une regulaarsust - kõikuv uneaeg väsitab rohkem kui lühike, kuid ühtlane uni.')
     const pillowAgeTip = ageTip(profile, 'pillow')
     if (pillowAgeTip) tips.push(pillowAgeTip)
-    if (profile.allergies === 'dust-mites') tips.push('Bambus on looduslikult tolmulestadele ebasoodne keskkond — tõhus valik tolmulesta-allergiaga magajale.')
-    else if (profile.allergies === 'synthetic') tips.push('Bambus on naturaalne kiud — erineb täielikult sünteetilistest materjalidest ja sobib enamikule.')
+    if (profile.allergies === 'dust-mites') tips.push('Bambus on looduslikult tolmulestadele ebasoodne keskkond - tõhus valik tolmulesta-allergiaga magajale.')
+    else if (profile.allergies === 'synthetic') tips.push('Bambus on naturaalne kiud - erineb täielikult sünteetilistest materjalidest ja sobib enamikule.')
     else if (profile.allergies === 'other') tips.push('Bambus on looduslikult hüpoallergeenne, kuid tundmatu allergia puhul soovitame enne ostu oma arsti käest küsida.')
     if (goodShape) tips.push('Sul pole praegu kiireloomulist vajadust. Kui valid uue padja, on bambus pikaajaline investeering une kvaliteeti.')
 
-    const finalTips = fillTips(tips, ['Hoia magamistuba jahedana (16–19 °C) — see on üks olulisimaid unekeskkonna tegureid.', 'Regulaarne unegraafik tugevdab keha sisekella paremini kui ükski lisand.'])
+    const finalTips = fillTips(tips, ['Hoia magamistuba jahedana (16-19 °C) - see on üks olulisimaid unekeskkonna tegureid.', 'Regulaarne unegraafik tugevdab keha sisekella paremini kui ükski lisand.'])
     const improvedScore = Math.min(98, score + calcImprovement(score))
 
     return { currentScore: score, improvedScore, profileSummary: buildProfileSummary(profile, calcType), recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
@@ -343,7 +343,7 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
     // adapt to that season
     if (profile.problemSeason === 'summer' || profile.problemSeason === 'winter') score -= 6
     score += ageScore(profile, 'blanket')
-    // Thermoregulation weakens with age — being a cold sleeper compounds it,
+    // Thermoregulation weakens with age - being a cold sleeper compounds it,
     // on top of the flat age shift above.
     if (profile.age === 'senior' && profile.temp === 'cold') score -= 3
     if (profile.allergies !== 'none') score -= 3
@@ -360,21 +360,21 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
       : []
 
     const tips: string[] = []
-    if (profile.roomTemp === 'warm') tips.push('Sinu magamistuba on une jaoks liiga soe — uuringute järgi on parim unetemperatuur 16–19 °C. Tuuluta enne magamaminekut või jäta aken irvakile.')
-    else if (profile.sweating === 'often') tips.push('Ülekuumenemise vastu: hoia magamistuba 16–19 °C juures ja vali hingavad voodimaterjalid.')
-    if (profile.problemSeason === 'summer') tips.push('Suvine unehäda on enamasti teki, mitte sinu süü — kerge suvetekk või ainult tekikott teeb kuumal ööl suure vahe.')
+    if (profile.roomTemp === 'warm') tips.push('Sinu magamistuba on une jaoks liiga soe - uuringute järgi on parim unetemperatuur 16-19 °C. Tuuluta enne magamaminekut või jäta aken irvakile.')
+    else if (profile.sweating === 'often') tips.push('Ülekuumenemise vastu: hoia magamistuba 16-19 °C juures ja vali hingavad voodimaterjalid.')
+    if (profile.problemSeason === 'summer') tips.push('Suvine unehäda on enamasti teki, mitte sinu süü - kerge suvetekk või ainult tekikott teeb kuumal ööl suure vahe.')
     else if (profile.problemSeason === 'winter') tips.push('Talvel aitab kihilisus: soojem tekk või tekk + õhem lisakiht, mida saab öö jooksul kohandada.')
-    if (profile.partner === 'shared') tips.push('Eraldi tekid on lihtne viis mõlema partneri und parandada — kummalgi on oma temperatuurikontroll.')
-    else if (profile.partner === 'separate') tips.push('Eraldi tekid on sul juba olemas — see on pool lahendusest. Teine pool on, et kumbki tekk sobiks just selle inimese soojatundega, mitte et mõlemad oleksid ühesugused.')
+    if (profile.partner === 'shared') tips.push('Eraldi tekid on lihtne viis mõlema partneri und parandada - kummalgi on oma temperatuurikontroll.')
+    else if (profile.partner === 'separate') tips.push('Eraldi tekid on sul juba olemas - see on pool lahendusest. Teine pool on, et kumbki tekk sobiks just selle inimese soojatundega, mitte et mõlemad oleksid ühesugused.')
     const blanketAgeTip = ageTip(profile, 'blanket')
     if (blanketAgeTip) tips.push(blanketAgeTip)
-    if (profile.temp === 'hot') tips.push('Bambus on üks hingavamaid looduslikke materjale — sobib ideaalselt soojasse magamistuppa.')
-    if (profile.allergies === 'dust-mites') tips.push('Bambus on looduslikult tolmulestadele ebasoodne keskkond — tõhus valik tolmulesta-allergiaga magajale.')
-    else if (profile.allergies === 'synthetic') tips.push('Bambus on naturaalne kiud — sobib enamikule sünteetikavastu tundlikele.')
+    if (profile.temp === 'hot') tips.push('Bambus on üks hingavamaid looduslikke materjale - sobib ideaalselt soojasse magamistuppa.')
+    if (profile.allergies === 'dust-mites') tips.push('Bambus on looduslikult tolmulestadele ebasoodne keskkond - tõhus valik tolmulesta-allergiaga magajale.')
+    else if (profile.allergies === 'synthetic') tips.push('Bambus on naturaalne kiud - sobib enamikule sünteetikavastu tundlikele.')
     else if (profile.allergies === 'other') tips.push('Bambus on looduslikult hüpoallergeenne. Tundmatu allergia puhul soovitame enne ostu arsti käest küsida.')
     if (goodShape) tips.push('Sul pole praegu selgeid uneprobleeme. Uus tekk on mugavuse täiendus, mitte hädavajadus.')
 
-    const finalTips = fillTips(tips, ['Hoia magamistuba jahedana (16–19 °C) — see on üks olulisimaid unekeskkonna tegureid.', 'Bambusvoodipesu on hingavam kui puuvill ja sobib nii sooja- kui jahedamale magajale.'])
+    const finalTips = fillTips(tips, ['Hoia magamistuba jahedana (16-19 °C) - see on üks olulisimaid unekeskkonna tegureid.', 'Bambusvoodipesu on hingavam kui puuvill ja sobib nii sooja- kui jahedamale magajale.'])
     const improvedScore = Math.min(98, score + calcImprovement(score))
 
     return { currentScore: score, improvedScore, profileSummary: buildProfileSummary(profile, calcType), recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }
@@ -394,7 +394,7 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
   else if (profile.sleepQuality === 'good') score += 6
   score += ageScore(profile, 'mattress')
   // Body weight is the main firmness determinant for a mattress, but it only
-  // reached the product tags — nothing the visitor could see moved, so the
+  // reached the product tags - nothing the visitor could see moved, so the
   // question read as ignored. A heavier sleeper both needs more support and
   // wears a mattress out faster, which is what these two lines encode.
   if (profile.bodyType === 'broad') {
@@ -417,32 +417,32 @@ export function getRecommendations(profile: UserProfile, products: Product[], ca
 
   const tips: string[] = []
   if (profile.backPain === 'often' || profile.backPain === 'sometimes') tips.push('Seljavalu ei kao kohe, kuid õige kõvadusega madrats vähendab lihaspingeid juba esimestel nädalatel.')
-  if (profile.bodyType === 'broad') tips.push('Üle 90 kg magaja vajub pehmesse madratsisse liiga sügavale ja puusad langevad allapoole õlgu — kandvam tuum hoiab lülisamba sirges.')
-  else if (profile.bodyType === 'slim') tips.push('Kergema keha all ei vaju kõva madrats piisavalt sisse ja õlg jääb toeta — sinu puhul on pehmem pealiskiht sageli parem kui kõvem madrats.')
-  if (profile.mattressAge === '5y+') tips.push('Sinu madrats on oma kasuliku eluea lõpus — üle viie aasta vana madrats ei toesta enam lülisambat korralikult.')
-  else if (profile.mattressAge === '3-5y') tips.push('3–5 aasta vanune madrats hakkab enamasti vajuma ja kaotab tasapisi oma toestamisvõime.')
+  if (profile.bodyType === 'broad') tips.push('Üle 90 kg magaja vajub pehmesse madratsisse liiga sügavale ja puusad langevad allapoole õlgu - kandvam tuum hoiab lülisamba sirges.')
+  else if (profile.bodyType === 'slim') tips.push('Kergema keha all ei vaju kõva madrats piisavalt sisse ja õlg jääb toeta - sinu puhul on pehmem pealiskiht sageli parem kui kõvem madrats.')
+  if (profile.mattressAge === '5y+') tips.push('Sinu madrats on oma kasuliku eluea lõpus - üle viie aasta vana madrats ei toesta enam lülisambat korralikult.')
+  else if (profile.mattressAge === '3-5y') tips.push('3-5 aasta vanune madrats hakkab enamasti vajuma ja kaotab tasapisi oma toestamisvõime.')
   // Every mattress type now yields a tip on its own. These used to be chained
   // with else-if behind extra conditions (spring needed an old mattress, foam
   // needed broad shoulders), so most people answered this question and saw
   // nothing come of it.
   if (profile.currentMattress === 'spring') {
     tips.push(profile.mattressAge === '3-5y' || profile.mattressAge === '5y+'
-      ? 'Vanema vedrumadratsi tüüpiline murekoht on keskosa vajumine — kontrolli, kas voodi keskele on tekkinud lohk.'
-      : 'Vedrumadrats juhib õhku hästi, kuid annab punkttoetust vähem kui vaht — jälgi, kas õlg ja puus vajuvad piisavalt sisse.')
+      ? 'Vanema vedrumadratsi tüüpiline murekoht on keskosa vajumine - kontrolli, kas voodi keskele on tekkinud lohk.'
+      : 'Vedrumadrats juhib õhku hästi, kuid annab punkttoetust vähem kui vaht - jälgi, kas õlg ja puus vajuvad piisavalt sisse.')
   } else if (profile.currentMattress === 'foam') {
     tips.push(profile.bodyType === 'broad'
-      ? 'Vahtmadrats vajub raskema keha all aja jooksul rohkem — tugevama tsoonitoega variant peab kauem vastu.'
-      : 'Vahtmadrats hoiab soojust rohkem kui vedrumadrats — kui ärkad öösel kuumalt, võib põhjus olla just selles.')
+      ? 'Vahtmadrats vajub raskema keha all aja jooksul rohkem - tugevama tsoonitoega variant peab kauem vastu.'
+      : 'Vahtmadrats hoiab soojust rohkem kui vedrumadrats - kui ärkad öösel kuumalt, võib põhjus olla just selles.')
   } else if (profile.currentMattress === 'hybrid') {
-    tips.push('Hübriidmadrats ühendab vedru õhulisuse ja vahu punkttoe — kui see sulle sobib, otsi asendust samast tüübist, mitte odavamast vahtmadratsist.')
+    tips.push('Hübriidmadrats ühendab vedru õhulisuse ja vahu punkttoe - kui see sulle sobib, otsi asendust samast tüübist, mitte odavamast vahtmadratsist.')
   } else if (profile.currentMattress === 'unknown') {
     tips.push('Ei tea, mis madrats sul on? Vajuta keskele: vedrud annavad vetruva vastupanu, vaht vajub aeglaselt ja ühtlaselt.')
   }
   const mattressAgeTip = ageTip(profile, 'mattress')
   if (mattressAgeTip) tips.push(mattressAgeTip)
-  if (goodShape) tips.push('Madrats on korras — kui mõtled vahetusele, tee seda siis, kui hakkad tundma esimesi ebamugavusi, mitte enne.')
+  if (goodShape) tips.push('Madrats on korras - kui mõtled vahetusele, tee seda siis, kui hakkad tundma esimesi ebamugavusi, mitte enne.')
 
-  const finalTips = fillTips(tips, ['Madratsi vahetamise märgid: voodiservad vajuvad, hommikul tuimus või valu, keeruline mugavat asendit leida.', 'Hoia magamistuba jahedana (16–19 °C) — see on üks olulisimaid unekeskkonna tegureid.'])
+  const finalTips = fillTips(tips, ['Madratsi vahetamise märgid: voodiservad vajuvad, hommikul tuimus või valu, keeruline mugavat asendit leida.', 'Hoia magamistuba jahedana (16-19 °C) - see on üks olulisimaid unekeskkonna tegureid.'])
   const improvedScore = Math.min(98, score + calcImprovement(score))
 
   return { currentScore: score, improvedScore, profileSummary: buildProfileSummary(profile, calcType), recommendations: recs, personalTips: finalTips.slice(0, 3), noUrgentNeed: goodShape }

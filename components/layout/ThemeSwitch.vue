@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Slider-style dark mode toggle. The knob position is LOCAL state so the
-// slide animation can finish first — the theme flips only after the 300ms
+// slide animation can finish first - the theme flips only after the 300ms
 // transition ends. Dark = knob LEFT, and the knob itself carries the
 // current-mode glyph (moon when dark), so state reads unambiguously.
 const { isDark, setTheme } = useTheme()

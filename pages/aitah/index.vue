@@ -8,7 +8,7 @@ useHead({
 
 const route = useRoute()
 // On the prerendered static build route.query can still be empty when the
-// component mounts (it fills in just after hydration) — window.location is
+// component mounts (it fills in just after hydration) - window.location is
 // the ground truth, so fall back to it on the client.
 const orderRef = computed(() => {
   const fromRoute = String(route.query.ref ?? '').trim()
@@ -23,7 +23,7 @@ const orderRef = computed(() => {
 const sheetsApiUrl = useRuntimeConfig().public.sheetsApiUrl as string
 
 // Server-verified status only: the page never claims "paid" based on the
-// return redirect alone — the Apps Script checks its own MAC-verified state.
+// return redirect alone - the Apps Script checks its own MAC-verified state.
 type Status = 'loading' | 'paid' | 'pending' | 'failed' | 'unknown'
 const status = ref<Status>('loading')
 
@@ -51,7 +51,7 @@ function eur(n: number): string {
 
 // The cart survives the payment redirect (so a cancel loses nothing) and is
 // emptied only once the payment is confirmed by the server. The checkout
-// note is also cleared then — it belonged to this order; contact details
+// note is also cleared then - it belonged to this order; contact details
 // stay for the next purchase.
 const { clear } = useCart()
 watch(status, (s) => {
@@ -78,7 +78,7 @@ watchEffect(() => {
 
 async function fetchStatus() {
   // No ref yet: the static-host redirect + hydration can briefly leave the
-  // URL without its query string — stay in 'loading' and let the poll retry.
+  // URL without its query string - stay in 'loading' and let the poll retry.
   if (!orderRef.value) return
   try {
     const res = await fetch(`${sheetsApiUrl}?action=order_status&ref=${encodeURIComponent(orderRef.value)}`)
@@ -89,7 +89,7 @@ async function fetchStatus() {
     else if (s === 'CANCELLED' || s === 'EXPIRED' || s === 'FAILED') status.value = 'failed'
     else status.value = 'unknown'
     if (data.orderNumber) orderNumber.value = Number(data.orderNumber)
-    // Older script versions return only {status} — the summary is optional.
+    // Older script versions return only {status} - the summary is optional.
     if (Array.isArray(data.items) && data.items.length) {
       order.value = {
         items: data.items,

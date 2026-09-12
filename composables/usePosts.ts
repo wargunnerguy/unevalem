@@ -33,7 +33,7 @@ export function useFeaturedPosts(limit = 5) {
   const { lastQuiz } = useQuizHistory()
 
   // A fresh seed per page load so equally-ranked posts visibly reshuffle each
-  // visit — the "feels alive" effect. Generated in onMounted (not at setup) so
+  // visit - the "feels alive" effect. Generated in onMounted (not at setup) so
   // it's genuinely random on the client and never differs from SSR mid-render.
   const seed = ref(dayOfYear())
   onMounted(() => { seed.value = dayOfYear() + Math.floor(Math.random() * 1000) })

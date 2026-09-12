@@ -7,7 +7,7 @@ import { gaTransport } from '~/utils/ga'
  *
  * The caller supplies `stepKeys` because the questions now come from the sheet
  * (useCalculators). Adding or removing a question in the sheet therefore also
- * adds or removes its response column, with no code change here — and removes
+ * adds or removes its response column, with no code change here - and removes
  * the risk of this list drifting from the one the UI rendered.
  */
 function answersForCalc(answers: Partial<UserProfile>, stepKeys: readonly string[]): Record<string, string> {
@@ -64,11 +64,11 @@ export function useAnalytics() {
       sessionId:     sessionId.value,
       env,
       // Which pain page (if any) sent this visitor into the calculator with
-      // answers pre-filled — lets prefilled sessions be excluded when reading
+      // answers pre-filled - lets prefilled sessions be excluded when reading
       // the raw answer distribution.
       prefilledFrom,
       // Only the answers THIS calculator asks for. Sending all eighteen every
-      // time gave each *_responses tab ten permanently empty columns —
+      // time gave each *_responses tab ten permanently empty columns -
       // handleCalcSubmit creates a column for any key it sees, so an always-''
       // field is an always-blank column. Deleting them in the sheet without
       // this change would only bring them back on the next submission.
@@ -77,7 +77,7 @@ export function useAnalytics() {
       currentScore:  result.currentScore,
       improvedScore: result.improvedScore,
       completedAt:   new Date().toISOString(),
-      // Campaign attribution. The sheet — not the ad pixel — is the reliable
+      // Campaign attribution. The sheet - not the ad pixel - is the reliable
       // source here: with ad consent opt-in, a large share of EU visitors
       // decline and pixel coverage is permanently partial. Don't expect these
       // counts to reconcile with Meta's.
@@ -108,7 +108,7 @@ export function useAnalytics() {
   // Fire-and-forget post-view ping so the Apps Script can tally which articles
   // draw the most interest (used to rank posts on the homepage). Deduped per
   // browser session per slug so refreshes don't inflate the count. No cookies,
-  // no PII — just an anonymous increment, same channel as submitCalcResult.
+  // no PII - just an anonymous increment, same channel as submitCalcResult.
   function trackPostView(slug: string) {
     if (!import.meta.client || !slug) return
     const url = config.public.sheetsApiUrl as string
@@ -119,7 +119,7 @@ export function useAnalytics() {
       if (sessionStorage.getItem(key)) return
       sessionStorage.setItem(key, '1')
     } catch {
-      // sessionStorage unavailable (private mode edge cases) — still send once
+      // sessionStorage unavailable (private mode edge cases) - still send once
     }
 
     // No attribution fields here on purpose: post_stats is an aggregate

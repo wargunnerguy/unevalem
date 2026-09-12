@@ -8,7 +8,7 @@ import { CALC_TYPES } from '~/utils/calc-schema'
  * Everything downstream keys off `answerKey`: the funnel's prefill, the skip
  * logic, the response-sheet columns and the recommendation engine. Those values
  * are validated during the build (see fetch-content.ts), so by the time the
- * browser sees this data it is already known-good — there is no runtime
+ * browser sees this data it is already known-good - there is no runtime
  * validation here on purpose, because there is nothing useful a page could do
  * about a bad calculator except render it wrong.
  */

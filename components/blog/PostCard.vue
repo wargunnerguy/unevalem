@@ -51,7 +51,7 @@ function toggle() {
     <!-- Excerpt (always visible) -->
     <p class="text-sm text-midnight leading-relaxed">{{ post.excerpt }}</p>
 
-    <!-- Expand toggle — pill button so the action is easy to spot -->
+    <!-- Expand toggle - pill button so the action is easy to spot -->
     <button
       v-if="!expanded"
       type="button"

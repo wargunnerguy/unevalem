@@ -5,7 +5,7 @@ import { painPage, common, blogPage } from '~/utils/copy'
 definePageMeta({
   // Keyed on the slug only. A fullPath key would change with every utm_*
   // query, discarding the prerendered payload and forcing a fetch to
-  // /api/pains — which does not exist on a static host. Since every ad click
+  // /api/pains - which does not exist on a static host. Since every ad click
   // arrives with a query string, that would have broken 100% of paid traffic.
   key: route => route.params.slug as string,
 })
@@ -34,7 +34,7 @@ const relatedPosts = computed(() => {
 })
 
 // Only redirect when the list actually loaded and this slug is not in it (a
-// deactivated campaign row). An empty list means the fetch failed — bouncing
+// deactivated campaign row). An empty list means the fetch failed - bouncing
 // paid traffic in that case throws away the click that was paid for.
 watchEffect(() => {
   if (!pending.value && pains.value.length > 0 && !pain.value) navigateTo('/')

@@ -10,7 +10,7 @@ const COOKIE_NAME = 'uva-attr'
 const SESSION_KEY = 'uva-attr-last'
 
 // Sheet cells choke on very long values and a click id is never legitimately
-// this long — cap rather than truncate silently at the backend.
+// this long - cap rather than truncate silently at the backend.
 const MAX_VALUE_LEN = 200
 
 function readParams(search: string): Attribution {
@@ -31,7 +31,7 @@ function hasAny(attr: Attribution): boolean {
 }
 
 export function useAttribution() {
-  // 90 days: longer than a typical consideration window for a €20–60 purchase,
+  // 90 days: longer than a typical consideration window for a €20-60 purchase,
   // short enough that a stale campaign doesn't get credit a season later.
   const firstTouch = useCookie<Attribution | null>(COOKIE_NAME, {
     maxAge: 60 * 60 * 24 * 90,
@@ -57,7 +57,7 @@ export function useAttribution() {
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(attr))
     } catch {
-      // sessionStorage unavailable (private mode) — first-touch cookie still set
+      // sessionStorage unavailable (private mode) - first-touch cookie still set
     }
   }
 

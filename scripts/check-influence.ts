@@ -1,14 +1,14 @@
 /**
  * Two checks over the calculator, both run from `npx tsx scripts/check-influence.ts`.
  *
- * 1. INFLUENCE — the rule from CLAUDE.md: every calculator step must visibly
+ * 1. INFLUENCE - the rule from CLAUDE.md: every calculator step must visibly
  *    influence the result. For each question it holds every other answer fixed,
  *    walks that question's options, and counts how many distinct results come
  *    out, where "result" is the score, the profile summary, the tip list and
  *    the recommended product id together. A question that yields 1 distinct
- *    result for N options is dead — the visitor answered it and nothing moved.
+ *    result for N options is dead - the visitor answered it and nothing moved.
  *
- * 2. DEAD SHEET COLUMNS — which columns in each `<calcType>_responses` tab can
+ * 2. DEAD SHEET COLUMNS - which columns in each `<calcType>_responses` tab can
  *    never receive a value, because that calculator does not ask the question.
  *    This is the list `deleteEmptyCalcColumns()` in apps-script.gs will remove.
  *
@@ -27,7 +27,7 @@ const products = JSON.parse(readFileSync('public/data/products.json', 'utf8'))
 const CONFIGS: CalcConfig[] = JSON.parse(readFileSync('public/data/calculators.json', 'utf8'))
 const configOf = (t: string): CalcConfig => {
   const c = CONFIGS.find(x => x.id === t)
-  if (!c) throw new Error(`calculators.json has no "${t}" — run npm run fetch-content first`)
+  if (!c) throw new Error(`calculators.json has no "${t}" - run npm run fetch-content first`)
   return c
 }
 
@@ -72,7 +72,7 @@ for (const calcType of CALC_TYPES) {
 const ALL_ANSWER_KEYS = [...new Set(CALC_TYPES.flatMap(t => configOf(t).questions.map(q => q.answerKey)))]
 
 console.log('\n\nDEAD COLUMNS PER RESPONSE TAB')
-console.log('  (delete these in the sheet — only after the new client code is live)')
+console.log('  (delete these in the sheet - only after the new client code is live)')
 for (const calcType of CALC_TYPES) {
   const asked = configOf(calcType).questions.map(q => q.answerKey) as readonly string[]
   const never = ALL_ANSWER_KEYS.filter(k => !asked.includes(k)).sort()

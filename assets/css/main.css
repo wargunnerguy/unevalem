@@ -14,7 +14,7 @@
    themes diverge the same Tailwind colour means different things per section:
    in light mode the hero band is page-toned with dark text while the value
    band below it stays deep teal with light text. No single `text-foam`
-   override can express both — the text colour has to travel with its surface.
+   override can express both - the text colour has to travel with its surface.
 
    Dark stays the default (nuxt.config stamps class="dark" on <html>, and an
    inline script strips it before first paint when the stored choice is light),
@@ -24,7 +24,7 @@
      the deep panel with light text.
 
      The colour is --color-lavender itself, not a tint of it. The palette is a
-     four-step ramp — midnight → dusk → lavender → moonlight — and an invented
+     four-step ramp - midnight → dusk → lavender → moonlight - and an invented
      in-between (the #7FBCC8 this replaced) reads as a foreign light blue no
      matter how well it measures, because it belongs to no step. Cohesion here
      comes from landing ON the ramp.
@@ -34,7 +34,7 @@
      Hence the per-theme pairs rather than a single tinted set. */
   --header-bg:    var(--color-lavender);
   --header-ink:   var(--color-midnight);
-  /* Same ink as the title — at 5.25:1 there is no room for a dimmer second
+  /* Same ink as the title - at 5.25:1 there is no room for a dimmer second
      tone, so nav hierarchy is carried by the gold active pill and hover tint
      rather than by colour. */
   --header-muted: var(--color-midnight);
@@ -48,7 +48,7 @@
   --hero-ink: var(--color-midnight);
   --hero-sub: var(--color-muted);
 
-  /* Value-claims band — the same ramp step as the bar, so the two tinted
+  /* Value-claims band - the same ramp step as the bar, so the two tinted
      surfaces on a light page read as one material rather than two guesses.
      The heading loses its gold here and cannot get it back: gold is itself a
      light colour and lands near 2:1 on this ground. Gold stays a fill (the tip
@@ -64,7 +64,7 @@
 .value-band-ink { color: var(--band-ink); }
 .value-band-sub { color: var(--band-sub); }
 
-/* Daily sleep tip — deliberately the one gold surface on the page, in both
+/* Daily sleep tip - deliberately the one gold surface on the page, in both
    themes. Gold carries dark ink at 10.35:1 on any ground, so this needs no
    per-theme token; it is an accent block, not a themed surface. */
 .tip-card {
@@ -95,7 +95,7 @@
   --tw-ring-color: var(--header-ring);
 }
 
-/* Gold is gold in both themes, so the ink is pinned rather than tokenised —
+/* Gold is gold in both themes, so the ink is pinned rather than tokenised -
    `text-midnight` would flip to a pale colour under html.dark and leave this
    pill unreadable. */
 .app-header-active {
@@ -123,7 +123,7 @@ html.dark {
   --hero-ink: #f0f9fb;
   --hero-sub: #5ba3b0;
 
-  /* Dark already reads as layered, so the band stays the original dusk — and
+  /* Dark already reads as layered, so the band stays the original dusk - and
      on that ground the heading gets its gold back. */
   --band-bg:  var(--color-dusk);
   --band-ink: var(--color-gold);
@@ -252,7 +252,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Eased theme change: this class is stamped on <html> by useTheme.setTheme()
-   for the duration of the switch only — a permanent global transition would
+   for the duration of the switch only - a permanent global transition would
    make normal hover/focus color changes feel laggy. */
 html.theme-transition,
 html.theme-transition *,
@@ -279,8 +279,8 @@ html.theme-transition *::after {
    fogDeep 18%, mid 25%, fogFront 38%, near 45% of scroll). Natural depth:
    far icons blurriest + faintest, near icons crisp + strongest. Fog blobs
    are unclipped (soft on every side) and sized so blob + blur spread fits
-   fully inside the tile — the repeat can never slice a cloud.
-   iOS ignores fixed attachment and simply scrolls the texture — fine.
+   fully inside the tile - the repeat can never slice a cloud.
+   iOS ignores fixed attachment and simply scrolls the texture - fine.
 
    Both axes are driven from JS: --sleep-y* is scroll parallax, --sleep-x* is
    the idle wander + scroll sway. The x fallbacks below are the layers' resting

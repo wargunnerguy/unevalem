@@ -73,7 +73,7 @@ async function submit() {
         // The whole visible context, stored verbatim with a version: this is
         // the record of what the subscriber actually saw when they pressed
         // Telli. Keep it in sync with the template if that copy changes.
-        consentText: `${props.heading || lead.headingGeneric} — ${lead.promise} [v${lead.consentVersion}]`,
+        consentText: `${props.heading || lead.headingGeneric} - ${lead.promise} [v${lead.consentVersion}]`,
         sessionId: sessionId.value,
         env: isProdSite(config.public.siteUrl as string) ? 'prod' : 'test',
         ...attrPayload(),

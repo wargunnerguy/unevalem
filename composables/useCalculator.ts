@@ -10,13 +10,13 @@ export function useCalculator() {
   const analyzing = useState<boolean>('calc-analyzing', () => false)
 
   /**
-   * Steps whose answer arrived pre-filled — from an earlier calculator in the
+   * Steps whose answer arrived pre-filled - from an earlier calculator in the
    * same session, or from a campaign page. They are held in `answers` but never
    * shown: re-asking someone their sleeping position because they moved from
    * the pillow flow to the mattress flow reads as the site not remembering.
    *
    * Snapshotted at reset() rather than derived from `answers`, which grows as
-   * the visitor answers — without the snapshot every answered step would
+   * the visitor answers - without the snapshot every answered step would
    * immediately become skippable and the flow would jump to the end.
    */
   const prefilledKeys = useState<string[]>('calc-prefilled', () => [])
@@ -104,7 +104,7 @@ export function useCalculator() {
   }
 
   /**
-   * `stepKeys` is what makes skipping possible — without it (or with no
+   * `stepKeys` is what makes skipping possible - without it (or with no
    * prefill) this behaves exactly as before and starts at step 1.
    */
   function reset(prefill?: Partial<UserProfile>, stepKeys?: readonly string[]) {

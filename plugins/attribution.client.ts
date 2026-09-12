@@ -5,7 +5,7 @@
 // No consent gate: this writes a first-party cookie holding the campaign the
 // visitor arrived from, which is the site's own record of its own traffic, not
 // a third-party identifier. It sets nothing until an ad tag is actually present
-// in the URL — a direct visitor gets no cookie at all.
+// in the URL - a direct visitor gets no cookie at all.
 export default defineNuxtPlugin(() => {
   const { capture } = useAttribution()
 

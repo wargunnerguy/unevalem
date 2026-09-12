@@ -6,7 +6,7 @@ export interface ConsentState {
 // v2. The old `uva-consent` cookie held a single 'granted' | 'denied' string
 // covering analytics only, on the premise that the site would never run ads.
 // That premise no longer holds, and a stored 'granted' must NOT be read as
-// permission to run advertising storage — hence a new cookie name rather than
+// permission to run advertising storage - hence a new cookie name rather than
 // a migration. Visitors holding the old cookie are asked once more.
 const COOKIE = 'uva-consent-v2'
 
@@ -39,7 +39,7 @@ export function useConsent() {
     decided,
     analyticsGranted,
     adsGranted,
-    // Reject must be exactly as easy as accept — one click, same prominence.
+    // Reject must be exactly as easy as accept - one click, same prominence.
     acceptAll:      () => push({ analytics: true,  ads: true }),
     necessaryOnly:  () => push({ analytics: false, ads: false }),
     // "Seaded": analytics on, advertising off. The middle option people

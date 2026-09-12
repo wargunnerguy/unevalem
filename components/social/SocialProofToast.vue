@@ -5,7 +5,7 @@ const { current, visible, showNext, hide } = useNotifications()
 const { step } = useCalculator()
 const { width } = useWindowSize()
 
-// On mobile, suppress while the calculator is mid-flow (steps 1–10)
+// On mobile, suppress while the calculator is mid-flow (steps 1-10)
 const suppressed = computed(
   () => width.value > 0 && width.value < 640 && step.value >= 1 && step.value <= 5,
 )
@@ -19,7 +19,7 @@ const icon = computed(() =>
 // Social proof should always feel live, so we don't show the real (possibly
 // stale) baked-in timestamp. Instead each toast gets a fresh recent time,
 // heavily weighted toward "just now" and capped at ~2 hours, so visitors feel
-// purchases & calculations are happening right now — never "11 tundi tagasi".
+// purchases & calculations are happening right now - never "11 tundi tagasi".
 const MAX_AGO_MINUTES = 120
 
 function randomRecentLabel(): string {
@@ -40,8 +40,8 @@ let hideTimer: ReturnType<typeof setTimeout> | null = null
 
 function schedule(firstShow = false) {
   const delay = firstShow
-    ? 4_000 + Math.random() * 2_000    // 4–6 s initial delay
-    : 15_000 + Math.random() * 10_000  // 15–25 s between shows
+    ? 4_000 + Math.random() * 2_000    // 4-6 s initial delay
+    : 15_000 + Math.random() * 10_000  // 15-25 s between shows
   showTimer = setTimeout(() => {
     if (showNext()) {
       relativeLabel.value = randomRecentLabel()
@@ -50,7 +50,7 @@ function schedule(firstShow = false) {
         schedule()
       }, 6_000)
     } else {
-      // No active notifications yet (sheet not populated) — retry later
+      // No active notifications yet (sheet not populated) - retry later
       schedule()
     }
   }, delay)

@@ -2,10 +2,10 @@
 // over the Measurement Protocol when the browser could not send it itself.
 //
 // Why this exists: tracker blockers do not fail loudly. uBlock Origin, AdGuard
-// and Brave Shields do not block googletagmanager.com — they answer it with a
+// and Brave Shields do not block googletagmanager.com - they answer it with a
 // neutered 200 stub that defines a no-op `gtag`. So `typeof window.gtag` stays
 // "function", every client-side event silently evaporates, and nothing in the
-// page can tell. 15–30% of visitors are affected, and that share is higher for
+// page can tell. 15-30% of visitors are affected, and that share is higher for
 // paid traffic than for organic.
 //
 // `window.google_tag_manager` is the honest signal: only the real library ever
@@ -20,7 +20,7 @@ const GTAG_GRACE_MS = 3000
  * that is only a second old may legitimately not have it yet. Claiming
  * "blocked" then would make the server re-send an event the browser is about
  * to send too, double-counting it. Before the grace period we say "not
- * blocked" and accept losing the rare conversion completed within 3 seconds —
+ * blocked" and accept losing the rare conversion completed within 3 seconds -
  * an undercount is recoverable, a double count silently corrupts the funnel.
  */
 export function isGaBlocked(): boolean {
@@ -37,7 +37,7 @@ function readCookie(name: string): string {
 }
 
 export interface GaTransport {
-  /** True when the real gtag.js never ran — the server should re-send. */
+  /** True when the real gtag.js never ran - the server should re-send. */
   gaBlocked: boolean
   /** GA4 client id, so a server event joins the visitor's existing session. */
   gaClientId: string
@@ -49,7 +49,7 @@ export interface GaTransport {
  * Reads GA4's own identifiers out of its cookies so a server-sent event can be
  * attributed to the same user and session as the browser's events.
  *
- * When GA is blocked both come back empty — the cookies were never written.
+ * When GA is blocked both come back empty - the cookies were never written.
  * That is expected: the server falls back to the `uva-sid` session cookie as
  * client_id, which recovers the conversion but cannot stitch it to a web
  * session. A counted conversion under a synthetic user beats a lost one.
@@ -63,7 +63,7 @@ export function gaTransport(measurementId?: string): GaTransport {
   const ga = readCookie('_ga')
   const gaClientId = ga ? ga.split('.').slice(2).join('.') : ''
 
-  // _ga_<streamId> = "GS1.1.<sessionId>.<hitCount>..." — stream id is the
+  // _ga_<streamId> = "GS1.1.<sessionId>.<hitCount>..." - stream id is the
   // measurement id without its "G-" prefix.
   const streamId = (measurementId ?? '').replace(/^G-/, '')
   const streamCookie = streamId ? readCookie('_ga_' + streamId) : ''
