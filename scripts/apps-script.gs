@@ -959,9 +959,18 @@ function importSources() {
  */
 function importCalculators() {
   var ss = SpreadsheetApp.getActiveSpreadsheet()
-  if (ss.getSheetByName('calculators') || ss.getSheetByName('calc_questions')) {
-    Logger.log('ABORTED: calculators/calc_questions already exist. Delete them by hand ' +
-      'first if you really mean to reseed - this would overwrite your edits.')
+  // Refuse only when a tab already holds DATA. A hand-created empty tab, or one
+  // with just a header row, is the normal state when someone has started this
+  // migration by hand - reuse it rather than making them delete it. getLastRow()
+  // is 0 for a truly empty sheet and 1 for header-only.
+  var meta = ss.getSheetByName('calculators')
+  var qs   = ss.getSheetByName('calc_questions')
+  var blocking = []
+  if (meta && meta.getLastRow() > 1) blocking.push('calculators')
+  if (qs   && qs.getLastRow()   > 1) blocking.push('calc_questions')
+  if (blocking.length) {
+    Logger.log('ABORTED: ' + blocking.join(' and ') + ' already contain data. Clear or ' +
+      'delete by hand first if you really mean to reseed - this would overwrite your edits.')
     return
   }
 
@@ -988,11 +997,13 @@ function importCalculators() {
     return
   }
 
-  var meta = ss.insertSheet('calculators')
+  if (!meta) meta = ss.insertSheet('calculators')
+  meta.clear()
   meta.appendRow(['id', 'icon', 'title', 'description', 'active'])
   meta.getRange(2, 1, metaRows.length, 5).setValues(metaRows)
 
-  var qs = ss.insertSheet('calc_questions')
+  if (!qs) qs = ss.insertSheet('calc_questions')
+  qs.clear()
   qs.appendRow(['calcId', 'order', 'answerKey', 'question', 'options'])
   qs.getRange(2, 1, questionRows.length, 5).setValues(questionRows)
   qs.setFrozenRows(1)
